@@ -84,6 +84,7 @@ function buildAppTargets(query, webUrl, opts){
 }
 
 function tryOpenSchemes(schemes, webUrl){
+  var device = getDeviceInfo();
   var index = 0;
   var opened = false;
   function attempt(){
@@ -93,11 +94,31 @@ function tryOpenSchemes(schemes, webUrl){
     }
     var scheme = schemes[index++];
     var timer = null;
-    function cleanup(){ if (timer) clearTimeout(timer); document.removeEventListener('visibilitychange', onVis); }
+    var iframe = null;
+    function cleanup(){
+      if (timer) clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVis);
+      try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch(e) {}
+      iframe = null;
+    }
     function onVis(){ if (document.hidden) { opened = true; cleanup(); } }
     document.addEventListener('visibilitychange', onVis);
-    try { window.location.href = scheme; } catch(e) { /* ignore */ }
-    timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
+
+    if (device.isIOS) {
+      // iOS: use hidden iframe to trigger app scheme (works more reliably in some iOS browsers)
+      try {
+        iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = scheme;
+        document.body.appendChild(iframe);
+      } catch(e) {
+        try { window.location.href = scheme; } catch(_e) {}
+      }
+      timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
+    } else {
+      try { window.location.href = scheme; } catch(e) { /* ignore */ }
+      timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
+    }
   }
   attempt();
 }
@@ -1088,6 +1109,24 @@ document.addEventListener('DOMContentLoaded', function(){
   setOpenMode(saved, { skipSave: true });
   radios.forEach(function(r){
     r.addEventListener('change', function(){ if (r.checked) setOpenMode(r.value); });
+  });
+});
+
+// Diagnostic buttons for device testing (UA, deviceInfo, scheme tests)
+document.addEventListener('DOMContentLoaded', function(){
+  function out(s){ var el = document.getElementById('diag_output'); if (el) el.textContent = String(s); else console.log(s); }
+  var uaBtn = document.getElementById('diag_ua'); if (uaBtn) uaBtn.addEventListener('click', function(){ out(navigator.userAgent || ''); });
+  var devBtn = document.getElementById('diag_devinfo'); if (devBtn) devBtn.addEventListener('click', function(){ out(JSON.stringify(getDeviceInfo(), null, 2)); });
+  var testX = document.getElementById('diag_test_x'); if (testX) testX.addEventListener('click', function(){
+    out('試行: x:// and twitter:// (fallback suppressed)');
+    tryOpenSchemes(['x://search?query=test','twitter://search?query=test'], null);
+  });
+  var testTwitter = document.getElementById('diag_test_twitter'); if (testTwitter) testTwitter.addEventListener('click', function(){
+    out('試行: twitter://');
+    tryOpenSchemes(['twitter://search?query=test'], null);
+  });
+  var testHttps = document.getElementById('diag_test_https'); if (testHttps) testHttps.addEventListener('click', function(){
+    var url = 'https://x.com/search?q=test'; out('開く: ' + url); openInBrowser(url);
   });
 });
 

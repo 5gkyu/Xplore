@@ -586,6 +586,18 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
       </div>
 
+      <!-- Diagnostic panel for device testing -->
+      <div id="diagnostic" style="margin-top:14px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="small" id="diag_ua">Show UA</button>
+          <button class="small" id="diag_devinfo">Show deviceInfo</button>
+          <button class="small" id="diag_test_x">Test x://</button>
+          <button class="small" id="diag_test_twitter">Test twitter://</button>
+          <button class="small" id="diag_test_https">Test https://</button>
+        </div>
+        <pre id="diag_output" style="margin-top:8px;background:var(--collapse-content-bg);padding:8px;border-radius:8px;border:1px solid var(--input-border);white-space:pre-wrap;">診断出力がここに表示されます</pre>
+      </div>
+
       <!-- fixed bottom bar removed; preset/history buttons moved into main card -->
 
       <!-- プリセットモーダル -->

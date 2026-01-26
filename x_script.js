@@ -121,11 +121,6 @@ function openAppOrFallback(query, webUrl){
 
 function openAppOnly(query, webUrl){
   var device = getDeviceInfo();
-  if (device.isAndroid && device.isChrome) {
-    // Chrome の intent は OS 側の確認ダイアログが出るため、JS confirm は出さない
-  } else {
-    if (!confirm('xを開きますか？')) return;
-  }
   if (!device.isMobile) return;
   var targets = buildAppTargets(query, webUrl, { includeFallback: false });
   if (device.isAndroid && device.isChrome && targets.intentUrl) {

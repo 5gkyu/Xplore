@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ja" class="theme-kohane">
 <head>
@@ -530,7 +531,7 @@ textarea{min-height:88px;resize:vertical}
 
 /* 小さな画面ではカードの max-height 制限を解除して縦スクロールを許可 */
 @media(max-width:420px){
-  html,body{ overflow-y:hidden !important; }
+  html,body{ overflow-y:auto; }
   .card{ max-height:none !important; overflow:visible !important; }
   .wrap{ padding-top:28px; padding-bottom:220px; }
 }

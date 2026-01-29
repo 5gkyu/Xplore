@@ -842,11 +842,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Note: delegated fallback removed to avoid duplicate confirmations.
 
-// モバイルでも常時スクロール可能にする（以前はタッチスクロールを無効にしていましたが、要望により常時有効化）
+// モバイルでのスクロールを全体的に禁止する（タッチスクロール防止）
 (function(){
   function enableMobileNoScroll(){
-    // no-op: keep scrolling enabled on all devices
-    return;
+    try{
+      var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints>0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints>0);
+      if(!isTouch) return;
+      document.documentElement.classList.add('no-scroll-mobile');
+      document.body.classList.add('no-scroll-mobile');
+      // NOTE: touchmove の preventDefault はピンチズームの復帰を阻害するため無効化
+    }catch(e){ console.warn('enableMobileNoScroll failed', e); }
   }
   if(document.readyState === 'complete' || document.readyState === 'interactive') enableMobileNoScroll(); else document.addEventListener('DOMContentLoaded', enableMobileNoScroll);
 })();

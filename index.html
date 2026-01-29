@@ -58,7 +58,7 @@ html,body{
 html.no-scroll-mobile, body.no-scroll-mobile, .no-scroll-mobile{
   overflow: hidden !important;
   height: 100% !important;
-  touch-action: auto !important;
+  touch-action: none !important;
   -webkit-overflow-scrolling: auto !important;
   overscroll-behavior: none !important;
 }
@@ -459,7 +459,7 @@ textarea{min-height:88px;resize:vertical}
   .collapsible-header{padding:6px; gap:8px;}
   .collapsible-header .title{font-size:13px}
 }
-.fixed-top-bar{ position:static; /* previously fixed; now participates in normal flow */ display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 8px; box-sizing:border-box; margin-bottom:8px; }
+.fixed-top-bar{ position:static; /* previously fixed; now participates in normal flow */ display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 0; box-sizing:border-box; margin-bottom:8px; }
 .query-display{ flex:1 1 70%; padding:6px 8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:11px; overflow:auto; white-space:nowrap; color:var(--text); min-width:0; }
 .top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--miku-headset-red-1),var(--miku-headset-red-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; }
 .top-reset-btn{ z-index:1701; pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; }

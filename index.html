@@ -533,7 +533,7 @@ textarea{min-height:88px;resize:vertical}
 @media(max-width:420px){
   html,body{ overflow-y:auto; }
   .card{ max-height:none !important; overflow:visible !important; }
-  .wrap{ padding-top:28px; padding-bottom:220px; }
+  .wrap{ padding-top:28px; padding-bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + 12px); }
 }
 
 /* Footer (参考: linklocal.html) */

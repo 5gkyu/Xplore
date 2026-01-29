@@ -1,9 +1,39 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" class="theme-kohane">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>X検索補助ツール</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  
+  <!-- OGP / Open Graph Protocol -->
+  <meta property="og:title" content="X検索補助ツール" />
+  <meta property="og:description" content="Xの検索を効率化するための補助ツール。期間指定、エンゲージメント、アカウント指定など高度な検索を簡単に実行できます。" />
+  <meta property="og:image" content="opp.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://your-domain.com/" />
+  <meta property="og:site_name" content="X検索補助ツール" />
+  <meta property="og:locale" content="ja_JP" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="X検索補助ツール" />
+  <meta name="twitter:description" content="Xの検索を効率化するための補助ツール。期間指定、エンゲージメント、アカウント指定など高度な検索を簡単に実行できます。" />
+  <meta name="twitter:image" content="opp.png" />
+  <meta name="twitter:site" content="@5gkyu" />
+  <meta name="twitter:creator" content="@5gkyu" />
+  
+  <!-- General Meta Tags -->
+  <meta name="description" content="Xの検索を効率化するための補助ツール。期間指定、エンゲージメント、アカウント指定など高度な検索を簡単に実行できます。" />
+  <meta name="keywords" content="X,Twitter,検索,ツール,検索補助,高度な検索,期間指定,エンゲージメント" />
+  <meta name="author" content="5gkyu" />
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="opp.png" />
+  
   <style>
 :root{ --bg:#f6fbfb; --card:#ffffff; --card-rgb:255,255,255; --accent-1:#0fb8bf; --accent-2:#8fe3dd; --text:#073a46; --muted:#57727a; --input-bg:#ffffff; --input-border:rgba(6,50,58,0.08); --shadow:0 10px 30px rgba(2,18,22,0.06); --radius:12px; --collapse-header-bg:#f3f3f3; --collapse-content-bg:#fafafa; --collapse-border:rgba(6,50,58,0.06); --miku-headset-red-1:#ff2d55; --miku-headset-red-2:#ff6b7a; --bottom-bar-height:64px; --footer-height:56px; }
 /* ダークモード（削除されました） */
@@ -14,7 +44,7 @@ html,body{
   margin:0;
   font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
   color:var(--text);
-  background:var(--bg) url('image/bg.png') no-repeat center center fixed;
+  background:var(--bg) url('bg.png') no-repeat center center fixed;
   background-size:cover;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
@@ -236,7 +266,7 @@ textarea{min-height:88px;resize:vertical}
 .menu-actions .secondary .label{ font-size:14px; font-weight:700; color:var(--text); text-align:center; }
 .menu-actions .secondary .sublabel{ font-size:11px; color:var(--muted); margin-top:2px; text-align:center; }
 .hint{font-size:12px;color:#6a8690;margin-top:6px}
-.open-mode-row{display:flex;gap:8px;flex-direction:column;align-items:flex-start;margin-top:6px}
+.open-mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .open-mode-option{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:13px;cursor:pointer;user-select:none}
 .open-mode-option input{accent-color:var(--accent-1)}
 .small{font-size:13px;padding:8px 10px;border-radius:8px}
@@ -543,7 +573,7 @@ footer.site-footer a{color:inherit;text-decoration:underline}
 .period-preset-btn.active{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border-color:transparent; box-shadow:0 8px 20px rgba(6,50,58,0.08); }
 
 /* テーマ時の背景オーバーレイ */
-html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8), rgba(255,235,235,0.8)), url('image/bg.png'); background-blend-mode: overlay; background-color: var(--bg); }
+html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8), rgba(255,235,235,0.8)), url('bg.png'); background-blend-mode: overlay; background-color: var(--bg); }
 .tri-toggle{ display:flex; border-radius:10px; overflow:hidden; border:1px solid var(--input-border); background:var(--collapse-content-bg); flex:1 1 auto; max-width:520px; }
 .tri-toggle button{ flex:1 1 0; padding:10px 8px; border:0; background:transparent; cursor:pointer; font-size:13px; font-weight:700; color:var(--muted); transition:all 0.15s; text-align:center; }
 .tri-toggle button:not(:last-child){ border-right:1px solid var(--input-border); }
@@ -584,18 +614,6 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         <div class="query-display" id="top_query_display">（検索クエリがここに表示されます）</div>
         <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット">✕</button>
         <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
-      </div>
-
-      <!-- Diagnostic panel for device testing -->
-      <div id="diagnostic" style="margin-top:14px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="small" id="diag_ua">Show UA</button>
-          <button class="small" id="diag_devinfo">Show deviceInfo</button>
-          <button class="small" id="diag_test_x">Test x://</button>
-          <button class="small" id="diag_test_twitter">Test twitter://</button>
-          <button class="small" id="diag_test_https">Test https://</button>
-        </div>
-        <pre id="diag_output" style="margin-top:8px;background:var(--collapse-content-bg);padding:8px;border-radius:8px;border:1px solid var(--input-border);white-space:pre-wrap;">診断出力がここに表示されます</pre>
       </div>
 
       <!-- fixed bottom bar removed; preset/history buttons moved into main card -->
@@ -698,126 +716,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         </div>
       </div>
 
-      <!-- コマンド図鑑モーダル -->
-      <div class="modal-overlay" id="modal_command_glossary">
-        <div class="modal-panel" style="max-height:90vh;overflow-y:auto">
-          <button class="modal-close-btn" id="close_command_glossary">✕</button>
-          <h3>📖 X検索コマンド図鑑</h3>
-          <div style="margin-top:8px;padding:10px;background:rgba(255,243,205,0.6);border-left:3px solid #f0c040;border-radius:6px;color:var(--text);">
-            <strong>重要:</strong> Xの検索はすべての投稿を検索していません。以下の制限事項を確認推奨。<br>
-            <div style="margin-top:6px;color:var(--muted);font-size:13px;line-height:1.5">
-              ・取得範囲の制限: 無料APIや検索インデックスの仕様により、古い投稿や大量の履歴は取得できない場合があります。検索でヒットしない場合は期間を狭めて再実行してください。<br>
-              ・表示されないアカウント: 非公開アカウント、最近作成されたアカウント、フォロワー数が非常に少ないアカウント、またはプラットフォーム側で表示制限（シャドウバン等）が疑われるアカウントの投稿は検索結果に表示されないことがあります。<br>
-            </div>
-          </div>
-          <div style="margin-top:10px;font-size:13px;color:var(--muted)">
-            すべての検索コマンドの一覧は外部ドキュメントで確認できます: <a href="https://docs.socialdata.tools/resources/twitter-search-operators/" target="_blank" rel="noopener">https://docs.socialdata.tools/resources/twitter-search-operators/</a>
-          </div>
-          <div style="margin-top:8px;font-size:13px;color:var(--muted)">
-            注意: イーロン・マスクが運営方針を変更して以降、一部の検索コマンドやオプションは動作しなくなったり仕様が変更されている場合があります。実際の挙動はサービス側の仕様や提供状況に依存します。
-          </div>
-          <div style="margin-top:12px;font-size:13px;line-height:1.7;color:var(--text)">
-            
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">🔎 基本検索</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">"フレーズ"</code> — 完全一致フレーズ検索（ワードの順序も固定）</p>
-              <p style="margin:6px 0 4px 0;font-size:13px;color:var(--muted)">このサイトの検索欄では自動で""をつけてフレーズ検索にします。
-                <br>比較: フレーズ検索なし / あり
-                
-              </p>
-              <img id="rei_img" src="rei.png" alt="rei" style="display:block;width:100%;max-width:560px;height:auto;margin:8px 0;border-radius:8px;object-fit:cover;cursor:zoom-in" />
-              <div id="rei_overlay" class="modal-overlay" style="display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:3000;padding:16px;">
-                <div style="position:relative;max-width:95vw;max-height:95vh;">
-                  <button class="modal-close-btn" id="close_rei_overlay" style="position:absolute;right:-8px;top:-8px;z-index:4">✕</button>
-                  <img id="rei_overlay_img" src="rei.png" alt="rei large" style="display:block;max-width:100%;max-height:100vh;border-radius:8px;cursor:zoom-out;margin:0 auto;" />
-                </div>
-              </div>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">A OR B</code> — どちらかを含む（OR は大文字必須）</p>
-              <p style="margin:4px 0;padding-left:12px;font-size:12px;color:var(--muted)">例: <code>(猫 OR ねこ OR ネコ)</code>で表示揺れを拾える</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">-除外ワード</code> — 指定のワードを除外</p>
-                            <p style="margin:4px 0;padding-left:12px;font-size:12px;color:var(--muted)">例: <code>-PR -url:amazon.co.jp -jp.mercari.com</code>で邪魔なPR系を除外できる</p>
-              <p style="margin:4px 0;font-size:11px;color:var(--muted)">💡 TIPS: -除外はコマンドにも有効。</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">📅 期間指定</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">since:yyyy-mm-dd</code> — この日以降のポスト</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">until:yyyy-mm-dd</code> — この日より前のポスト（<b>⚠️指定日は含まない</b>）</p>
-              <p style="margin:4px 0;padding:8px;background:rgba(255,100,100,0.08);border-left:3px solid #ff6464;border-radius:4px;font-size:12px">
-                <b>⚠️ untilの注意点:</b><br>
-                <code>until:2025-01-17</code> と指定すると、<b>1月17日は含まれません</b>（1月16日23:59:59まで）。<br>
-                このサイトでは直感的に「終了日を含める」ため、内部的に自動で+1日しています。
-              </p>
-              <p style="margin:4px 0;font-size:11px;color:var(--muted)">💡 TIPS: 検索ワードやアカウント指定がないと検索できない</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">👤 アカウント指定</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">from:ユーザー名</code> — 特定ユーザーの投稿のみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">to:ユーザー名</code> — 特定ユーザーへのリプライのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">@ユーザー名</code> — 特定ユーザーへのリプライと本文中に@ユーザー名を含む投稿のみ</b>）</p>
-              <p style="margin:4px 0;padding:8px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:4px;font-size:12px">
-                <b>📝 to: と @ の違い:</b><br>
-                <code>to:user</code> は「user宛ての返信（リプライ）のみ」を検索。<br>
-                <code>@user</code> は「本文中に@userが書かれている投稿すべて」を検索（引用や通常ツイートでのメンションも含む）。<br>
-                例: 「@user さんありがとう！」という通常ツイートは <code>@user</code> で引っかかるが、<code>to:user</code> では引っかからない。
-              </p>
-              <p style="margin:4px 0;font-size:11px;color:var(--muted)">💡 TIPS: <code>from:A OR from:B</code> で複数アカウント指定可</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">❤️ エンゲージメント</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">min_faves:100</code> — 最小いいね数（100以上）</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">min_retweets:50</code> — 最小リポスト数（50以上）</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">min_replies:10</code> — 最小リプライ数（10以上）</p>
-              <p style="margin:4px 0;font-size:11px;color:var(--muted)">💡 TIPS: 最大値を指定したいときは <code>-min_faves:1000</code> のように-をつけると1000いいね以上の投稿を除外できる</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">📎 タイプ指定（フィルター）</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:links</code> — 「何かしらのリンク要素を含む投稿」を検出</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">url:example.com</code> — 特定ドメインのリンクを含むポスト</p>
-              <p style="margin:4px 0;padding:8px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:4px;font-size:12px;color:var(--text)">
-                <b>link に含まれるもの（要約）</b><br>
-                • 外部URL（https://～ など）<br>
-                • 画像・動画の内部URL（添付メディアのリンク）<br>
-                • 引用ポストの元ポストURL<br>
-                • カード（OGP）プレビューのリンク
-                • 動画プレイヤーの内部リンク
-                • x.com 内部参照リンク（X内の短縮URL等）
-                <div style="margin-top:6px;color:var(--muted);font-size:12px">例: 画像だけ・動画だけの投稿でも <code>filter:links</code> にヒットします。外部URLのみを対象にしたい場合は <code>filter:links -filter:media</code> のように組み合わせてください。</div>
-              </p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:images</code> — 画像を含むポストのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:videos</code> — 動画を含むポストのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:media</code> — 画像、動画を含むポストのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:replies</code> — リプライのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:quote</code> — 引用ポストのみ</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">filter:verified</code> — 青バッジユーザーのみ</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">🌐 言語・その他</h4>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">lang:ja</code> — 日本語のポストのみ（ISO 639-1コード）</p>
-              <p style="margin:4px 0"><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">lang:en</code> — 英語のポストのみ</p>
-              <p style="margin:4px 0;font-size:11px;color:var(--muted)">💡 TIPS: 言語コードは <a href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes" target="_blank" style="color:var(--accent-1)">ISO 639-1</a> 参照</p>
-            </section>
-            <hr style="border:none;border-top:1px solid var(--input-border);margin:16px 0" />
-            <section style="margin-bottom:20px">
-              <h4 style="font-size:15px;font-weight:700;margin:0 0 8px;color:var(--accent-1)">🔬 高度な検索例</h4>
-              <ol style="margin:6px 0 0 12px;color:var(--text);padding-left:6px">
-                <li style="margin-bottom:8px"><b>自分のツイートについた引用リツイートのみを表示</b><br><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">(url:twitter.com/5gkyu/ OR url:x.com/5gkyu/) -from:5gkyu</code><br><small style="color:var(--muted)">説明: 指定URL（5gkyu の投稿）を参照している投稿のうち、投稿者本人の投稿を除外することで引用リツイート（引用RT）やその参照投稿のみを表示します。</small></li>
-                <li style="margin-bottom:8px"><b>曲の反応を調べる</b><br><code style="background:var(--input-bg);padding:2px 6px;border-radius:4px">("待ってて、彼岸で" OR yznvJ2XXP70 OR sm45263197) lang:ja</code><br><small style="color:var(--muted)">説明: 曲の反応を見たいときは曲名だけでなく動画ID（YouTube の短縮ID や niconico の sm ID）も直接クエリに入れると、その動画を参照する投稿（リンクや言及）を探せます。この検索方法なら、リンクだけを貼っていて曲名が文に含まれていない投稿もヒットします。</small></li>
-              </ol>
-              <p style="margin:8px 0 0 0;font-size:12px;color:var(--muted)">補足: 長いクエリや複雑な組合せは検索のタイムアウトやヒット率低下を招くため、必要に応じて条件を分割して実行してください。</p>
-            </section>
 
-            <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:6px;color:var(--muted);font-size:13px;line-height:1.5">
-              <b>使い方メモ:</b> サイト上部に表示される現在の検索クエリ（表示バー）をタップすると、そのクエリが拡大表示され編集できます。長いクエリの微調整や複雑な条件の編集は、表示バーをタップして行ってください。
-            </div>
-
-          </div>
-        </div>
-      </div>
 
       <!-- 2×3 メニューボタングリッド -->
       <!-- 基本検索をメイン画面に常設 -->
@@ -854,11 +753,11 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <span class="label">その他</span>
           <span class="sublabel">言語 / タブ</span>
         </button>
-        <button class="menu-btn" data-modal="modal_command_glossary">
+        <a href="https://note.com/5gkyu" target="_blank" rel="noopener noreferrer" class="menu-btn" style="text-decoration:none;">
           <span class="icon">📖</span>
           <span class="label">コマンド図鑑</span>
           <span class="sublabel">実用的なコマンド一覧 / テクニック</span>
-        </button>
+        </a>
       </div>
 
       <div class="menu-actions" style="margin-top:8px;">
@@ -1133,13 +1032,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <button class="section-modal-close" data-close="modal_other">✕</button>
           <h3>⚙️ その他</h3>
           
-          <div style="margin-top:6px">
-            <label class="muted-small" for="q_theme_select" style="color:var(--text)">🎨 テーマ</label>
-            <select id="q_theme_select" aria-label="テーマ選択" style="width:200px;color:var(--text);background:var(--input-bg);">
-              <option value="light">M</option>
-              <option value="awake">A</option>
-            </select>
-          </div>
+          <!-- テーマ選択は削除されました -->
           
           <div style="margin-top:10px">
             <label class="muted-small" for="q_lang_select" style="color:var(--text)">🌐 言語</label>

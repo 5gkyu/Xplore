@@ -84,7 +84,6 @@ function buildAppTargets(query, webUrl, opts){
 }
 
 function tryOpenSchemes(schemes, webUrl){
-  var device = getDeviceInfo();
   var index = 0;
   var opened = false;
   function attempt(){
@@ -94,31 +93,11 @@ function tryOpenSchemes(schemes, webUrl){
     }
     var scheme = schemes[index++];
     var timer = null;
-    var iframe = null;
-    function cleanup(){
-      if (timer) clearTimeout(timer);
-      document.removeEventListener('visibilitychange', onVis);
-      try { if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch(e) {}
-      iframe = null;
-    }
+    function cleanup(){ if (timer) clearTimeout(timer); document.removeEventListener('visibilitychange', onVis); }
     function onVis(){ if (document.hidden) { opened = true; cleanup(); } }
     document.addEventListener('visibilitychange', onVis);
-
-    if (device.isIOS) {
-      // iOS: use hidden iframe to trigger app scheme (works more reliably in some iOS browsers)
-      try {
-        iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = scheme;
-        document.body.appendChild(iframe);
-      } catch(e) {
-        try { window.location.href = scheme; } catch(_e) {}
-      }
-      timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
-    } else {
-      try { window.location.href = scheme; } catch(e) { /* ignore */ }
-      timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
-    }
+    try { window.location.href = scheme; } catch(e) { /* ignore */ }
+    timer = setTimeout(function(){ cleanup(); if (!opened) attempt(); }, OPEN_APP_TIMEOUT_MS);
   }
   attempt();
 }
@@ -141,6 +120,7 @@ function openAppOrFallback(query, webUrl){
 }
 
 function openAppOnly(query, webUrl){
+  if (!confirm('xを開きますか？')) return;
   var device = getDeviceInfo();
   if (!device.isMobile) return;
   var targets = buildAppTargets(query, webUrl, { includeFallback: false });
@@ -605,10 +585,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // モーダル開閉
-  var btnCommandGlossary = document.getElementById('btn_command_glossary');
-  if (btnCommandGlossary) btnCommandGlossary.addEventListener('click', function() { document.getElementById('modal_command_glossary').classList.add('active'); });
-  var closeCommandGlossary = document.getElementById('close_command_glossary');
-  if (closeCommandGlossary) closeCommandGlossary.addEventListener('click', function() { document.getElementById('modal_command_glossary').classList.remove('active'); });
   var btnHistory = document.getElementById('btn_history');
   if (btnHistory) btnHistory.addEventListener('click', function() { renderHistory(); document.getElementById('modal_history').classList.add('active'); });
   var closeHistory = document.getElementById('close_history');
@@ -1112,30 +1088,11 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-// Diagnostic buttons for device testing (UA, deviceInfo, scheme tests)
-document.addEventListener('DOMContentLoaded', function(){
-  function out(s){ var el = document.getElementById('diag_output'); if (el) el.textContent = String(s); else console.log(s); }
-  var uaBtn = document.getElementById('diag_ua'); if (uaBtn) uaBtn.addEventListener('click', function(){ out(navigator.userAgent || ''); });
-  var devBtn = document.getElementById('diag_devinfo'); if (devBtn) devBtn.addEventListener('click', function(){ out(JSON.stringify(getDeviceInfo(), null, 2)); });
-  var testX = document.getElementById('diag_test_x'); if (testX) testX.addEventListener('click', function(){
-    out('試行: x:// and twitter:// (fallback suppressed)');
-    tryOpenSchemes(['x://search?query=test','twitter://search?query=test'], null);
-  });
-  var testTwitter = document.getElementById('diag_test_twitter'); if (testTwitter) testTwitter.addEventListener('click', function(){
-    out('試行: twitter://');
-    tryOpenSchemes(['twitter://search?query=test'], null);
-  });
-  var testHttps = document.getElementById('diag_test_https'); if (testHttps) testHttps.addEventListener('click', function(){
-    var url = 'https://x.com/search?q=test'; out('開く: ' + url); openInBrowser(url);
-  });
-});
-
 // Reset all inputs to defaults
 function resetAllInputs() {
   // Reset inputs/selects/textareas that start with q_, and tri-toggle hidden checkboxes (only_/exclude_)
   var sel = 'input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]';
   document.querySelectorAll(sel).forEach(function(el){
-    if (el.id === 'q_theme_select') return;
     if (el.type === 'checkbox') el.checked = false;
     else el.value = '';
     try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
@@ -1346,30 +1303,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (typeof updatePreview === 'function') updatePreview();
   });
 
-  // === テーマ切り替え機能 ===
-  var themeSelect = document.getElementById('q_theme_select');
-  if (themeSelect) {
-    // 保存されたテーマを復元（デフォルトを Awake に変更）
-    var savedTheme = localStorage.getItem('x_search_theme') || 'awake';
-    themeSelect.value = savedTheme;
-    applyTheme(savedTheme);
-    
-    themeSelect.addEventListener('change', function() {
-      var theme = themeSelect.value;
-      applyTheme(theme);
-      localStorage.setItem('x_search_theme', theme);
-    });
-  }
-  
-  function applyTheme(theme) {
-    var html = document.documentElement;
-    // 既存のテーマクラスを削除（awake のみを扱う）
-    html.classList.remove('theme-kohane');
-    if (theme === 'awake') {
-      html.classList.add('theme-kohane');
-    }
-    // light はデフォルトなので何もしない
-  }
+  // テーマ選択は削除されました
 
   // rei image lightbox handlers (separate DOMContentLoaded to ensure elements exist)
   document.addEventListener('DOMContentLoaded', function() {

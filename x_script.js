@@ -664,9 +664,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var modalQueryText = document.getElementById('modal_query_text');
   var topQueryDisplay = document.getElementById('top_query_display');
   if (topQueryDisplay && modalQuery && modalQueryText) {
-    function isTouchDevice() {
-      return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints>0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints>0);
-    }
     var modalQueryAnalysis = document.getElementById('modal_query_analysis');
     var saveModalQuery = function(){
       var text = modalQueryText.value || '';
@@ -691,15 +688,10 @@ document.addEventListener('DOMContentLoaded', function() {
         modalQueryText.value = q.trim();
         updateModalQueryAnalysis();
         modalQuery.classList.add('active');
-        // allow modal scrolling / avoid being trapped by global no-scroll on mobile
-        if (isTouchDevice()) {
-          document.documentElement.classList.remove('no-scroll-mobile');
-          document.body.classList.remove('no-scroll-mobile');
-        }
       }
     });
     var closeQuery = document.getElementById('close_query');
-    if (closeQuery) closeQuery.addEventListener('click', function() { saveModalQuery(); modalQuery.classList.remove('active'); if (isTouchDevice()) { document.documentElement.classList.add('no-scroll-mobile'); document.body.classList.add('no-scroll-mobile'); } });
+    if (closeQuery) closeQuery.addEventListener('click', function() { saveModalQuery(); modalQuery.classList.remove('active'); });
     // モーダル内のコピーボタン
     var modalQueryCopy = document.getElementById('modal_query_copy');
     if (modalQueryCopy) {
@@ -722,7 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.target === modalQuery) {
         saveModalQuery();
         modalQuery.classList.remove('active');
-        if (isTouchDevice()) { document.documentElement.classList.add('no-scroll-mobile'); document.body.classList.add('no-scroll-mobile'); }
       }
     });
 
@@ -851,16 +842,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Note: delegated fallback removed to avoid duplicate confirmations.
 
-// モバイルでのスクロールを全体的に禁止する（タッチスクロール防止）
+// モバイルでも常時スクロール可能にする（以前はタッチスクロールを無効にしていましたが、要望により常時有効化）
 (function(){
   function enableMobileNoScroll(){
-    try{
-      var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints>0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints>0);
-      if(!isTouch) return;
-      document.documentElement.classList.add('no-scroll-mobile');
-      document.body.classList.add('no-scroll-mobile');
-      // NOTE: touchmove の preventDefault はピンチズームの復帰を阻害するため無効化
-    }catch(e){ console.warn('enableMobileNoScroll failed', e); }
+    // no-op: keep scrolling enabled on all devices
+    return;
   }
   if(document.readyState === 'complete' || document.readyState === 'interactive') enableMobileNoScroll(); else document.addEventListener('DOMContentLoaded', enableMobileNoScroll);
 })();

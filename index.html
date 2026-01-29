@@ -56,11 +56,12 @@ html,body{
 /* モバイル向けに強制的にスクロールを禁止するクラス
    タッチ移動を無効化し、オーバースクロールを抑制します */
 html.no-scroll-mobile, body.no-scroll-mobile, .no-scroll-mobile{
-  overflow: hidden !important;
-  height: 100% !important;
+  /* 常時スクロール可能にする（以前はモバイルでoverflowを無効にしていました） */
+  overflow: auto !important;
+  height: auto !important;
   touch-action: auto !important;
-  -webkit-overflow-scrolling: auto !important;
-  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: auto !important;
 }
 /* 大きなボタングリッド（2×3） */
 .menu-grid{

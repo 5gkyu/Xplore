@@ -762,22 +762,27 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <span class="label">アカウント</span>
           <span class="sublabel">from / to / @</span>
         </button>
-        <button class="menu-btn" data-modal="modal_other">
-          <span class="icon">⚙️</span>
-          <span class="label">その他</span>
-          <span class="sublabel">言語 / タブ</span>
-        </button>
-        <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" class="menu-btn" style="text-decoration:none;">
-          <span class="icon">📖</span>
-          <span class="label">コマンド説明</span>
-          <span class="sublabel">実用的なコマンド一覧</span>
-        </a>
         <button class="menu-btn" id="btn_preset" data-modal="modal_preset">
           <span class="icon">📁</span>
           <span class="label">プリセット</span>
           <span class="sublabel">保存 / 呼出</span>
         </button>
         <button class="menu-btn" id="btn_history">
+          <span class="icon">🕒</span>
+          <span class="label">検索履歴</span>
+          <span class="sublabel">過去の検索</span>
+        </button>
+        <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" class="menu-btn" style="text-decoration:none;">
+          <span class="icon">📖</span>
+          <span class="label">コマンド説明</span>
+          <span class="sublabel">実用的なコマンド一覧</span>
+        </a>
+        <button class="menu-btn" data-modal="modal_other">
+          <span class="icon">⚙️</span>
+          <span class="label">その他</span>
+          <span class="sublabel">言語 / タブ</span>
+        </button>
+      </div>
           <span class="icon">🕒</span>
           <span class="label">検索履歴</span>
           <span class="sublabel">過去の検索</span>
@@ -941,11 +946,11 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         <div class="section-modal">
           <button class="section-modal-close" data-close="modal_type">✕</button>
           <h3>📎 タイプ指定</h3>
-          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-            <button id="btn_type_reset" type="button" class="engagement-reset-btn" title="全てのフィルターを未指定に戻す">全てリセット</button>
-          </div>
           <div class="type-grid">
-            <label class="muted-small" style="margin-bottom:4px"><b>ツイートタイプ</b></label>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <label class="muted-small" style="margin:0"><b>ツイートタイプ</b></label>
+              <button id="btn_type_reset" type="button" class="engagement-reset-btn" title="全てのフィルターを未指定に戻す">全てリセット</button>
+            </div>
             <div class="type-row">
               <span class="type-label">リプライ</span>
               <div class="tri-toggle" data-filter="replies">

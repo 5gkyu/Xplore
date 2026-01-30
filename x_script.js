@@ -1395,4 +1395,18 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
+  // モーダル内の入力フィールドがキーボードで隠れないようにする
+  var modalInputs = document.querySelectorAll('.section-modal input[type="text"], .section-modal textarea');
+  modalInputs.forEach(function(input) {
+    input.addEventListener('focus', function(e) {
+      var modal = input.closest('.section-modal');
+      if (modal) {
+        setTimeout(function() {
+          // 入力フィールドがモーダル内で見えるようにスクロール
+          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    });
+  });
+
 });

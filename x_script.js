@@ -1322,4 +1322,50 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
+  // iOS Safari キーボード表示時のページズレ対策
+  if (window.visualViewport) {
+    var initialHeight = window.visualViewport.height;
+    var lastScrollTop = 0;
+    
+    function handleViewportChange() {
+      var currentHeight = window.visualViewport.height;
+      var offsetTop = window.visualViewport.offsetTop;
+      
+      // キーボードが表示された（ビューポートが縮小された）場合
+      if (currentHeight < initialHeight * 0.85) {
+        // ページのスクロールを元に戻す
+        window.scrollTo(0, 0);
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.bottom = 'auto';
+      } else {
+        // キーボードが非表示になった場合
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.bottom = '';
+        window.scrollTo(0, 0);
+      }
+    }
+    
+    window.visualViewport.addEventListener('resize', handleViewportChange);
+    window.visualViewport.addEventListener('scroll', function() {
+      // ビューポートのスクロールを防ぐ
+      window.scrollTo(0, 0);
+    });
+  }
+
+  // フォーカス時のスクロール防止（iOS Safari用）
+  var inputFields = document.querySelectorAll('input[type="text"], textarea, select');
+  inputFields.forEach(function(field) {
+    field.addEventListener('focus', function(e) {
+      setTimeout(function() {
+        window.scrollTo(0, 0);
+      }, 100);
+    });
+  });
+
 });

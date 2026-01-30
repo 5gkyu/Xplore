@@ -459,10 +459,9 @@ textarea{min-height:88px;resize:vertical}
   .collapsible-header{padding:6px; gap:8px;}
   .collapsible-header .title{font-size:13px}
 }
-.fixed-top-bar{ position:fixed; top:0; left:0; right:0; z-index:1600; display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 8px; box-sizing:border-box; }
+.fixed-top-bar{ position:relative; display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 16px; box-sizing:border-box; width:100%; max-width:532px; margin-bottom:0; border-radius:var(--radius); }
 .query-display{ flex:1 1 70%; padding:6px 8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:11px; overflow:auto; white-space:nowrap; color:var(--text); min-width:0; }
-.top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--miku-headset-red-1),var(--miku-headset-red-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; }
-.top-reset-btn{ z-index:1701; pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; }
+.top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--miku-headset-red-1),var(--miku-headset-red-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; display:inline-flex; align-items:center; justify-content:center; }
 .top-search-btn{ flex:0 0 42px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; font-weight:700; }
 /* copy button moved inside query modal */
 
@@ -526,13 +525,25 @@ textarea{min-height:88px;resize:vertical}
   .period-buttons button{ flex:1 1 0 }
 }
 .date-input{ width:120px; padding:6px 8px; border-radius:8px; text-align:center; font-size:13px; border:1px solid var(--input-border); background:var(--input-bg); }
-.wrap{ padding-top:40px; padding-bottom:16px; display:flex;flex-direction:column;align-items:center; min-height:100vh; }
+.wrap{ padding-top:0; padding-bottom:16px; display:flex;flex-direction:column;align-items:center; min-height:100vh; }
+
+/* iOS Safari キーボード対策 */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+  .wrap {
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+  }
+}
 
 /* 小さな画面ではカードの max-height 制限を解除して縦スクロールを許可 */
 @media(max-width:420px){
   html,body{ overflow-y:hidden !important; }
   .card{ max-height:none !important; overflow:visible !important; }
-  .wrap{ padding-top:28px; padding-bottom:220px; }
+  .wrap{ padding-top:0; padding-bottom:220px; }
 }
 
 /* Footer (参考: linklocal.html) */
@@ -610,13 +621,14 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
 </head>
 <body>
   <div class="wrap">
+    <!-- top bar (常設) -->
+    <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
+      <div class="query-display" id="top_query_display">（検索クエリがここに表示されます）</div>
+      <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット">✕</button>
+      <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
+    </div>
+
     <div class="card" role="region" aria-label="X検索補助ツール">
-      <!-- fixed top bar (常設) -->
-      <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
-        <div class="query-display" id="top_query_display">（検索クエリがここに表示されます）</div>
-        <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット">✕</button>
-        <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
-      </div>
 
       <!-- fixed bottom bar removed; preset/history buttons moved into main card -->
 
@@ -722,7 +734,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
 
       <!-- 2×3 メニューボタングリッド -->
       <!-- 基本検索をメイン画面に常設 -->
-      <div class="basic-section search-hero" style="margin-top:8px;">
+      <div class="basic-section search-hero" style="margin-top:0;">
         <div style="display:flex;flex-direction:column;gap:8px">
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
           <input id="q_phrase_input" class="phrase-input" type="text" placeholder='例: 検索ワードをここに入力' />

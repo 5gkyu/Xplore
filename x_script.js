@@ -636,6 +636,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       document.getElementById('preset_edit_query').value = queryText;
       document.getElementById('modal_preset_edit').classList.add('active');
+      // フォーカスを防止するためにアクティブ要素からフォーカスを外す
+      if (document.activeElement) document.activeElement.blur();
     });
   });
 
@@ -1185,6 +1187,31 @@ document.addEventListener('DOMContentLoaded', function(){
       });
     });
   });
+
+  // === タイプ指定モーダル 全リセットボタン ===
+  var typeResetBtn = document.getElementById('btn_type_reset');
+  if (typeResetBtn) {
+    typeResetBtn.addEventListener('click', function() {
+      // 全ての tri-toggle を「未指定」に戻す
+      document.querySelectorAll('.tri-toggle').forEach(function(toggle) {
+        var filter = toggle.dataset.filter;
+        var buttons = toggle.querySelectorAll('button');
+        buttons.forEach(function(btn) {
+          btn.classList.remove('active-none', 'active-only', 'active-exclude');
+          if (btn.dataset.val === 'none') btn.classList.add('active-none');
+        });
+        // hidden checkbox をリセット
+        var onlyEl = document.getElementById('only_' + filter);
+        var excludeEl = document.getElementById('exclude_' + filter);
+        if (onlyEl) onlyEl.checked = false;
+        if (excludeEl) excludeEl.checked = false;
+      });
+      // URL検索もリセット
+      var urlEl = document.getElementById('q_url');
+      if (urlEl) urlEl.value = '';
+      if (typeof updatePreview === 'function') updatePreview();
+    });
+  }
 
   // === 期間クイック選択 ===
   document.querySelectorAll('.period-preset-btn[data-quick]').forEach(function(btn) {

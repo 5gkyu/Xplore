@@ -1323,39 +1323,3 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
 });
-
-    /* iOS Safari: キーボード表示でページが上にズレる問題を補正
-       - visualViewport を使ってキーボード高さを検出し、.wrap を下方向に移動させる
-       - iOS のみで動作するよう制限し、フォーカス時・リサイズ時に補正を更新する
-    */
-    (function(){
-      try{
-        if (!('visualViewport' in window)) return;
-        var ua = navigator.userAgent || '';
-        var isiOS = /iP(hone|od|ad)/.test(ua);
-        if (!isiOS) return;
-        var wrap = document.querySelector('.wrap') || document.body;
-        var last = 0;
-        function apply(delta){
-          if (delta === last) return; last = delta;
-          if (delta > 0){
-            wrap.style.transition = 'transform 160ms ease';
-            wrap.style.transform = 'translateY(' + delta + 'px)';
-          } else {
-            wrap.style.transition = 'transform 120ms ease';
-            wrap.style.transform = '';
-          }
-        }
-        function onChange(){
-          var vv = window.visualViewport;
-          var kb = Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0));
-          apply(kb);
-        }
-        var raf = null;
-        function schedule(){ if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(onChange); }
-        window.visualViewport.addEventListener('resize', schedule);
-        window.visualViewport.addEventListener('scroll', schedule);
-        document.addEventListener('focusin', function(){ setTimeout(schedule, 50); });
-        document.addEventListener('focusout', function(){ setTimeout(function(){ apply(0); }, 50); });
-      }catch(e){ console.warn('visualViewport補正失敗', e); }
-    })();

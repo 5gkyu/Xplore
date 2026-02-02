@@ -757,6 +757,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // ポストIDから conversation_id:ID OR ID を生成して検索を開く
+  var btnOpenById = document.getElementById('btn_open_by_id');
+  if (btnOpenById) {
+    btnOpenById.addEventListener('click', function() {
+      var idEl = document.getElementById('q_post_id');
+      var raw = idEl ? String(idEl.value || '').trim() : '';
+      if (!raw) { alert('ポストIDを入力してください'); return; }
+      var m = raw.match(/(\d+)/);
+      var id = m ? m[1] : raw;
+      if (!id) { alert('有効なIDが見つかりませんでした'); return; }
+      var query = 'conversation_id:' + id + ' OR ' + id;
+      try {
+        var top = document.getElementById('top_query_display');
+        if (top) top.textContent = query;
+        manualQueryOverride = query;
+        userEditedQuery = true;
+        if (typeof updatePreview === 'function') updatePreview();
+        // 履歴に追加
+        try {
+          var formData = {};
+          document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"]').forEach(function(el) {
+            formData[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+          });
+          addHistory(query, formData);
+        } catch (e) { /* ignore history errors */ }
+        // モーダルを閉じて検索を開く
+        var modal = document.getElementById('modal_engagement'); if (modal) modal.classList.remove('active');
+        openSearchWithPreference(query);
+      } catch (e) { console.warn('open by id failed', e); alert('検索を開けませんでした'); }
+    });
+  }
+
+  // クリップボードからURLや共有テキストを読み取り、IDを抽出して入力欄に貼り付ける
+  function extractTweetIdFromText(text){
+    if (!text) return null;
+    var s = String(text).trim();
+    // common patterns: /status/12345 or /i/web/status/12345
+    var m = s.match(/(?:status|statuses|i\/web\/status)\/(\d{6,20})/i);
+    if (m) return m[1];
+    // query param style
+    m = s.match(/(?:tweet_id=|id=)(\d{6,20})/i);
+    if (m) return m[1];
+    // any long numeric sequence (prefer 17+ digits typical of tweet ids)
+    var all = s.match(/\d{6,20}/g);
+    if (!all || all.length === 0) return null;
+    for (var i = 0; i < all.length; i++){ if (all[i].length >= 17) return all[i]; }
+    // fallback: longest sequence
+    all.sort(function(a,b){ return b.length - a.length; });
+    return all[0];
+  }
+
+  var btnPasteId = document.getElementById('btn_paste_id');
+  if (btnPasteId) {
+    btnPasteId.addEventListener('click', async function(){
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.readText) {
+          alert('クリップボード読み取りが利用できません。手動で貼り付けしてください。');
+          return;
+        }
+        var txt = await navigator.clipboard.readText();
+        if (!txt) { alert('クリップボードが空です'); return; }
+        var id = extractTweetIdFromText(txt);
+        if (!id) {
+          alert('URLやテキスト内に有効なIDが見つかりませんでした。手動で貼り付けしてください。');
+          return;
+        }
+        var idEl = document.getElementById('q_post_id');
+        if (idEl) {
+          idEl.value = id;
+          try { idEl.focus(); } catch(e){}
+          if (typeof updatePreview === 'function') updatePreview();
+        }
+      } catch (e) {
+        console.warn('paste id failed', e);
+        alert('クリップボードから読み取れませんでした');
+      }
+    });
+  }
+
   // from/to/@/期間のリセットボタン（クエリも更新）
   document.querySelectorAll('[data-reset="q_from"], [data-reset="q_to"], [data-reset="q_at_search"], [data-reset="q_since_date"], [data-reset="q_until_date"]').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -1385,13 +1464,33 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
 
-  // フォーカス時のスクロール防止（iOS Safari用）
+  // フォーカス時にスクロール許可＋入力を表示（iOS Safari含む）
+  function setMobileScrollAllowed(allow){
+    try {
+      var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints>0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints>0);
+      if (!isTouch) return;
+      var html = document.documentElement;
+      var body = document.body;
+      if (allow) {
+        html.classList.add('allow-scroll-mobile');
+        body.classList.add('allow-scroll-mobile');
+      } else {
+        html.classList.remove('allow-scroll-mobile');
+        body.classList.remove('allow-scroll-mobile');
+      }
+    } catch(e){ console.warn('setMobileScrollAllowed failed', e); }
+  }
+
   var inputFields = document.querySelectorAll('input[type="text"], textarea, select');
   inputFields.forEach(function(field) {
-    field.addEventListener('focus', function(e) {
+    field.addEventListener('focus', function() {
+      setMobileScrollAllowed(true);
       setTimeout(function() {
-        window.scrollTo(0, 0);
+        try { field.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
       }, 100);
+    });
+    field.addEventListener('blur', function() {
+      setTimeout(function(){ setMobileScrollAllowed(false); }, 150);
     });
   });
 

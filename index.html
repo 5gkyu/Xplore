@@ -62,6 +62,13 @@ html.no-scroll-mobile, body.no-scroll-mobile, .no-scroll-mobile{
   -webkit-overflow-scrolling: auto !important;
   overscroll-behavior: none !important;
 }
+/* 入力フォーカス時のみスクロールを許可（モバイル） */
+html.allow-scroll-mobile, body.allow-scroll-mobile{
+  overflow: auto !important;
+  height: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+}
 /* 大きなボタングリッド（2×3） */
 .menu-grid{
   display:grid;
@@ -694,7 +701,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
             <button class="secondary" id="preset_edit_cancel">キャンセル</button>
-            <button class="btn" id="preset_edit_save">保存</button>
+            <button class="modal-action-btn" id="preset_edit_save">保存</button>
           </div>
         </div>
       </div>
@@ -905,6 +912,17 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
               <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
               <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
             </div>
+          </div>
+
+          <!-- ポストIDでリプライと引用を開く -->
+          <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
+            <label class="muted-small" for="q_post_id" style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ポストIDを貼り付け</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="q_post_id" type="text" placeholder="例: 1255050733675704320 または https://x.com/.../status/ID" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
+              <button id="btn_paste_id" type="button" class="secondary" style="white-space:nowrap;flex:0 0 78px">📋 ペースト</button>
+              <button id="btn_open_by_id" type="button" class="engagement-reset-btn" style="white-space:nowrap">検索実行</button>
+            </div>
+            <div class="hint" style="margin-top:8px;color:var(--muted)">貼り付けたIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の取得）。</div>
           </div>
         </div>
       </div>

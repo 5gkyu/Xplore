@@ -323,6 +323,16 @@ function buildQueryAnalysis(query){
 let scheduleSaveState = function(){};
 let userEditedQuery = false;
 let manualQueryOverride = null;
+let forceAutoQueryUpdate = false;
+
+function clearManualOverride(){
+  userEditedQuery = false;
+  manualQueryOverride = null;
+}
+
+function markAutoQueryUpdate(){
+  forceAutoQueryUpdate = true;
+}
 
 function syncTriToggleUI(){
   try{
@@ -503,7 +513,22 @@ document.addEventListener('DOMContentLoaded', function() {
           var el = document.getElementById(key);
           if (el) el.value = presets[idx].data[key];
         });
+        markAutoQueryUpdate();
         if (typeof updatePreview === 'function') updatePreview();
+        // 即検索: クエリを構築して履歴に追加、好みの方法で開く
+        try {
+          var q = '';
+          try { q = buildQuery(); } catch(e){ q = ''; }
+          if (q && q.trim()) {
+            var formData = {};
+            document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
+              formData[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
+            addHistory(q, formData);
+            document.getElementById('modal_preset').classList.remove('active');
+            openSearchWithPreference(q);
+          }
+        } catch(e) { console.warn('preset quick search failed', e); }
         alert('プリセット「' + presets[idx].title + '」を呼び出しました');
       } else {
         alert('このプリセットは保存されていません');
@@ -662,7 +687,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // モーダル背景クリックで閉じる
   document.querySelectorAll('.modal-overlay').forEach(function(modal) {
     modal.addEventListener('click', function(e) {
-      if (e.target === modal) modal.classList.remove('active');
+      if (e.target === modal) {
+        if (modal.id === 'modal_preset') {
+          var presetEdit = document.getElementById('modal_preset_edit');
+          if (presetEdit && presetEdit.classList.contains('active')) return;
+        }
+        modal.classList.remove('active');
+      }
     });
   });
 
@@ -703,13 +734,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     topQueryDisplay.style.cursor = 'pointer';
     topQueryDisplay.addEventListener('click', function() {
-      var q = topQueryDisplay.textContent || '';
-      if (q.trim() && q !== '（検索クエリがここに表示されます）') {
-        modalQueryText.value = q.trim();
-        updateModalQueryAnalysis();
-        modalQuery.classList.add('active');
+      var current = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride.trim() : '';
+      if (!current) {
+        var built = '';
+        try { built = buildQuery(); } catch(e) { built = ''; }
+        current = (built || '').trim();
       }
+      modalQueryText.value = current;
+      updateModalQueryAnalysis();
+      modalQuery.classList.add('active');
+      try { modalQueryText.focus(); } catch(e) {}
     });
+    // キーボード操作でも開く（Enter / Space）
+    topQueryDisplay.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); topQueryDisplay.click(); }
+    });
+    // touchstart で即時フォーカスを試みる
+    topQueryDisplay.addEventListener('touchstart', function(){ try { topQueryDisplay.focus(); } catch(e){} });
     var closeQuery = document.getElementById('close_query');
     if (closeQuery) closeQuery.addEventListener('click', function() { saveModalQuery(); modalQuery.classList.remove('active'); });
     // モーダル内のコピーボタン
@@ -760,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById(targetId);
       if (input) {
         input.value = value;
+        markAutoQueryUpdate();
         if (typeof updatePreview === 'function') updatePreview();
       }
     });
@@ -770,6 +812,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById(targetId);
       if (input) {
         input.value = '';
+        markAutoQueryUpdate();
         if (typeof updatePreview === 'function') updatePreview();
       }
     });
@@ -783,6 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var el = document.getElementById(id);
         if (el) el.value = '';
       });
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   }
@@ -795,6 +839,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var el = document.getElementById(id);
         if (el) el.value = '';
       });
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   }
@@ -885,6 +930,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById(targetId);
       if (input) {
         input.value = '';
+        markAutoQueryUpdate();
         if (typeof updatePreview === 'function') updatePreview();
       }
     });
@@ -917,6 +963,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var untilEl = document.getElementById('q_until_date');
       if (sinceEl) sinceEl.value = sinceStr;
       if (untilEl) untilEl.value = untilStr;
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   });
@@ -958,6 +1005,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var untilStr = String(until.getFullYear()).slice(2) + String(until.getMonth() + 1).padStart(2, '0') + String(until.getDate()).padStart(2, '0');
       var untilEl = document.getElementById('q_until_date');
       if (untilEl) untilEl.value = untilStr;
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   });
@@ -1152,6 +1200,10 @@ function updatePeriodDescription(){
 
 function updatePreview() {
   try {
+    if (forceAutoQueryUpdate) {
+      clearManualOverride();
+      forceAutoQueryUpdate = false;
+    }
     var q = buildQuery();
     var topQueryDisplay = document.getElementById('top_query_display');
     if (topQueryDisplay) {
@@ -1344,7 +1396,8 @@ document.addEventListener('DOMContentLoaded', function(){
           if (onlyEl) onlyEl.checked = false;
           if (excludeEl) excludeEl.checked = false;
         }
-        
+
+        markAutoQueryUpdate();
         if (typeof updatePreview === 'function') updatePreview();
       });
     });
@@ -1371,6 +1424,7 @@ document.addEventListener('DOMContentLoaded', function(){
       // URL検索もリセット
       var urlEl = document.getElementById('q_url');
       if (urlEl) urlEl.value = '';
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   }
@@ -1405,7 +1459,8 @@ document.addEventListener('DOMContentLoaded', function(){
         if (sinceEl) sinceEl.value = sinceStr;
         if (untilEl) untilEl.value = untilStr;
       }
-      
+
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   });
@@ -1445,6 +1500,7 @@ document.addEventListener('DOMContentLoaded', function(){
       document.querySelectorAll('.period-preset-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
 
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   });
@@ -1476,6 +1532,7 @@ document.addEventListener('DOMContentLoaded', function(){
       var untilStr = String(until.getFullYear()).slice(2) + String(until.getMonth() + 1).padStart(2, '0') + String(until.getDate()).padStart(2, '0');
       var untilEl = document.getElementById('q_until_date');
       if (untilEl) untilEl.value = untilStr;
+      markAutoQueryUpdate();
       if (typeof updatePreview === 'function') updatePreview();
     });
   });
@@ -1489,6 +1546,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (untilEl) untilEl.value = '';
     // clear active state on presets
     document.querySelectorAll('.period-preset-btn').forEach(function(b) { b.classList.remove('active'); });
+    markAutoQueryUpdate();
     if (typeof updatePreview === 'function') updatePreview();
   });
 

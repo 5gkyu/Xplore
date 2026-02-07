@@ -496,7 +496,7 @@ textarea{min-height:88px;resize:vertical}
   .collapsible-header .title{font-size:13px}
 }
 .fixed-top-bar{ position:relative; display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 16px; box-sizing:border-box; width:100%; max-width:532px; margin-bottom:0; border-radius:var(--radius); }
-.query-display{ flex:1 1 70%; padding:6px 8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:11px; overflow:auto; white-space:nowrap; color:var(--text); min-width:0; }
+.query-display{ flex:1 1 70%; padding:10px 12px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; overflow:auto; white-space:normal; color:var(--text); min-width:0; display:flex; align-items:center; cursor:pointer; z-index:2; }
 .top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--miku-headset-red-1),var(--miku-headset-red-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; display:inline-flex; align-items:center; justify-content:center; }
 .top-search-btn{ flex:0 0 42px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; font-weight:700; }
 /* copy button moved inside query modal */
@@ -661,7 +661,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
   <div class="wrap">
     <!-- top bar (常設) -->
     <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
-      <div class="query-display" id="top_query_display">（検索クエリがここに表示されます）</div>
+      <div class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</div>
       <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット">✕</button>
       <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
     </div>
@@ -775,7 +775,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <div class="basic-section search-hero" style="margin-top:0;">
         <div style="display:flex;flex-direction:column;gap:8px">
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
-          <input id="q_phrase_input" class="phrase-input" type="text" placeholder='例: 検索ワードをここに入力' />
+          <input id="q_phrase_input" class="phrase-input" type="text" placeholder='検索ワードをここに入力' />
         </div>
       </div>
 

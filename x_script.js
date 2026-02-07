@@ -573,6 +573,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // メニューのクイック検索ボタン（トップ検索と同じ動作）
+  var quickSearchBtn = document.getElementById('btn_quick_search');
+  if (quickSearchBtn) {
+    quickSearchBtn.addEventListener('click', function() {
+      var query = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride : buildQuery();
+      if (query && query.trim()) {
+        var formData = {};
+        document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
+          formData[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+        });
+        addHistory(query, formData);
+        try { openSearchWithPreference(query); } catch(e) { console.warn('open search failed', e); }
+      } else {
+        alert('検索クエリが空です');
+      }
+    });
+  }
+
   var clearHistoryBtn = document.getElementById('btn_clear_history');
   if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', function() {
@@ -756,6 +774,30 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // エンゲージ項目を一括リセット（いいね・リツイート・リプライ）
+  var resetAllEngage = document.getElementById('btn_reset_all_engagement');
+  if (resetAllEngage) {
+    resetAllEngage.addEventListener('click', function() {
+      ['q_min_likes','q_min_retweets','q_min_replies'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      if (typeof updatePreview === 'function') updatePreview();
+    });
+  }
+
+  // アカウント指定モーダル 全リセット（from / to / @）
+  var accountResetAll = document.getElementById('btn_account_reset_all');
+  if (accountResetAll) {
+    accountResetAll.addEventListener('click', function() {
+      ['q_from','q_to','q_at_search'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      if (typeof updatePreview === 'function') updatePreview();
+    });
+  }
 
   // ポストIDから conversation_id:ID OR ID を生成して検索を開く
   var btnOpenById = document.getElementById('btn_open_by_id');
@@ -1068,6 +1110,46 @@ function buildSearchURL(query) {
   return base;
 }
 
+function formatDateJP(date){
+  if (!date || isNaN(date.getTime())) return '';
+  return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+}
+
+function parseYYMMDD(str){
+  if (!str || String(str).trim().length !== 6) return null;
+  var s = String(str).trim();
+  var yy = parseInt(s.slice(0,2), 10);
+  var mm = parseInt(s.slice(2,4), 10) - 1;
+  var dd = parseInt(s.slice(4,6), 10);
+  var year = (yy < 50 ? 2000 + yy : 1900 + yy);
+  var d = new Date(year, mm, dd);
+  if (isNaN(d.getTime())) return null;
+  return d;
+}
+
+function updatePeriodDescription(){
+  var el = document.getElementById('period_desc');
+  if (!el) return;
+  var sinceEl = document.getElementById('q_since_date');
+  var untilEl = document.getElementById('q_until_date');
+  var since = parseYYMMDD(sinceEl ? sinceEl.value : '');
+  var until = parseYYMMDD(untilEl ? untilEl.value : '');
+  if (!since && !until) {
+    el.textContent = '期間が未指定です。';
+    return;
+  }
+  var text = '';
+  if (since) text += formatDateJP(since) + 'から';
+  if (until) {
+    var displayUntil = new Date(until);
+    displayUntil.setDate(displayUntil.getDate() - 1);
+    text += formatDateJP(displayUntil) + 'まで';
+  } else {
+    text += '（終了日未指定）';
+  }
+  el.textContent = text;
+}
+
 function updatePreview() {
   try {
     var q = buildQuery();
@@ -1080,6 +1162,7 @@ function updatePreview() {
       }
     }
   } finally {
+    updatePeriodDescription();
     scheduleSaveState();
   }
 }
@@ -1507,5 +1590,24 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     });
   });
+
+  // プリセット編集モーダル: フォーカス中はモーダルを上に寄せる
+  var presetOverlay = document.getElementById('modal_preset_edit');
+  if (presetOverlay) {
+    var presetInputs = presetOverlay.querySelectorAll('input[type="text"], textarea');
+    function setPresetFocus(on){
+      if (on) presetOverlay.classList.add('focused');
+      else presetOverlay.classList.remove('focused');
+    }
+    presetInputs.forEach(function(el){
+      el.addEventListener('focus', function(){ setPresetFocus(true); });
+      el.addEventListener('blur', function(){
+        setTimeout(function(){
+          var active = document.activeElement;
+          if (!active || !presetOverlay.contains(active)) setPresetFocus(false);
+        }, 120);
+      });
+    });
+  }
 
 });

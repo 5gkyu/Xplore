@@ -319,6 +319,35 @@ textarea{min-height:88px;resize:vertical}
 .engagement-buttons button:hover {
   background: linear-gradient(180deg,var(--card),var(--collapse-header-bg));
 }
+/* エンゲージ3列（モバイルでも列表示） */
+.engagement-columns{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+}
+.engagement-columns .engagement-block{
+  margin:0;
+  padding:8px;
+}
+.engagement-columns .engagement-buttons{
+  margin-top:6px;
+  gap:6px;
+}
+.engagement-columns .engagement-buttons button{
+  padding:6px 0;
+  font-size:11px;
+  border-radius:6px;
+  box-shadow:none;
+}
+@media(max-width:520px){
+  .engagement-columns .engagement-buttons{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .engagement-columns .engagement-buttons button{
+    width:100%;
+  }
+}
 @media(max-width:520px){
   .engagement-row {
     gap: 0;
@@ -485,7 +514,9 @@ textarea{min-height:88px;resize:vertical}
 /* モーダル */
 .modal-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:2000; }
 .modal-overlay.active{ display:flex; }
+.modal-overlay.focused{ align-items:flex-start; padding-top:12px; }
 .modal-panel{ position:relative; background:linear-gradient(180deg,var(--card),#fbffff); padding:12px; border-radius:10px; max-width:500px; width:92%; max-height:80vh; overflow:auto; box-shadow:0 10px 40px rgba(2,12,20,0.4); border:1px solid rgba(6,50,58,0.04); }
+.modal-overlay.focused .modal-panel{ margin-top:0; max-height:90vh; }
 .modal-panel h3{ margin:0 0 10px 0; color:var(--text); font-size:15px; }
 .modal-close-btn{
   position:absolute;
@@ -779,15 +810,15 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <span class="label">検索履歴</span>
           <span class="sublabel">過去の検索</span>
         </button>
-        <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" class="menu-btn" style="text-decoration:none;">
-          <span class="icon">📖</span>
-          <span class="label">コマンド説明</span>
-          <span class="sublabel">実用的なコマンド一覧</span>
-        </a>
         <button class="menu-btn" data-modal="modal_other">
           <span class="icon">⚙️</span>
           <span class="label">その他</span>
           <span class="sublabel">言語 / タブ</span>
+        </button>
+        <button id="btn_quick_search" class="menu-btn" type="button">
+          <span class="icon">🔍</span>
+          <span class="label">検索</span>
+          <span class="sublabel">現在の条件で検索</span>
         </button>
       </div>
           
@@ -818,6 +849,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
               
             </div>
           </div>
+          <div id="period_desc" class="hint" style="margin-top:8px;color:var(--muted)">期間が未指定です。</div>
 
           <div style="height:8px"></div>
           <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>カレンダー範囲</b></label>
@@ -864,53 +896,64 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <div class="section-modal-overlay" id="modal_engagement">
         <div class="section-modal">
           <button class="section-modal-close" data-close="modal_engagement">✕</button>
-          <h3>📊 エンゲージ指定</h3>
-          
-          <!-- いいね数（1行目） -->
-          <div class="engagement-block" style="margin-bottom:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)">👍 いいね数（最小）</label>
-              <button type="button" class="engagement-reset-btn" data-reset="q_min_likes">リセット</button>
-            </div>
-            <input id="q_min_likes" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);" type="text" placeholder="最小いいね数を入力" inputmode="numeric" maxlength="6" />
-            <div class="engagement-buttons" style="margin-top:8px">
-              <button type="button" class="like-btn" data-target="q_min_likes" data-value="10">10</button>
-              <button type="button" class="like-btn" data-target="q_min_likes" data-value="100">100</button>
-              <button type="button" class="like-btn" data-target="q_min_likes" data-value="500">500</button>
-              <button type="button" class="like-btn" data-target="q_min_likes" data-value="1000">1000</button>
-              <button type="button" class="like-btn" data-target="q_min_likes" data-value="10000">10000</button>
-            </div>
+          <h3>📊 エンゲージ指定（最小）</h3>
+          <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
+            <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn" title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
           </div>
-          
-          <!-- リツイート数（2行目） -->
-          <div class="engagement-block" style="padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)">🔁 リツイート数（最小）</label>
-              <button type="button" class="engagement-reset-btn" data-reset="q_min_retweets">リセット</button>
+
+          <div class="engagement-columns">
+            <!-- リプライ数（左列） -->
+            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+              <div style="margin-bottom:6px;">
+                <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)">💬 リプライ数</label>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+                <button type="button" class="engagement-reset-btn" data-reset="q_min_replies">リセット</button>
+              </div>
+              <input id="q_min_replies" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 3" inputmode="numeric" maxlength="6" />
+              <div class="engagement-buttons">
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="1">1</button>
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="3">3</button>
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="5">5</button>
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
+              </div>
             </div>
-            <input id="q_min_retweets" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);" type="text" placeholder="最小リツイート数を入力" inputmode="numeric" maxlength="6" />
-            <div class="engagement-buttons" style="margin-top:8px">
-              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="10">10</button>
-              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="50">50</button>
-              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="100">100</button>
-              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="500">500</button>
-              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="1000">1000</button>
+
+            <!-- リツイート数（中央列） -->
+            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+              <div style="margin-bottom:6px;">
+                <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)">🔁 リツイート数</label>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+                <button type="button" class="engagement-reset-btn" data-reset="q_min_retweets">リセット</button>
+              </div>
+              <input id="q_min_retweets" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 50" inputmode="numeric" maxlength="6" />
+              <div class="engagement-buttons">
+                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="10">10</button>
+                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="50">50</button>
+                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="100">100</button>
+                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="500">500</button>
+                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="1000">1000</button>
+              </div>
             </div>
-          </div>
-          
-          <!-- リプライ数（3行目） -->
-          <div class="engagement-block" style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)">💬 リプライ数（最小）</label>
-              <button type="button" class="engagement-reset-btn" data-reset="q_min_replies">リセット</button>
-            </div>
-            <input id="q_min_replies" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);" type="text" placeholder="最小リプライ数を入力" inputmode="numeric" maxlength="6" />
-            <div class="engagement-buttons" style="margin-top:8px">
-              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="1">1</button>
-              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="3">3</button>
-              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="5">5</button>
-              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
-              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
+
+            <!-- いいね数（右列） -->
+            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+              <div style="margin-bottom:6px;">
+                <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)">👍 いいね数</label>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+                <button type="button" class="engagement-reset-btn" data-reset="q_min_likes">リセット</button>
+              </div>
+              <input id="q_min_likes" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 100" inputmode="numeric" maxlength="6" />
+              <div class="engagement-buttons">
+                <button type="button" class="like-btn" data-target="q_min_likes" data-value="10">10</button>
+                <button type="button" class="like-btn" data-target="q_min_likes" data-value="100">100</button>
+                <button type="button" class="like-btn" data-target="q_min_likes" data-value="500">500</button>
+                <button type="button" class="like-btn" data-target="q_min_likes" data-value="1000">1000</button>
+                <button type="button" class="like-btn" data-target="q_min_likes" data-value="10000">10000</button>
+              </div>
             </div>
           </div>
 
@@ -932,6 +975,9 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         <div class="section-modal">
           <button class="section-modal-close" data-close="modal_account">✕</button>
           <h3>👤 アカウント指定</h3>
+          <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
+            <button id="btn_account_reset_all" type="button" class="engagement-reset-btn" title="全てのアカウント指定を未指定に戻す">全てリセット</button>
+          </div>
           <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
             <div style="font-weight:800;color:var(--muted);width:44px">from</div>
             <div style="flex:1"><input id="q_from" type="text" placeholder="例: 5gkyu" /></div>
@@ -1051,7 +1097,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <div style="display:flex;gap:8px;align-items:center">
             <div style="flex:1">
               <label class="muted-small" for="q_url" style="display:block;margin-bottom:6px"><b>URL検索（url:）</b></label>
-              <input id="q_url" type="text" placeholder="例: reddit.com/r/news または https://example.com/path" style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
+              <input id="q_url" type="text" placeholder="例: reddit.com" style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
             </div>
             <div style="flex:0 0 90px">
               <button type="button" class="engagement-reset-btn" data-reset="q_url" style="width:100%">リセット</button>
@@ -1081,13 +1127,16 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             </select>
           </div>
           <div style="margin-top:10px">
+            <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
+          </div>
+          <div style="margin-top:10px">
             <label class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">📺 結果表示</label>
             <div id="result_tabs" class="tabs" role="tablist" aria-label="結果表示タブ">
               <button id="tab_top" class="tab" role="tab" aria-selected="false" tabindex="-1">話題</button>
               <button id="tab_latest" class="tab" role="tab" aria-selected="true" tabindex="0">最新</button>
               <button id="tab_media" class="tab" role="tab" aria-selected="false" tabindex="-1">メディア</button>
             </div>
-            <div class="hint" style="color:var(--muted)">「話題」タブは関連性が薄いので基本は「最新」タブを使ってください。</div>
+            <div class="hint" style="color:var(--muted)">「話題」タブは関連性が薄いので基本は「最新」タブを使ってください。<br><b>注意:</b> アプリで検索を開くと `f=live`（最新）指定がアプリ側で無視され、結果が「話題」タブで表示される場合があります。</div>
           </div>
 
           <div style="margin-top:12px">

@@ -52,6 +52,7 @@ html,body{
   -moz-osx-font-smoothing:grayscale;
   padding-bottom:env(safe-area-inset-bottom);
   overflow:hidden; /* デフォルトではページスクロールを無効にして、大画面での 固定レイアウト を維持 */
+  scrollbar-gutter: stable;
 }
 /* モバイル向けに強制的にスクロールを禁止するクラス
    タッチ移動を無効化し、オーバースクロールを抑制します */
@@ -495,8 +496,8 @@ textarea{min-height:88px;resize:vertical}
   .collapsible-header{padding:6px; gap:8px;}
   .collapsible-header .title{font-size:13px}
 }
-.fixed-top-bar{ position:relative; display:flex; gap:6px; align-items:center; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 16px; box-sizing:border-box; width:100%; max-width:532px; margin-bottom:0; border-radius:var(--radius); }
-.query-display{ flex:1 1 70%; padding:10px 12px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; overflow:auto; white-space:normal; color:var(--text); min-width:0; display:flex; align-items:center; cursor:pointer; z-index:2; }
+.fixed-top-bar{ position:relative; display:flex; gap:6px; align-items:stretch; background:linear-gradient(180deg,#f8ffff,rgba(255,255,255,0.98)); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 16px; box-sizing:border-box; width:100%; max-width:532px; margin-bottom:0; border-radius:var(--radius); }
+.query-display{ flex:1 1 70%; padding:12px 12px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; color:var(--text); min-width:0; display:flex; align-items:center; cursor:pointer; z-index:2; min-height:44px; align-self:stretch; position:relative; pointer-events:auto; text-align:left; appearance:none; -webkit-appearance:none; outline:none; }
 .top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--miku-headset-red-1),var(--miku-headset-red-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; display:inline-flex; align-items:center; justify-content:center; }
 .top-search-btn{ flex:0 0 42px; padding:6px; border-radius:8px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; font-weight:700; }
 /* copy button moved inside query modal */
@@ -541,9 +542,13 @@ textarea{min-height:88px;resize:vertical}
 .query-analysis{ background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; padding:10px; font-size:12px; color:var(--text); line-height:1.6; }
 .query-analysis ul{ margin:6px 0 0 18px; padding:0; }
 .query-analysis li{ margin:2px 0; }
-.preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); }
+.preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); flex-wrap:wrap; }
 .preset-row input{ flex:1; padding:8px; border-radius:6px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; }
 .preset-row button{ padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:0; }
+.preset-edit-area{ display:none; width:100%; margin-top:8px; }
+.preset-edit-area textarea{ width:100%; height:110px; padding:10px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); box-sizing:border-box; }
+.preset-edit-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+.preset-edit-actions button{ padding:6px 10px; border-radius:8px; border:0; font-size:12px; font-weight:700; cursor:pointer; }
 .preset-save-btn{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; }
 .preset-load-btn{ background:#e3f5ff; color:var(--text); border:1px solid var(--input-border); }
 .preset-actions{ display:flex; gap:8px; }
@@ -661,7 +666,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
   <div class="wrap">
     <!-- top bar (常設) -->
     <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
-      <div class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</div>
+      <button type="button" class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</button>
       <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット">✕</button>
       <button class="top-search-btn" id="top_btn_search" title="検索">🔍</button>
     </div>
@@ -679,63 +684,50 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <div class="preset-row" data-preset="1">
               <input type="text" class="preset-title" value="プリセット1" />
               <div class="preset-actions">
-                <button class="preset-save-btn">保存</button>
+                <button class="preset-edit-btn">編集</button>
                 <button class="preset-load-btn">呼出</button>
               </div>
+              <div class="preset-edit-area"></div>
               </div>
               
             <div class="preset-row" data-preset="2">
               <input type="text" class="preset-title" value="プリセット2" />
               <div class="preset-actions">
-                <button class="preset-save-btn">保存</button>
+                <button class="preset-edit-btn">編集</button>
                 <button class="preset-load-btn">呼出</button>
               </div>
+              <div class="preset-edit-area"></div>
             </div>
             <div class="preset-row" data-preset="3">
               <input type="text" class="preset-title" value="プリセット3" />
               <div class="preset-actions">
-                <button class="preset-save-btn">保存</button>
+                <button class="preset-edit-btn">編集</button>
                 <button class="preset-load-btn">呼出</button>
               </div>
+              <div class="preset-edit-area"></div>
             </div>
             <div class="preset-row" data-preset="4">
               <input type="text" class="preset-title" value="プリセット4" />
               <div class="preset-actions">
-                <button class="preset-save-btn">保存</button>
+                <button class="preset-edit-btn">編集</button>
                 <button class="preset-load-btn">呼出</button>
               </div>
+              <div class="preset-edit-area"></div>
             </div>
             <div class="preset-row" data-preset="5">
               <input type="text" class="preset-title" value="プリセット5" />
               <div class="preset-actions">
-                <button class="preset-save-btn">保存</button>
+                <button class="preset-edit-btn">編集</button>
                 <button class="preset-load-btn">呼出</button>
               </div>
+              <div class="preset-edit-area"></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- プリセット編集モーダル -->
-      <div class="modal-overlay" id="modal_preset_edit">
-        <div class="modal-panel">
-          <button class="modal-close-btn" id="close_preset_edit">✕</button>
-          <h3>📝 プリセット編集</h3>
-          <input type="hidden" id="preset_edit_idx" value="" />
-          <div style="margin-top:12px">
-            <label style="font-weight:700;color:var(--text)">タイトル</label>
-            <input id="preset_edit_title" type="text" style="width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);box-sizing:border-box" />
-          </div>
-          <div style="margin-top:12px">
-            <label style="font-weight:700;color:var(--text)">クエリ内容</label>
-            <textarea id="preset_edit_query" style="width:100%;height:120px;margin-top:4px;padding:10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);box-sizing:border-box"></textarea>
-          </div>
-          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-            <button class="secondary" id="preset_edit_cancel">キャンセル</button>
-            <button class="modal-action-btn" id="preset_edit_save">保存</button>
-          </div>
-        </div>
-      </div>
+      <!-- プリセット編集モーダルはインライン編集UIに置き換え -->
 
       <!-- 検索履歴モーダル -->
       <div class="modal-overlay" id="modal_history">
@@ -864,12 +856,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>直近から遡る（クイック選択）</b></label>
           <div class="period-preset-row">
             <button type="button" class="period-preset-btn" data-quick="1d">1日</button>
-            <button type="button" class="period-preset-btn" data-quick="3d">3日</button>
             <button type="button" class="period-preset-btn" data-quick="7d">7日</button>
-            <button type="button" class="period-preset-btn" data-quick="14d">14日</button>
             <button type="button" class="period-preset-btn" data-quick="31d">31日</button>
-            <button type="button" class="period-preset-btn" data-quick="90d">90日</button>
-            <button type="button" class="period-preset-btn" data-quick="180d">180日</button>
             <button type="button" class="period-preset-btn" data-quick="365d">365日</button>
           </div>
 
@@ -877,12 +865,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>開始日からn日（開始日を先に入力）</b></label>
           <div class="period-preset-row period-from-row">
             <button type="button" class="period-preset-btn" data-period-from="1d">+1日</button>
-            <button type="button" class="period-preset-btn" data-period-from="3d">+3日</button>
             <button type="button" class="period-preset-btn" data-period-from="7d">+7日</button>
-            <button type="button" class="period-preset-btn" data-period-from="14d">+14日</button>
             <button type="button" class="period-preset-btn" data-period-from="31d">+31日</button>
-            <button type="button" class="period-preset-btn" data-period-from="90d">+90日</button>
-            <button type="button" class="period-preset-btn" data-period-from="180d">+180日</button>
             <button type="button" class="period-preset-btn" data-period-from="365d">+365日</button>
           </div>
           <div class="hint" style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--muted)">
@@ -993,6 +977,20 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <div style="flex:1"><input id="q_at_search" type="text" placeholder="例: 5gkyu" /></div>
             <button type="button" class="engagement-reset-btn" data-reset="q_at_search">リセット</button>
           </div>
+          <div style="margin-top:10px">
+            <label class="muted-small" for="q_lang_select" style="color:var(--text)">🌐 言語</label>
+            <select id="q_lang_select" aria-label="言語指定" style="width:200px;color:var(--text);background:var(--input-bg);">
+              <option value="">自動</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="en">英語 (en)</option>
+              <option value="zh-CN">中国語（簡体） (zh-CN)</option>
+              <option value="zh-TW">中国語（繁体） (zh-TW)</option>
+              <option value="ko">韓国語 (ko)</option>
+              <option value="es">スペイン語 (es)</option>
+              <option value="fr">フランス語 (fr)</option>
+              <option value="de">ドイツ語 (de)</option>
+            </select>
+          </div>
           <div class="hint" style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--text)">
             <div style="margin-bottom:6px"><b>📝 コマンドの違い:</b></div>
             <div style="font-size:12px;margin-bottom:4px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">from:</code> — 指定アカウントが投稿したポスト</div>
@@ -1007,6 +1005,17 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
         <div class="section-modal">
           <button class="section-modal-close" data-close="modal_type">✕</button>
           <h3>📎 タイプ指定</h3>
+          <div style="height:6px"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="flex:1">
+              <label class="muted-small" for="q_url" style="display:block;margin-bottom:6px"><b>URL検索（url:）</b></label>
+              <input id="q_url" type="text" placeholder="例: reddit.com" style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
+            </div>
+            <div style="flex:0 0 90px">
+              <button type="button" class="engagement-reset-btn" data-reset="q_url" style="width:100%">リセット</button>
+            </div>
+          </div>
+          <div style="height:10px"></div>
           <div class="type-grid">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
               <label class="muted-small" style="margin:0"><b>ツイートタイプ</b></label>
@@ -1093,16 +1102,6 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <input type="checkbox" id="only_following">
             <input type="checkbox" id="exclude_following">
           </div>
-          <div style="height:8px"></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div style="flex:1">
-              <label class="muted-small" for="q_url" style="display:block;margin-bottom:6px"><b>URL検索（url:）</b></label>
-              <input id="q_url" type="text" placeholder="例: reddit.com" style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
-            </div>
-            <div style="flex:0 0 90px">
-              <button type="button" class="engagement-reset-btn" data-reset="q_url" style="width:100%">リセット</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1112,20 +1111,6 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
           <button class="section-modal-close" data-close="modal_other">✕</button>
           <h3>⚙️ その他</h3>
                     
-          <div style="margin-top:10px">
-            <label class="muted-small" for="q_lang_select" style="color:var(--text)">🌐 言語</label>
-            <select id="q_lang_select" aria-label="言語指定" style="width:200px;color:var(--text);background:var(--input-bg);">
-              <option value="">自動</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="en">英語 (en)</option>
-              <option value="zh-CN">中国語（簡体） (zh-CN)</option>
-              <option value="zh-TW">中国語（繁体） (zh-TW)</option>
-              <option value="ko">韓国語 (ko)</option>
-              <option value="es">スペイン語 (es)</option>
-              <option value="fr">フランス語 (fr)</option>
-              <option value="de">ドイツ語 (de)</option>
-            </select>
-          </div>
           <div style="margin-top:10px">
             <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
           </div>

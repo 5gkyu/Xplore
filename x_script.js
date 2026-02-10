@@ -72,6 +72,24 @@ function openInBrowser(url){
   }
 }
 
+function openInBrowserNoApp(url){
+  try {
+    var w = window.open(url, '_blank', 'noopener,noreferrer');
+    if (w) return;
+  } catch(e) {}
+  try {
+    var a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  } catch(e) {}
+  alert('ブラウザで開くにはポップアップの許可が必要です');
+}
+
 function buildAppTargets(query, webUrl, opts){
   var encoded = encodeURIComponent(query || '');
   var twitterScheme = 'twitter://search?query=' + encoded;
@@ -134,7 +152,7 @@ function openAppOnly(query, webUrl){
 function openSearchWithPreference(query){
   var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
   var mode = getOpenMode();
-  if (mode === 'browser') return openInBrowser(url);
+  if (mode === 'browser') return openInBrowserNoApp(url);
   if (mode === 'app') return openAppOnly(query, url);
   var device = getDeviceInfo();
   if (device.isMobile) return openAppOrFallback(query, url);
@@ -489,18 +507,77 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   loadPresetTitles();
 
-  document.querySelectorAll('.preset-save-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var row = btn.closest('.preset-row');
+  // プリセットタイトルは自動保存
+  document.querySelectorAll('.preset-row .preset-title').forEach(function(titleInput){
+    titleInput.addEventListener('input', function(){
+      var row = titleInput.closest('.preset-row');
+      if (!row) return;
       var idx = row.getAttribute('data-preset');
-      var title = row.querySelector('.preset-title').value;
-      var formData = {};
-      document.querySelectorAll('input[id^="q_"], select[id^="q_"]').forEach(function(el) {
-        formData[el.id] = el.value;
-      });
-      presets[idx] = { title: title, data: formData };
+      if (!presets[idx]) presets[idx] = {};
+      presets[idx].title = titleInput.value;
       localStorage.setItem('x_presets', JSON.stringify(presets));
-      alert('プリセット「' + title + '」を保存しました');
+    });
+  });
+
+  // プリセットのクエリ内容をインラインで編集
+  document.querySelectorAll('.preset-edit-btn').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var row = btn.closest('.preset-row');
+      if (!row) return;
+      var idx = row.getAttribute('data-preset');
+      var preset = presets[idx] || {};
+      var editArea = row.querySelector('.preset-edit-area');
+      if (!editArea) return;
+
+      // 初回のみ編集UIを生成
+      if (!editArea.hasChildNodes()) {
+        editArea.innerHTML = '';
+        var textarea = document.createElement('textarea');
+        textarea.className = 'preset-edit-textarea';
+        var actions = document.createElement('div');
+        actions.className = 'preset-edit-actions';
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.textContent = '閉じる';
+        cancelBtn.className = 'secondary';
+        var saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.textContent = '保存';
+        saveBtn.className = 'modal-action-btn';
+        actions.appendChild(cancelBtn);
+        actions.appendChild(saveBtn);
+        editArea.appendChild(textarea);
+        editArea.appendChild(actions);
+
+        cancelBtn.addEventListener('click', function(){
+          editArea.style.display = 'none';
+        });
+        saveBtn.addEventListener('click', function(){
+          var newTitle = row.querySelector('.preset-title').value;
+          var newQuery = textarea.value || '';
+          if (!presets[idx]) presets[idx] = {};
+          presets[idx].title = newTitle;
+          presets[idx].rawQuery = newQuery;
+          localStorage.setItem('x_presets', JSON.stringify(presets));
+          alert('プリセット「' + newTitle + '」を保存しました');
+        });
+      }
+
+      // 内容をセットして表示
+      var textEl = editArea.querySelector('textarea');
+      var queryText = (preset.rawQuery || '').trim();
+      if (!queryText && preset.data) {
+        Object.keys(preset.data).forEach(function(key){
+          var el = document.getElementById(key);
+          if (el) el.value = preset.data[key];
+        });
+        try { queryText = buildQuery(); } catch(e){ queryText = ''; }
+      }
+      textEl.value = queryText;
+      editArea.style.display = 'block';
+      try { textEl.focus(); } catch(e) {}
     });
   });
 
@@ -611,7 +688,12 @@ document.addEventListener('DOMContentLoaded', function() {
         addHistory(query, formData);
         try { openSearchWithPreference(query); } catch(e) { console.warn('open search failed', e); }
       } else {
-        alert('検索クエリが空です');
+        var phraseInput = document.getElementById('q_phrase_input');
+        if (phraseInput) {
+          try { phraseInput.focus(); } catch(e) {}
+        } else {
+          alert('検索クエリが空です');
+        }
       }
     });
   }
@@ -635,65 +717,10 @@ document.addEventListener('DOMContentLoaded', function() {
   var closePreset = document.getElementById('close_preset');
   if (closePreset) closePreset.addEventListener('click', function() { document.getElementById('modal_preset').classList.remove('active'); });
 
-  // プリセット編集モーダルハンドラ
-  var closePresetEdit = document.getElementById('close_preset_edit');
-  if (closePresetEdit) closePresetEdit.addEventListener('click', function() { document.getElementById('modal_preset_edit').classList.remove('active'); });
-  var presetEditCancel = document.getElementById('preset_edit_cancel');
-  if (presetEditCancel) presetEditCancel.addEventListener('click', function() { document.getElementById('modal_preset_edit').classList.remove('active'); });
-  var presetEditSave = document.getElementById('preset_edit_save');
-  if (presetEditSave) presetEditSave.addEventListener('click', function() {
-    var idx = document.getElementById('preset_edit_idx').value;
-    var newTitle = document.getElementById('preset_edit_title').value;
-    var newQuery = document.getElementById('preset_edit_query').value;
-    if (!idx) return;
-    // parse query into form data (best effort: store raw query for display)
-    if (!presets[idx]) presets[idx] = {};
-    presets[idx].title = newTitle;
-    presets[idx].rawQuery = newQuery;
-    // update title input in preset list
-    var row = document.querySelector('.preset-row[data-preset="' + idx + '"]');
-    if (row) row.querySelector('.preset-title').value = newTitle;
-    localStorage.setItem('x_presets', JSON.stringify(presets));
-    document.getElementById('modal_preset_edit').classList.remove('active');
-    alert('プリセット「' + newTitle + '」を保存しました');
-  });
-  // プリセットタイトルクリックで編集モーダルを開く
-  document.querySelectorAll('.preset-row .preset-title').forEach(function(titleInput) {
-    titleInput.style.cursor = 'pointer';
-    titleInput.addEventListener('click', function(e) {
-      e.stopPropagation();
-      var row = titleInput.closest('.preset-row');
-      var idx = row.getAttribute('data-preset');
-      var preset = presets[idx] || {};
-      document.getElementById('preset_edit_idx').value = idx;
-      document.getElementById('preset_edit_title').value = preset.title || titleInput.value;
-      // show raw query if available, else build from data
-      var queryText = preset.rawQuery || '';
-      if (!queryText && preset.data) {
-        // attempt to rebuild query from saved form data
-        Object.keys(preset.data).forEach(function(key) {
-          var el = document.getElementById(key);
-          if (el) el.value = preset.data[key];
-        });
-        if (typeof buildQuery === 'function') queryText = buildQuery();
-      }
-      document.getElementById('preset_edit_query').value = queryText;
-      document.getElementById('modal_preset_edit').classList.add('active');
-      // フォーカスを防止するためにアクティブ要素からフォーカスを外す
-      if (document.activeElement) document.activeElement.blur();
-    });
-  });
-
   // モーダル背景クリックで閉じる
   document.querySelectorAll('.modal-overlay').forEach(function(modal) {
     modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        if (modal.id === 'modal_preset') {
-          var presetEdit = document.getElementById('modal_preset_edit');
-          if (presetEdit && presetEdit.classList.contains('active')) return;
-        }
-        modal.classList.remove('active');
-      }
+      if (e.target === modal) modal.classList.remove('active');
     });
   });
 
@@ -715,7 +742,23 @@ document.addEventListener('DOMContentLoaded', function() {
   var modalQueryText = document.getElementById('modal_query_text');
   var topQueryDisplay = document.getElementById('top_query_display');
   if (topQueryDisplay && modalQuery && modalQueryText) {
+    var modalQueryJustOpened = false;
+    var suppressNextQueryClick = false;
     var modalQueryAnalysis = document.getElementById('modal_query_analysis');
+    function openQueryModal(){
+      var current = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride.trim() : '';
+      if (!current) {
+        var built = '';
+        try { built = buildQuery(); } catch(e) { built = ''; }
+        current = (built || '').trim();
+      }
+      modalQueryText.value = current;
+      updateModalQueryAnalysis();
+      modalQuery.classList.add('active');
+      modalQueryJustOpened = true;
+      setTimeout(function(){ modalQueryJustOpened = false; }, 300);
+      try { modalQueryText.focus(); } catch(e) {}
+    }
     var saveModalQuery = function(){
       var text = modalQueryText.value || '';
       var top = document.getElementById('top_query_display');
@@ -733,21 +776,19 @@ document.addEventListener('DOMContentLoaded', function() {
       modalQueryAnalysis.innerHTML = buildQueryAnalysis(text);
     };
     topQueryDisplay.style.cursor = 'pointer';
-    topQueryDisplay.addEventListener('click', function() {
-      var current = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride.trim() : '';
-      if (!current) {
-        var built = '';
-        try { built = buildQuery(); } catch(e) { built = ''; }
-        current = (built || '').trim();
-      }
-      modalQueryText.value = current;
-      updateModalQueryAnalysis();
-      modalQuery.classList.add('active');
-      try { modalQueryText.focus(); } catch(e) {}
+    topQueryDisplay.addEventListener('pointerdown', function(e){
+      suppressNextQueryClick = true;
+      e.preventDefault();
+      e.stopPropagation();
+      openQueryModal();
+    });
+    topQueryDisplay.addEventListener('click', function(e) {
+      if (suppressNextQueryClick) { suppressNextQueryClick = false; return; }
+      openQueryModal();
     });
     // キーボード操作でも開く（Enter / Space）
     topQueryDisplay.addEventListener('keydown', function(e){
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); topQueryDisplay.click(); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openQueryModal(); }
     });
     // touchstart で即時フォーカスを試みる
     topQueryDisplay.addEventListener('touchstart', function(){ try { topQueryDisplay.focus(); } catch(e){} });
@@ -773,6 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     modalQuery.addEventListener('click', function(e){
       if (e.target === modalQuery) {
+        if (modalQueryJustOpened) return;
         saveModalQuery();
         modalQuery.classList.remove('active');
       }
@@ -1649,23 +1691,6 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
-  // プリセット編集モーダル: フォーカス中はモーダルを上に寄せる
-  var presetOverlay = document.getElementById('modal_preset_edit');
-  if (presetOverlay) {
-    var presetInputs = presetOverlay.querySelectorAll('input[type="text"], textarea');
-    function setPresetFocus(on){
-      if (on) presetOverlay.classList.add('focused');
-      else presetOverlay.classList.remove('focused');
-    }
-    presetInputs.forEach(function(el){
-      el.addEventListener('focus', function(){ setPresetFocus(true); });
-      el.addEventListener('blur', function(){
-        setTimeout(function(){
-          var active = document.activeElement;
-          if (!active || !presetOverlay.contains(active)) setPresetFocus(false);
-        }, 120);
-      });
-    });
-  }
+  // 旧プリセット編集モーダルは廃止
 
 });

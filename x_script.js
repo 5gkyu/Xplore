@@ -150,11 +150,14 @@ function openAppOnly(query, webUrl){
 }
 
 function openSearchWithPreference(query){
-  var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
   var mode = getOpenMode();
-  if (mode === 'browser') return openInBrowserNoApp(url);
-  if (mode === 'app') return openAppOnly(query, url);
   var device = getDeviceInfo();
+  var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
+  if (mode === 'browser') {
+    var browserUrl = buildSearchURLWithBase(query, device.isMobile ? 'https://mobile.twitter.com/search?q=' : null);
+    return openInBrowserNoApp(browserUrl);
+  }
+  if (mode === 'app') return openAppOnly(query, url);
   if (device.isMobile) return openAppOrFallback(query, url);
   return openInBrowser(url);
 }
@@ -542,17 +545,27 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelBtn.type = 'button';
         cancelBtn.textContent = '閉じる';
         cancelBtn.className = 'secondary';
+        var saveCurrentBtn = document.createElement('button');
+        saveCurrentBtn.type = 'button';
+        saveCurrentBtn.textContent = '現在のクエリを保存';
+        saveCurrentBtn.className = 'modal-action-btn';
         var saveBtn = document.createElement('button');
         saveBtn.type = 'button';
         saveBtn.textContent = '保存';
         saveBtn.className = 'modal-action-btn';
         actions.appendChild(cancelBtn);
+        actions.appendChild(saveCurrentBtn);
         actions.appendChild(saveBtn);
         editArea.appendChild(textarea);
         editArea.appendChild(actions);
 
         cancelBtn.addEventListener('click', function(){
           editArea.style.display = 'none';
+        });
+        saveCurrentBtn.addEventListener('click', function(){
+          var currentQuery = '';
+          try { currentQuery = buildQuery(); } catch(e){ currentQuery = ''; }
+          textarea.value = (currentQuery || '').trim();
         });
         saveBtn.addEventListener('click', function(){
           var newTitle = row.querySelector('.preset-title').value;
@@ -578,7 +591,29 @@ document.addEventListener('DOMContentLoaded', function() {
       textEl.value = queryText;
       editArea.style.display = 'block';
       try { textEl.focus(); } catch(e) {}
+      try { textEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
     });
+  });
+
+  // プリセット編集エリアの入力がキーボードで隠れないようにする
+  document.addEventListener('focusin', function(e){
+    var target = e.target;
+    if (!target) return;
+    if (target.classList && target.classList.contains('preset-edit-textarea')) {
+      try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(true); } catch(e) {}
+      setTimeout(function(){
+        try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+      }, 120);
+    }
+  });
+  document.addEventListener('focusout', function(e){
+    var target = e.target;
+    if (!target) return;
+    if (target.classList && target.classList.contains('preset-edit-textarea')) {
+      setTimeout(function(){
+        try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(false); } catch(e) {}
+      }, 180);
+    }
   });
 
   document.querySelectorAll('.preset-load-btn').forEach(function(btn) {
@@ -1180,9 +1215,9 @@ function buildQuery() {
   return parts.filter(Boolean).join(' ').trim();
 }
 
-function buildSearchURL(query) {
+function buildSearchURLWithBase(query, basePrefix) {
   var encoded = encodeURIComponent(query || '');
-  var base = 'https://x.com/search?q=' + encoded;
+  var base = basePrefix ? (basePrefix + encoded) : ('https://x.com/search?q=' + encoded);
   var fParam = null;
   try {
     var mediaTab = document.getElementById('tab_media');
@@ -1196,8 +1231,12 @@ function buildSearchURL(query) {
     if (/filter:videos/.test(query)) fParam = 'videos';
     if (/filter:media/.test(query)) fParam = 'media';
   } catch (e) { /* ignore */ }
-  if (fParam) base += '&f=' + encodeURIComponent(fParam);
+  if (fParam) base += (base.indexOf('?') >= 0 ? '&' : '?') + 'f=' + encodeURIComponent(fParam);
   return base;
+}
+
+function buildSearchURL(query) {
+  return buildSearchURLWithBase(query, null);
 }
 
 function formatDateJP(date){

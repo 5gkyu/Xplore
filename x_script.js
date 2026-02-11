@@ -73,6 +73,20 @@ function openInBrowser(url){
 }
 
 function openInBrowserNoApp(url){
+  var device = getDeviceInfo();
+  if (device && device.isIOS) {
+    var msg = 'iOSではユニバーサルリンクの仕様でアプリが優先されます。\nURLをコピーしたので、Safariのアドレスバーに貼り付けて開いてください。';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function(){
+        alert(msg);
+      }).catch(function(){
+        try { prompt('URLをコピーしてください（iOSはアプリが優先されます）', url); } catch(e) { alert(msg); }
+      });
+    } else {
+      try { prompt('URLをコピーしてください（iOSはアプリが優先されます）', url); } catch(e) { alert(msg); }
+    }
+    return;
+  }
   var opened = false;
   try {
     var w = window.open(url, '_blank', 'noopener,noreferrer');

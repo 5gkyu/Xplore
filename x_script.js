@@ -238,6 +238,7 @@ function buildQueryAnalysis(query){
     var from = [], to = [], mentions = [], hashtags = [], langs = [];
     var filtersInclude = [], filtersExclude = [];
     var urlsInclude = [], urlsExclude = [];
+    var includes = [], excludes = [];
     var mins = [];
     var since = null, until = null;
     var excludeWords = [];
@@ -261,6 +262,8 @@ function buildQueryAnalysis(query){
       if (rawLower.startsWith('until:')) { until = raw.slice(6); return; }
       if (rawLower.startsWith('min_faves:') || rawLower.startsWith('min_retweets:') || rawLower.startsWith('min_replies:')) { mins.push({ raw: raw, neg: neg }); return; }
       if (rawLower.startsWith('filter:')) { var f = raw.slice(7); if (neg) filtersExclude.push(f); else filtersInclude.push(f); return; }
+      if (rawLower.startsWith('include:')) { var inc = raw.slice(8); if (neg) excludes.push(inc); else includes.push(inc); return; }
+      if (rawLower.startsWith('exclude:')) { var exc = raw.slice(8); if (neg) includes.push(exc); else excludes.push(exc); return; }
       if (rawLower.startsWith('url:')) { var u = raw.slice(4); if (neg) urlsExclude.push(u); else urlsInclude.push(u); return; }
       if (raw.startsWith('@') && raw.length > 1) { mentions.push(raw.slice(1)); return; }
       if (raw.startsWith('#') && raw.length > 1) { hashtags.push(raw.slice(1)); return; }
@@ -283,7 +286,9 @@ function buildQueryAnalysis(query){
       filtersInclude: filtersInclude,
       filtersExclude: filtersExclude,
       urlsInclude: urlsInclude,
-      urlsExclude: urlsExclude
+      urlsExclude: urlsExclude,
+      includes: includes,
+      excludes: excludes
     };
   }
 
@@ -341,6 +346,8 @@ function buildQueryAnalysis(query){
   if (info.mins.length) lines.push('エンゲージ条件: ' + joinList(info.mins.map(describeMin)));
   if (info.filtersInclude.length) lines.push('フィルター: ' + describeFilters(info.filtersInclude));
   if (info.filtersExclude.length) lines.push('除外フィルター: ' + describeExcludeFilters(info.filtersExclude));
+  if (info.includes.length) lines.push('include: ' + joinList(info.includes) + ' を含める');
+  if (info.excludes.length) lines.push('exclude: ' + joinList(info.excludes) + ' を除外');
   if (info.urlsInclude.length) lines.push('URL含む: ' + joinList(info.urlsInclude) + ' を含む');
   if (info.urlsExclude.length) lines.push('URL除外: ' + joinList(info.urlsExclude) + ' を除く');
 
@@ -370,6 +377,8 @@ function buildQueryAnalysis(query){
       if (gi.mins.length) parts.push('エンゲージ条件: ' + joinList(gi.mins.map(describeMin)));
       if (gi.filtersInclude.length) parts.push('フィルター: ' + describeFilters(gi.filtersInclude));
       if (gi.filtersExclude.length) parts.push('除外フィルター: ' + describeExcludeFilters(gi.filtersExclude));
+      if (gi.includes.length) parts.push('include: ' + joinList(gi.includes) + ' を含める');
+      if (gi.excludes.length) parts.push('exclude: ' + joinList(gi.excludes) + ' を除外');
       if (gi.urlsInclude.length) parts.push('URL含む: ' + joinList(gi.urlsInclude) + ' を含む');
       if (gi.urlsExclude.length) parts.push('URL除外: ' + joinList(gi.urlsExclude) + ' を除く');
       if (gi.since || gi.until) parts.push('期間: ' + (gi.since ? ('since:' + gi.since) : '') + (gi.since && gi.until ? ' 〜 ' : '') + (gi.until ? ('until:' + gi.until) : ''));
@@ -385,7 +394,6 @@ let scheduleSaveState = function(){};
 let userEditedQuery = false;
 let manualQueryOverride = null;
 let forceAutoQueryUpdate = false;
-let baseQueryPrefix = '';
 
 function clearManualOverride(){
   userEditedQuery = false;
@@ -394,15 +402,6 @@ function clearManualOverride(){
 
 function markAutoQueryUpdate(){
   forceAutoQueryUpdate = true;
-}
-
-function getEffectiveQuery(){
-  if (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) {
-    return manualQueryOverride.trim();
-  }
-  var built = '';
-  try { built = buildQuery(); } catch(e) { built = ''; }
-  return collapseSpaces([baseQueryPrefix, built].filter(Boolean).join(' '));
 }
 
 function syncTriToggleUI(){
@@ -734,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      if (hasData) {
+      if (hasData && !hasRawQuery) {
         Object.keys(preset.data).forEach(function(key) {
           var el = document.getElementById(key);
           if (el) el.value = preset.data[key];
@@ -744,17 +743,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       if (hasRawQuery) {
-        baseQueryPrefix = String(preset.rawQuery).trim();
-        manualQueryOverride = null;
-        userEditedQuery = false;
+        manualQueryOverride = String(preset.rawQuery).trim();
+        userEditedQuery = true;
         if (typeof updatePreview === 'function') updatePreview();
-      } else {
-        baseQueryPrefix = '';
       }
 
       // 即検索: クエリを構築して履歴に追加、好みの方法で開く
       try {
-        var q = getEffectiveQuery();
+        var q = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride : buildQuery();
         if (q && q.trim()) {
           var formData = {};
           document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
@@ -815,7 +811,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (topSearchEl) {
     topSearchEl.addEventListener('click', function() {
       // build current query (or use manual override) and add to history, then open search in new tab
-      var query = getEffectiveQuery();
+      var query = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride : buildQuery();
       if (query && query.trim()) {
         var formData = {};
           document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
@@ -835,7 +831,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var quickSearchBtn = document.getElementById('btn_quick_search');
   if (quickSearchBtn) {
     quickSearchBtn.addEventListener('click', function() {
-      var query = getEffectiveQuery();
+      var query = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride : buildQuery();
       if (query && query.trim()) {
         var formData = {};
         document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
@@ -870,13 +866,37 @@ document.addEventListener('DOMContentLoaded', function() {
   if (btnHistory) btnHistory.addEventListener('click', function() { renderHistory(); document.getElementById('modal_history').classList.add('active'); });
   var closeHistory = document.getElementById('close_history');
   if (closeHistory) closeHistory.addEventListener('click', function() { document.getElementById('modal_history').classList.remove('active'); });
+  function closePresetModal(){
+    var modal = document.getElementById('modal_preset');
+    if (!modal) return;
+    modal.querySelectorAll('.preset-row').forEach(function(row){
+      var idx = row.getAttribute('data-preset');
+      if (!idx) return;
+      if (!presets[idx]) presets[idx] = {};
+      var titleInput = row.querySelector('.preset-title');
+      if (titleInput) presets[idx].title = titleInput.value;
+      var editArea = row.querySelector('.preset-edit-area');
+      if (editArea) {
+        var textarea = editArea.querySelector('textarea');
+        if (textarea) presets[idx].rawQuery = textarea.value || '';
+        editArea.style.display = 'none';
+      }
+      if (titleInput) titleInput.readOnly = true;
+    });
+    localStorage.setItem('x_presets', JSON.stringify(presets));
+    modal.classList.remove('active');
+  }
+
   var closePreset = document.getElementById('close_preset');
-  if (closePreset) closePreset.addEventListener('click', function() { document.getElementById('modal_preset').classList.remove('active'); });
+  if (closePreset) closePreset.addEventListener('click', function() { closePresetModal(); });
 
   // モーダル背景クリックで閉じる
   document.querySelectorAll('.modal-overlay').forEach(function(modal) {
     modal.addEventListener('click', function(e) {
-      if (e.target === modal) modal.classList.remove('active');
+      if (e.target === modal) {
+        if (modal.id === 'modal_preset') closePresetModal();
+        else modal.classList.remove('active');
+      }
     });
   });
 
@@ -903,7 +923,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var suppressNextQueryClick = false;
     var modalQueryAnalysis = document.getElementById('modal_query_analysis');
     function openQueryModal(){
-      var current = getEffectiveQuery();
+      var current = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride.trim() : '';
+      if (!current) {
+        var built = '';
+        try { built = buildQuery(); } catch(e) { built = ''; }
+        current = (built || '').trim();
+      }
       modalQueryText.value = current;
       updateModalQueryAnalysis();
       modalQuery.classList.add('active');
@@ -1428,7 +1453,7 @@ function updatePreview() {
       clearManualOverride();
       forceAutoQueryUpdate = false;
     }
-    var q = getEffectiveQuery();
+    var q = buildQuery();
     var topQueryDisplay = document.getElementById('top_query_display');
     if (topQueryDisplay) {
       if (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) {

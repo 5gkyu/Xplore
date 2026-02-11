@@ -139,6 +139,19 @@ function tryOpenSchemes(schemes, webUrl){
   attempt();
 }
 
+function tryOpenSchemeIOS(scheme){
+  try { window.location.href = scheme; return; } catch(e) {}
+  try {
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = scheme;
+    document.body.appendChild(iframe);
+    setTimeout(function(){
+      try { document.body.removeChild(iframe); } catch(e) {}
+    }, 800);
+  } catch(e) {}
+}
+
 function openAppOrFallback(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return openInBrowser(webUrl);
@@ -156,7 +169,7 @@ function openAppOrFallback(query, webUrl){
         if (!openedIOS && webUrl) openInBrowser(webUrl);
         return;
       }
-      try { window.location.href = schemesIOS[idx]; } catch(e) { /* ignore */ }
+      tryOpenSchemeIOS(schemesIOS[idx]);
       timerIOS = setTimeout(function(){ attemptIOS(idx + 1); }, OPEN_APP_TIMEOUT_MS);
     }
     attemptIOS(0);
@@ -183,10 +196,10 @@ function openAppOnly(query, webUrl){
     var targetsIOS = buildAppTargets(query, webUrl, { includeFallback: false });
     var schemesIOS = targetsIOS.schemes || [];
     if (schemesIOS.length) {
-      try { window.location.href = schemesIOS[0]; } catch(e) { /* ignore */ }
+      tryOpenSchemeIOS(schemesIOS[0]);
       if (schemesIOS.length > 1) {
         setTimeout(function(){
-          try { window.location.href = schemesIOS[1]; } catch(e) { /* ignore */ }
+          tryOpenSchemeIOS(schemesIOS[1]);
         }, 300);
       }
     }

@@ -75,15 +75,27 @@ function openInBrowser(url){
 function openInBrowserNoApp(url){
   var device = getDeviceInfo();
   if (device && device.isIOS) {
-    var msg = 'iOSではユニバーサルリンクの仕様でアプリが優先されます。\nURLをコピーしたので、Safariのアドレスバーに貼り付けて開いてください。';
+    var opened = false;
+    try {
+      var w = window.open('about:blank', '_blank');
+      if (w) {
+        try { w.location.href = url; } catch(e) {}
+        opened = true;
+      }
+    } catch(e) {}
+    if (!opened) {
+      try { window.location.href = url; opened = true; } catch(e) {}
+    }
+    if (opened) return;
+    var msg = 'iOSではユニバーサルリンクの仕様でアプリが優先される場合があります。\nURLをコピーしたので、Safariのアドレスバーに貼り付けて開いてください。';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(function(){
         alert(msg);
       }).catch(function(){
-        try { prompt('URLをコピーしてください（iOSはアプリが優先されます）', url); } catch(e) { alert(msg); }
+        try { prompt('URLをコピーしてください（iOSはアプリが優先される場合があります）', url); } catch(e) { alert(msg); }
       });
     } else {
-      try { prompt('URLをコピーしてください（iOSはアプリが優先されます）', url); } catch(e) { alert(msg); }
+      try { prompt('URLをコピーしてください（iOSはアプリが優先される場合があります）', url); } catch(e) { alert(msg); }
     }
     return;
   }

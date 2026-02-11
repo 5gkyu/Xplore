@@ -142,6 +142,26 @@ function tryOpenSchemes(schemes, webUrl){
 function openAppOrFallback(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return openInBrowser(webUrl);
+  if (device.isIOS) {
+    var targetsIOS = buildAppTargets(query, webUrl, { includeFallback: false });
+    var schemesIOS = targetsIOS.schemes || [];
+    var openedIOS = false;
+    var timerIOS = null;
+    function cleanupIOS(){ if (timerIOS) clearTimeout(timerIOS); document.removeEventListener('visibilitychange', onVisIOS); }
+    function onVisIOS(){ if (document.hidden) { openedIOS = true; cleanupIOS(); } }
+    document.addEventListener('visibilitychange', onVisIOS);
+    function attemptIOS(idx){
+      if (idx >= schemesIOS.length) {
+        cleanupIOS();
+        if (!openedIOS && webUrl) openInBrowser(webUrl);
+        return;
+      }
+      try { window.location.href = schemesIOS[idx]; } catch(e) { /* ignore */ }
+      timerIOS = setTimeout(function(){ attemptIOS(idx + 1); }, OPEN_APP_TIMEOUT_MS);
+    }
+    attemptIOS(0);
+    return;
+  }
   var targets = buildAppTargets(query, webUrl, { includeFallback: true });
   if (device.isAndroid && device.isChrome && targets.intentUrl) {
     var timer = null;
@@ -157,9 +177,22 @@ function openAppOrFallback(query, webUrl){
 }
 
 function openAppOnly(query, webUrl){
-  if (!confirm('xを開きますか？')) return;
   var device = getDeviceInfo();
   if (!device.isMobile) return;
+  if (device.isIOS) {
+    var targetsIOS = buildAppTargets(query, webUrl, { includeFallback: false });
+    var schemesIOS = targetsIOS.schemes || [];
+    if (schemesIOS.length) {
+      try { window.location.href = schemesIOS[0]; } catch(e) { /* ignore */ }
+      if (schemesIOS.length > 1) {
+        setTimeout(function(){
+          try { window.location.href = schemesIOS[1]; } catch(e) { /* ignore */ }
+        }, 300);
+      }
+    }
+    return;
+  }
+  if (!confirm('xを開きますか？')) return;
   var targets = buildAppTargets(query, webUrl, { includeFallback: false });
   if (device.isAndroid && device.isChrome && targets.intentUrl) {
     try { window.location.href = targets.intentUrl; } catch(e) { /* ignore */ }

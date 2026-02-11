@@ -76,18 +76,7 @@ function openInBrowser(url){
 function openInBrowserNoApp(url){
   var device = getDeviceInfo();
   if (device && device.isIOS) {
-    var opened = false;
-    try {
-      var w = window.open('about:blank', '_blank');
-      if (w) {
-        try { w.location.href = url; } catch(e) {}
-        opened = true;
-      }
-    } catch(e) {}
-    if (!opened) {
-      try { window.location.href = url; opened = true; } catch(e) {}
-    }
-    if (opened) return;
+    try { window.location.href = url; return; } catch(e) {}
     var msg = 'iOSではユニバーサルリンクの仕様でアプリが優先される場合があります。\nURLをコピーしたので、Safariのアドレスバーに貼り付けて開いてください。';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(function(){
@@ -239,7 +228,7 @@ function openSearchWithPreference(query){
 function showOpenIntermediate(mode, query){
   var device = getDeviceInfo();
   var modal = document.getElementById('modal_open_intermediate');
-  var browserUrl = buildSearchURLWithBase(query, device.isMobile ? 'https://m.twitter.com/search?q=' : null);
+  var browserUrl = buildSearchURLWithBase(query, null);
   var appWebUrl = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
   if (!modal) {
     if (mode === 'app') return openAppOnly(query, appWebUrl);

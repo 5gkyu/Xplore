@@ -163,16 +163,18 @@ function openAppOrFallback(query, webUrl){
     function cleanupIOS(){ if (timerIOS) clearTimeout(timerIOS); document.removeEventListener('visibilitychange', onVisIOS); }
     function onVisIOS(){ if (document.hidden) { openedIOS = true; cleanupIOS(); } }
     document.addEventListener('visibilitychange', onVisIOS);
-    function attemptIOS(idx){
-      if (idx >= schemesIOS.length) {
-        cleanupIOS();
-        if (!openedIOS && webUrl) openInBrowser(webUrl);
-        return;
+    if (schemesIOS.length) {
+      tryOpenSchemeIOS(schemesIOS[0]);
+      if (schemesIOS.length > 1) {
+        setTimeout(function(){ tryOpenSchemeIOS(schemesIOS[1]); }, 300);
       }
-      tryOpenSchemeIOS(schemesIOS[idx]);
-      timerIOS = setTimeout(function(){ attemptIOS(idx + 1); }, OPEN_APP_TIMEOUT_MS);
     }
-    attemptIOS(0);
+    timerIOS = setTimeout(function(){
+      cleanupIOS();
+      if (!openedIOS && webUrl) {
+        try { window.location.href = webUrl; } catch(e) { openInBrowser(webUrl); }
+      }
+    }, OPEN_APP_TIMEOUT_MS + 400);
     return;
   }
   var targets = buildAppTargets(query, webUrl, { includeFallback: true });
@@ -209,7 +211,9 @@ function openAppOnly(query, webUrl){
       }
       timerIOS = setTimeout(function(){
         cleanupIOS();
-        if (!openedIOS && webUrl) openInBrowser(webUrl);
+        if (!openedIOS && webUrl) {
+          try { window.location.href = webUrl; } catch(e) { openInBrowser(webUrl); }
+        }
       }, OPEN_APP_TIMEOUT_MS + 400);
     }
     return;

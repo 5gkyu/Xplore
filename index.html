@@ -556,12 +556,14 @@ textarea{min-height:88px;resize:vertical}
 .preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); flex-wrap:wrap; }
 .preset-row input{ flex:1; padding:8px; border-radius:6px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; }
 .preset-row button{ padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:0; }
-.preset-edit-btn{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#fff; }
-.preset-edit-btn:hover{ filter:brightness(0.98); }
+.preset-edit-btn{ background:#ffd6e0; color:var(--text); border:1px solid var(--input-border); }
+.preset-edit-btn:hover{ background:#ffe3ea; }
 .preset-edit-area{ display:none; width:100%; margin-top:8px; }
 .preset-edit-area textarea{ width:100%; height:110px; padding:10px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); box-sizing:border-box; }
 .preset-edit-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
 .preset-edit-actions button{ padding:6px 10px; border-radius:8px; border:0; font-size:12px; font-weight:700; cursor:pointer; }
+.preset-edit-actions .preset-save-current-btn{ background:#e3f5ff; color:var(--text); border:1px solid var(--input-border); }
+.preset-edit-actions .preset-save-btn-inline{ background:#ffe3ea; color:var(--text); border:1px solid var(--input-border); }
 .preset-save-btn{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; }
 .preset-load-btn{ background:#e3f5ff; color:var(--text); border:1px solid var(--input-border); }
 .preset-actions{ display:flex; gap:8px; }
@@ -684,8 +686,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
     <!-- top bar (常設) -->
     <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
       <button type="button" class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</button>
-      <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-      <button class="top-search-btn" id="top_btn_search" title="検索"><img src="./magnifying-glass.svg" alt="" aria-hidden="true" /></button>
+      <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+      <button class="top-search-btn" id="top_btn_search" title="検索"><img src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /></button>
     </div>
 
     <div class="card" role="region" aria-label="X検索補助ツール">
@@ -695,8 +697,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- プリセットモーダル -->
       <div class="modal-overlay" id="modal_preset">
         <div class="modal-panel">
-          <button class="modal-close-btn" id="close_preset"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./folder.svg" alt="" aria-hidden="true" /> プリセット</h3>
+          <button class="modal-close-btn" id="close_preset"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/folder.svg" alt="" aria-hidden="true" /> プリセット</h3>
           <div id="preset_list">
             <div class="preset-row" data-preset="1">
               <input type="text" class="preset-title" value="プリセット1" readonly />
@@ -749,8 +751,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- 検索履歴モーダル -->
       <div class="modal-overlay" id="modal_history">
         <div class="modal-panel">
-          <button class="modal-close-btn" id="close_history"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./clock-counter-clockwise.svg" alt="" aria-hidden="true" /> 検索履歴</h3>
+          <button class="modal-close-btn" id="close_history"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /> 検索履歴</h3>
           <div id="history_list"></div>
           <button class="clear-history-btn" id="btn_clear_history">履歴全消去</button>
           <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:6px;color:var(--muted);font-size:12px;line-height:1.5">
@@ -763,8 +765,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- 検索クエリ全文表示モーダル -->
       <div class="modal-overlay" id="modal_query">
         <div class="modal-panel">
-          <button class="modal-close-btn" id="close_query"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./magnifying-glass.svg" alt="" aria-hidden="true" /> 検索クエリ（全文）</h3>
+          <button class="modal-close-btn" id="close_query"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /> 検索クエリ（全文）</h3>
           <div style="margin-top:8px">
             <textarea id="modal_query_text" style="width:100%;height:160px;padding:12px;border-radius:8px;border:1px solid var(--input-border);box-sizing:border-box;background:var(--input-bg);color:var(--text);"></textarea>
           </div>
@@ -790,42 +792,42 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
 
       <div class="menu-grid">
         <button class="menu-btn" data-modal="modal_period">
-          <span class="icon"><img src="./calendar.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/calendar.svg" alt="" aria-hidden="true" /></span>
           <span class="label">期間指定</span>
           <span class="sublabel">開始日 / 終了日</span>
         </button>
         <button class="menu-btn" data-modal="modal_engagement">
-          <span class="icon"><img src="./heart.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/heart.svg" alt="" aria-hidden="true" /></span>
           <span class="label">エンゲージ</span>
           <span class="sublabel">いいね / RT / 返信</span>
         </button>
         <button class="menu-btn" data-modal="modal_type">
-          <span class="icon"><img src="./toggle-left.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/toggle-left.svg" alt="" aria-hidden="true" /></span>
           <span class="label">タイプ指定</span>
           <span class="sublabel">限定 / 除外</span>
         </button>
         <button class="menu-btn" data-modal="modal_account">
-          <span class="icon"><img src="./user-circle.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/user-circle.svg" alt="" aria-hidden="true" /></span>
           <span class="label">アカウント</span>
           <span class="sublabel">from / to / @</span>
         </button>
         <button class="menu-btn" id="btn_preset" data-modal="modal_preset">
-          <span class="icon"><img src="./folder.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/folder.svg" alt="" aria-hidden="true" /></span>
           <span class="label">プリセット</span>
           <span class="sublabel">保存 / 呼出</span>
         </button>
         <button class="menu-btn" id="btn_history">
-          <span class="icon"><img src="./clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
           <span class="label">検索履歴</span>
           <span class="sublabel">過去の検索</span>
         </button>
         <button class="menu-btn" data-modal="modal_other">
-          <span class="icon"><img src="./gear.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/gear.svg" alt="" aria-hidden="true" /></span>
           <span class="label">その他</span>
           <span class="sublabel">言語 / タブ</span>
         </button>
         <button id="btn_quick_search" class="menu-btn" type="button">
-          <span class="icon"><img src="./magnifying-glass.svg" alt="" aria-hidden="true" /></span>
+          <span class="icon"><img src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /></span>
           <span class="label">検索</span>
           <span class="sublabel">現在の条件で検索</span>
         </button>
@@ -839,8 +841,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- 期間指定モーダル -->
       <div class="section-modal-overlay" id="modal_period">
         <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_period"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./calendar.svg" alt="" aria-hidden="true" /> 期間指定</h3>
+          <button class="section-modal-close" data-close="modal_period"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/calendar.svg" alt="" aria-hidden="true" /> 期間指定</h3>
           
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
             <label class="muted-small" style="margin:0;color:var(--text)"><b>カスタム期間（yymmdd形式）</b></label>
@@ -896,8 +898,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- エンゲージモーダル -->
       <div class="section-modal-overlay" id="modal_engagement">
         <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_engagement"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./heart.svg" alt="" aria-hidden="true" /> エンゲージ指定（最小）</h3>
+          <button class="section-modal-close" data-close="modal_engagement"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> エンゲージ指定（最小）</h3>
           <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
             <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn" title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
           </div>
@@ -906,7 +908,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <!-- リプライ数（左列） -->
             <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
               <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./chat-circle.svg" alt="" aria-hidden="true" /> リプライ</label>
+                <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/chat-circle.svg" alt="" aria-hidden="true" /> リプライ</label>
               </div>
               <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
                 <button type="button" class="engagement-reset-btn" data-reset="q_min_replies">リセット</button>
@@ -924,7 +926,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <!-- リツイート数（中央列） -->
             <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
               <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./repeat.svg" alt="" aria-hidden="true" /> リツイート</label>
+                <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/repeat.svg" alt="" aria-hidden="true" /> リツイート</label>
               </div>
               <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
                 <button type="button" class="engagement-reset-btn" data-reset="q_min_retweets">リセット</button>
@@ -942,7 +944,7 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <!-- いいね数（右列） -->
             <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
               <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./heart.svg" alt="" aria-hidden="true" /> いいね</label>
+                <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> いいね</label>
               </div>
               <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
                 <button type="button" class="engagement-reset-btn" data-reset="q_min_likes">リセット</button>
@@ -974,8 +976,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- アカウント指定モーダル -->
       <div class="section-modal-overlay" id="modal_account">
         <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_account"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./user-circle.svg" alt="" aria-hidden="true" /> アカウント指定</h3>
+          <button class="section-modal-close" data-close="modal_account"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/user-circle.svg" alt="" aria-hidden="true" /> アカウント指定</h3>
           <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
             <button id="btn_account_reset_all" type="button" class="engagement-reset-btn" title="全てのアカウント指定を未指定に戻す">全てリセット</button>
           </div>
@@ -1020,8 +1022,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- タイプ指定モーダル -->
       <div class="section-modal-overlay" id="modal_type">
         <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_type"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./toggle-left.svg" alt="" aria-hidden="true" /> タイプ指定</h3>
+          <button class="section-modal-close" data-close="modal_type"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/toggle-left.svg" alt="" aria-hidden="true" /> タイプ指定</h3>
           <div style="height:6px"></div>
           <div style="display:flex;gap:8px;align-items:center">
             <div style="flex:1">
@@ -1125,8 +1127,8 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
       <!-- その他モーダル -->
       <div class="section-modal-overlay" id="modal_other">
         <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_other"><img src="./x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./gear.svg" alt="" aria-hidden="true" /> その他</h3>
+          <button class="section-modal-close" data-close="modal_other"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/gear.svg" alt="" aria-hidden="true" /> その他</h3>
                     
           <div style="margin-top:10px">
             <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>

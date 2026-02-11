@@ -73,18 +73,19 @@ function openInBrowser(url){
 }
 
 function openInBrowserNoApp(url){
-  try {
-    window.location.href = url;
-    return;
-  } catch(e) {}
+  var opened = false;
   try {
     var w = window.open(url, '_blank', 'noopener,noreferrer');
-    if (w) return;
+    if (w) {
+      try { w.opener = null; } catch(e) {}
+      opened = true;
+    }
   } catch(e) {}
+  if (opened) return;
   try {
     var a = document.createElement('a');
     a.href = url;
-    a.target = '_self';
+    a.target = '_blank';
     a.rel = 'noopener noreferrer';
     document.body.appendChild(a);
     a.click();
@@ -158,7 +159,7 @@ function openSearchWithPreference(query){
   var device = getDeviceInfo();
   var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
   if (mode === 'browser') {
-    var browserUrl = buildSearchURLWithBase(query, device.isMobile ? 'https://mobile.twitter.com/search?q=' : null);
+    var browserUrl = buildSearchURLWithBase(query, device.isMobile ? 'https://m.twitter.com/search?q=' : null);
     return openInBrowserNoApp(browserUrl);
   }
   if (mode === 'app') return openAppOnly(query, url);
@@ -517,12 +518,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // プリセットタイトルは自動保存
   document.querySelectorAll('.preset-row .preset-title').forEach(function(titleInput){
     titleInput.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
+      if (titleInput.readOnly) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
     titleInput.addEventListener('pointerdown', function(e){
-      e.preventDefault();
-      e.stopPropagation();
+      if (titleInput.readOnly) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
     titleInput.addEventListener('input', function(){
       var row = titleInput.closest('.preset-row');
@@ -569,11 +574,11 @@ document.addEventListener('DOMContentLoaded', function() {
         var saveCurrentBtn = document.createElement('button');
         saveCurrentBtn.type = 'button';
         saveCurrentBtn.textContent = '現在のクエリを保存';
-        saveCurrentBtn.className = 'modal-action-btn';
+        saveCurrentBtn.className = 'preset-save-current-btn';
         var saveBtn = document.createElement('button');
         saveBtn.type = 'button';
         saveBtn.textContent = '保存';
-        saveBtn.className = 'modal-action-btn';
+        saveBtn.className = 'preset-save-btn-inline';
         actions.appendChild(cancelBtn);
         actions.appendChild(saveCurrentBtn);
         actions.appendChild(saveBtn);

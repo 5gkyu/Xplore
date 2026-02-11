@@ -73,21 +73,31 @@ function openInBrowser(url){
   }
 }
 
-function openInBrowserNoApp(url){
+function openInBrowserNoApp(url, query){
   var device = getDeviceInfo();
   if (device && device.isIOS) {
-    // 失敗するスキームを投げてからブラウザへ遷移
-    try { window.location.href = 'x-fail-open://'; } catch(e) {}
+    // アプリ起動用スキームを“失敗させる”目的で iframe だけに投げる（同時にhttpsへ遷移）
     try {
-      var iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = 'x-fail-open://';
-      document.body.appendChild(iframe);
-      setTimeout(function(){ try { document.body.removeChild(iframe); } catch(e) {} }, 800);
+      var encoded = encodeURIComponent(query || '');
+      var schemes = [
+        'twitter://search?query=' + encoded,
+        'x://search?query=' + encoded
+      ];
+      schemes.forEach(function(s, idx){
+        setTimeout(function(){
+          try {
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = s;
+            document.body.appendChild(iframe);
+            setTimeout(function(){ try { document.body.removeChild(iframe); } catch(e) {} }, 800);
+          } catch(e) {}
+        }, idx * 120);
+      });
     } catch(e) {}
     setTimeout(function(){
       try { window.location.href = url; } catch(e) {}
-    }, 200);
+    }, 240);
     return;
   }
   var opened = false;
@@ -233,7 +243,7 @@ function showOpenIntermediate(mode, query){
   var appWebUrl = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
   if (!modal) {
     if (mode === 'app') return openAppOnly(query, appWebUrl);
-    return openInBrowserNoApp(browserUrl);
+    return openInBrowserNoApp(browserUrl, query);
   }
 
   pendingOpenIntermediate = {
@@ -940,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!pendingOpenIntermediate) return;
       var st = pendingOpenIntermediate;
       if (st.mode === 'app') openAppOnly(st.query, st.appWebUrl);
-      else openInBrowserNoApp(st.browserUrl);
+      else openInBrowserNoApp(st.browserUrl, st.query);
       closeOpenIntermediate();
     });
     if (copyOpen) copyOpen.addEventListener('click', function(){

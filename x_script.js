@@ -74,13 +74,17 @@ function openInBrowser(url){
 
 function openInBrowserNoApp(url){
   try {
+    window.location.href = url;
+    return;
+  } catch(e) {}
+  try {
     var w = window.open(url, '_blank', 'noopener,noreferrer');
     if (w) return;
   } catch(e) {}
   try {
     var a = document.createElement('a');
     a.href = url;
-    a.target = '_blank';
+    a.target = '_self';
     a.rel = 'noopener noreferrer';
     document.body.appendChild(a);
     a.click();
@@ -512,6 +516,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // プリセットタイトルは自動保存
   document.querySelectorAll('.preset-row .preset-title').forEach(function(titleInput){
+    titleInput.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    titleInput.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    });
     titleInput.addEventListener('input', function(){
       var row = titleInput.closest('.preset-row');
       if (!row) return;
@@ -532,7 +544,16 @@ document.addEventListener('DOMContentLoaded', function() {
       var idx = row.getAttribute('data-preset');
       var preset = presets[idx] || {};
       var editArea = row.querySelector('.preset-edit-area');
+      var titleInput = row.querySelector('.preset-title');
       if (!editArea) return;
+
+      // toggle edit area
+      if (editArea.style.display === 'block') {
+        editArea.style.display = 'none';
+        if (titleInput) titleInput.readOnly = true;
+        return;
+      }
+      if (titleInput) titleInput.readOnly = false;
 
       // 初回のみ編集UIを生成
       if (!editArea.hasChildNodes()) {
@@ -561,6 +582,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         cancelBtn.addEventListener('click', function(){
           editArea.style.display = 'none';
+          if (titleInput) titleInput.readOnly = true;
         });
         saveCurrentBtn.addEventListener('click', function(){
           var currentQuery = '';
@@ -615,6 +637,31 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 180);
     }
   });
+
+  // プリセットモーダル内のタイトル・編集欄で一時的にスクロール許可
+  var presetModal = document.getElementById('modal_preset');
+  if (presetModal) {
+    presetModal.addEventListener('focusin', function(e){
+      var target = e.target;
+      if (!target) return;
+      if (target.classList && (target.classList.contains('preset-title') || target.classList.contains('preset-edit-textarea'))) {
+        presetModal.classList.add('focused');
+        try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(true); } catch(e) {}
+        setTimeout(function(){
+          try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+        }, 120);
+      }
+    });
+    presetModal.addEventListener('focusout', function(){
+      setTimeout(function(){
+        var active = document.activeElement;
+        if (!active || !presetModal.contains(active)) {
+          presetModal.classList.remove('focused');
+          try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(false); } catch(e) {}
+        }
+      }, 180);
+    });
+  }
 
   document.querySelectorAll('.preset-load-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -1110,8 +1157,34 @@ function buildQuery() {
   // phrases (space separated tokens) - OR, (), "" は引用符で囲まない
   var phraseInput = document.getElementById('q_phrase_input');
   var phraseRaw = (phraseInput && phraseInput.value) ? phraseInput.value.trim() : '';
-  // トークン化（OR, 括弧, ダブルクォート付きワードを保持）
-  var tokens = phraseRaw.match(/\(|\)|OR|"[^"]*"|[^\s()]+/gi) || [];
+
+  function tokenizePhrase(input){
+    var tokens = [];
+    var buf = '';
+    var inQuote = false;
+    for (var i = 0; i < input.length; i++){
+      var ch = input[i];
+      if (ch === '"') {
+        buf += ch;
+        inQuote = !inQuote;
+        continue;
+      }
+      if (!inQuote && (ch === '(' || ch === ')')) {
+        if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
+        tokens.push(ch);
+        continue;
+      }
+      if (!inQuote && /\s/.test(ch)) {
+        if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
+        continue;
+      }
+      buf += ch;
+    }
+    if (buf.trim()) tokens.push(buf.trim());
+    return tokens;
+  }
+
+  var tokens = tokenizePhrase(phraseRaw);
   if (tokens.length) {
     var processed = tokens.map(function(t) {
       var upper = t.toUpperCase();

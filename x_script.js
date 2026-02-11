@@ -76,17 +76,18 @@ function openInBrowser(url){
 function openInBrowserNoApp(url){
   var device = getDeviceInfo();
   if (device && device.isIOS) {
-    try { window.location.href = url; return; } catch(e) {}
-    var msg = 'iOSではユニバーサルリンクの仕様でアプリが優先される場合があります。\nURLをコピーしたので、Safariのアドレスバーに貼り付けて開いてください。';
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(function(){
-        alert(msg);
-      }).catch(function(){
-        try { prompt('URLをコピーしてください（iOSはアプリが優先される場合があります）', url); } catch(e) { alert(msg); }
-      });
-    } else {
-      try { prompt('URLをコピーしてください（iOSはアプリが優先される場合があります）', url); } catch(e) { alert(msg); }
-    }
+    // 失敗するスキームを投げてからブラウザへ遷移
+    try { window.location.href = 'x-fail-open://'; } catch(e) {}
+    try {
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = 'x-fail-open://';
+      document.body.appendChild(iframe);
+      setTimeout(function(){ try { document.body.removeChild(iframe); } catch(e) {} }, 800);
+    } catch(e) {}
+    setTimeout(function(){
+      try { window.location.href = url; } catch(e) {}
+    }, 200);
     return;
   }
   var opened = false;

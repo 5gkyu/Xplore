@@ -550,6 +550,9 @@ textarea{min-height:88px;resize:vertical}
 .modal-copy-btn{ position:absolute; right:56px; top:8px; padding:6px 10px; border-radius:8px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border:0; cursor:pointer; font-size:13px; }
 /* action-styled buttons inside modal (not absolutely positioned) */
 .modal-action-btn{ padding:6px 10px; border-radius:8px; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; border:0; cursor:pointer; font-size:13px; }
+.open-intermediate-url{ margin-top:8px; padding:8px 10px; background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; font-size:12px; color:var(--muted); word-break:break-all; }
+.open-intermediate-actions{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.open-intermediate-actions .secondary{ font-weight:700; }
 .query-analysis{ background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; padding:10px; font-size:12px; color:var(--text); line-height:1.6; }
 .query-analysis ul{ margin:6px 0 0 18px; padding:0; }
 .query-analysis li{ margin:2px 0; }
@@ -775,6 +778,23 @@ html.theme-kohane body{ background-image: linear-gradient(rgba(255,235,235,0.8),
             <button class="modal-action-btn" id="modal_query_select_all" title="全選択">全選択</button>
             <button class="modal-action-btn" id="modal_query_copy" title="コピー">コピー</button>
             <!-- 保存ボタンは要望により削除 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- アプリ/ブラウザ中間ページモーダル -->
+      <div class="modal-overlay" id="modal_open_intermediate">
+        <div class="modal-panel">
+          <button class="modal-close-btn" id="close_open_intermediate"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3 id="open_intermediate_title">開き方の確認</h3>
+          <div id="open_intermediate_desc" class="hint" style="margin-top:6px"></div>
+          <div id="open_intermediate_url" class="open-intermediate-url"></div>
+          <div class="open-intermediate-actions">
+            <button class="modal-action-btn" id="open_intermediate_primary" type="button">開く</button>
+            <button class="secondary" id="open_intermediate_secondary" type="button">キャンセル</button>
+          </div>
+          <div class="open-intermediate-actions" id="open_intermediate_copy_wrap" style="justify-content:flex-start;display:none;">
+            <button class="secondary" id="open_intermediate_copy" type="button">URLをコピー</button>
           </div>
         </div>
       </div>

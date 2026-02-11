@@ -153,7 +153,7 @@ function tryOpenSchemeIOS(scheme){
 }
 
 // パターン1: 直叩き＋短い連続試行（最優先でアプリ起動）
-function openAppPattern1(query){
+function openAppPattern1Backup(query){
   var device = getDeviceInfo();
   var targets = buildAppTargets(query, null, { includeFallback: false });
   if (device.isAndroid && device.isChrome && targets.intentUrl) {
@@ -176,16 +176,39 @@ function openAppPattern1(query){
   }
 }
 
+// パターン2: 事前iframe起動（iOS優先）
+function openAppPattern2(query){
+  var device = getDeviceInfo();
+  var targets = buildAppTargets(query, null, { includeFallback: false });
+  if (device.isAndroid && device.isChrome && targets.intentUrl) {
+    try { window.location.href = targets.intentUrl; } catch(e) { /* ignore */ }
+    return;
+  }
+  var schemes = targets.schemes || [];
+  if (device.isIOS) {
+    if (schemes.length) {
+      tryOpenSchemeIOS(schemes[0]);
+      if (schemes.length > 1) {
+        setTimeout(function(){ tryOpenSchemeIOS(schemes[1]); }, 300);
+      }
+    }
+    return;
+  }
+  if (schemes.length) {
+    tryOpenSchemes(schemes, null);
+  }
+}
+
 function openAppOrFallback(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return openInBrowser(webUrl);
-  openAppPattern1(query);
+  openAppPattern2(query);
 }
 
 function openAppOnly(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return;
-  openAppPattern1(query);
+  openAppPattern2(query);
 }
 
 function openSearchWithPreference(query){

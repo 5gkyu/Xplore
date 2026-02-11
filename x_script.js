@@ -8,10 +8,7 @@ const ICON_EXPANDED = 'image/close.png';
 const ICON_COLLAPSED = 'image/open.png';
 const STORAGE_KEY = 'xsearch_state_v3';
 const SAVE_DEBOUNCE_MS = 200;
-const OPEN_PREF_KEY = 'x_open_pref_v1';
-const DEFAULT_OPEN_MODE = 'auto';
 const OPEN_APP_TIMEOUT_MS = 1200;
-let pendingOpenIntermediate = null;
 
 function debounce(fn, ms){ let t; return function(){ clearTimeout(t); t = setTimeout(fn, ms); } }
 function splitTrim(s){ return s? String(s).trim().split(/\s+/).filter(x=>x):[] }
@@ -27,32 +24,6 @@ function escapeHtml(str){
     .replace(/'/g, '&#39;');
 }
 
-function getStoredOpenMode(){
-  try {
-    var v = localStorage.getItem(OPEN_PREF_KEY);
-    if (v === 'auto' || v === 'app' || v === 'browser') return v;
-  } catch(e) {}
-  return DEFAULT_OPEN_MODE;
-}
-
-function getOpenMode(){
-  try {
-    var selected = document.querySelector('input[name="open_mode"]:checked');
-    if (selected && selected.value) return selected.value;
-  } catch(e) {}
-  return getStoredOpenMode();
-}
-
-function setOpenMode(mode, opts){
-  var v = (mode === 'app' || mode === 'browser' || mode === 'auto') ? mode : DEFAULT_OPEN_MODE;
-  if (!opts || !opts.skipSave) {
-    try { localStorage.setItem(OPEN_PREF_KEY, v); } catch(e) {}
-  }
-  try {
-    var el = document.getElementById('open_mode_' + v);
-    if (el) el.checked = true;
-  } catch(e) {}
-}
 
 function getDeviceInfo(){
   var ua = navigator.userAgent || '';
@@ -225,72 +196,10 @@ function openAppOnly(query, webUrl){
 }
 
 function openSearchWithPreference(query){
-  var mode = getOpenMode();
   var device = getDeviceInfo();
   var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
-  if (mode === 'browser') {
-    return showOpenIntermediate('browser', query);
-  }
-  if (mode === 'app') return showOpenIntermediate('app', query);
   if (device.isMobile) return openAppOnly(query, url);
   return openInBrowser(url);
-}
-
-function showOpenIntermediate(mode, query){
-  var device = getDeviceInfo();
-  var modal = document.getElementById('modal_open_intermediate');
-  var browserUrl = buildSearchURLWithBase(query, null);
-  var appWebUrl = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
-  if (!modal) {
-    if (mode === 'app') return openAppOnly(query, appWebUrl);
-    return openInBrowserNoApp(browserUrl, query);
-  }
-
-  pendingOpenIntermediate = {
-    mode: mode,
-    query: query,
-    browserUrl: browserUrl,
-    appWebUrl: appWebUrl
-  };
-
-  var titleEl = document.getElementById('open_intermediate_title');
-  var descEl = document.getElementById('open_intermediate_desc');
-  var urlEl = document.getElementById('open_intermediate_url');
-  var primaryBtn = document.getElementById('open_intermediate_primary');
-  var secondaryBtn = document.getElementById('open_intermediate_secondary');
-  var copyWrap = document.getElementById('open_intermediate_copy_wrap');
-
-  if (titleEl) titleEl.textContent = (mode === 'app') ? 'アプリで開く' : 'ブラウザで開く';
-  if (descEl) {
-    descEl.textContent = (mode === 'app')
-      ? 'ボタンを押すとXアプリを起動します。開かない場合はもう一度お試しください。'
-      : 'ボタンを押すとブラウザで開きます。iOSではアプリが開く場合があるため、その場合は「URLをコピー」を使ってSafariのアドレスバーへ貼り付けてください。';
-  }
-  if (urlEl) urlEl.textContent = (mode === 'app') ? appWebUrl : browserUrl;
-  if (primaryBtn) primaryBtn.textContent = (mode === 'app') ? 'アプリで開く' : 'ブラウザで開く';
-  if (secondaryBtn) secondaryBtn.textContent = 'キャンセル';
-  if (copyWrap) copyWrap.style.display = (mode === 'browser') ? 'flex' : 'none';
-
-  modal.classList.add('active');
-}
-
-function closeOpenIntermediate(){
-  var modal = document.getElementById('modal_open_intermediate');
-  if (modal) modal.classList.remove('active');
-  pendingOpenIntermediate = null;
-}
-
-function copyUrlWithMessage(url, msg){
-  var message = msg || 'URLをコピーしました';
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(function(){
-      alert(message);
-    }).catch(function(){
-      try { prompt('URLをコピーしてください', url); } catch(e) { alert(message); }
-    });
-    return;
-  }
-  try { prompt('URLをコピーしてください', url); } catch(e) { alert(message); }
 }
 
 function buildQueryAnalysis(query){
@@ -769,14 +678,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // プリセットモーダル内のタイトル・編集欄で一時的にスクロール許可
+  // プリセットモーダル内のタイトル・編集欄で一時的にスクロール許可（位置ずれ防止のため focused クラスは使わない）
   var presetModal = document.getElementById('modal_preset');
   if (presetModal) {
     presetModal.addEventListener('focusin', function(e){
       var target = e.target;
       if (!target) return;
       if (target.classList && (target.classList.contains('preset-title') || target.classList.contains('preset-edit-textarea'))) {
-        presetModal.classList.add('focused');
         try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(true); } catch(e) {}
         setTimeout(function(){
           try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
@@ -787,7 +695,6 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){
         var active = document.activeElement;
         if (!active || !presetModal.contains(active)) {
-          presetModal.classList.remove('focused');
           try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(false); } catch(e) {}
         }
       }, 180);
@@ -937,29 +844,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // アプリ/ブラウザ中間ページモーダル
-  var openModal = document.getElementById('modal_open_intermediate');
-  if (openModal) {
-    var closeOpen = document.getElementById('close_open_intermediate');
-    var primaryOpen = document.getElementById('open_intermediate_primary');
-    var secondaryOpen = document.getElementById('open_intermediate_secondary');
-    var copyOpen = document.getElementById('open_intermediate_copy');
-    if (closeOpen) closeOpen.addEventListener('click', function(){ closeOpenIntermediate(); });
-    if (secondaryOpen) secondaryOpen.addEventListener('click', function(){ closeOpenIntermediate(); });
-    if (primaryOpen) primaryOpen.addEventListener('click', function(){
-      if (!pendingOpenIntermediate) return;
-      var st = pendingOpenIntermediate;
-      if (st.mode === 'app') openAppOnly(st.query, st.appWebUrl);
-      else openInBrowserNoApp(st.browserUrl, st.query);
-      closeOpenIntermediate();
-    });
-    if (copyOpen) copyOpen.addEventListener('click', function(){
-      if (!pendingOpenIntermediate) return;
-      var url = pendingOpenIntermediate.browserUrl || pendingOpenIntermediate.appWebUrl;
-      copyUrlWithMessage(url, 'URLをコピーしました');
-    });
-    openModal.addEventListener('click', function(e){ if (e.target === openModal) closeOpenIntermediate(); });
-  }
 
   // メニューボタンで特定入力をフォーカスする（基本検索を常設した際の挙動）
   document.querySelectorAll('.menu-btn[data-focus]').forEach(function(btn) {
@@ -1602,16 +1486,6 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 });
 
-// bind open-mode preference (auto/app/browser)
-document.addEventListener('DOMContentLoaded', function(){
-  var radios = document.querySelectorAll('input[name="open_mode"]');
-  if (!radios || radios.length === 0) return;
-  var saved = getStoredOpenMode();
-  setOpenMode(saved, { skipSave: true });
-  radios.forEach(function(r){
-    r.addEventListener('change', function(){ if (r.checked) setOpenMode(r.value); });
-  });
-});
 
 // Reset all inputs to defaults
 function resetAllInputs() {

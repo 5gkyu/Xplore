@@ -152,79 +152,40 @@ function tryOpenSchemeIOS(scheme){
   } catch(e) {}
 }
 
+// パターン1: 直叩き＋短い連続試行（最優先でアプリ起動）
+function openAppPattern1(query){
+  var device = getDeviceInfo();
+  var targets = buildAppTargets(query, null, { includeFallback: false });
+  if (device.isAndroid && device.isChrome && targets.intentUrl) {
+    try { window.location.href = targets.intentUrl; } catch(e) { /* ignore */ }
+    return;
+  }
+  var schemes = targets.schemes || [];
+  if (device.isIOS) {
+    if (schemes.length) {
+      tryOpenSchemeIOS(schemes[0]);
+      if (schemes.length > 1) {
+        setTimeout(function(){ tryOpenSchemeIOS(schemes[1]); }, 300);
+      }
+      setTimeout(function(){ tryOpenSchemeIOS(schemes[0]); }, 700);
+    }
+    return;
+  }
+  if (schemes.length) {
+    tryOpenSchemes(schemes, null);
+  }
+}
+
 function openAppOrFallback(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return openInBrowser(webUrl);
-  if (device.isIOS) {
-    var targetsIOS = buildAppTargets(query, webUrl, { includeFallback: false });
-    var schemesIOS = targetsIOS.schemes || [];
-    var openedIOS = false;
-    var timerIOS = null;
-    function cleanupIOS(){ if (timerIOS) clearTimeout(timerIOS); document.removeEventListener('visibilitychange', onVisIOS); }
-    function onVisIOS(){ if (document.hidden) { openedIOS = true; cleanupIOS(); } }
-    document.addEventListener('visibilitychange', onVisIOS);
-    if (schemesIOS.length) {
-      tryOpenSchemeIOS(schemesIOS[0]);
-      if (schemesIOS.length > 1) {
-        setTimeout(function(){ tryOpenSchemeIOS(schemesIOS[1]); }, 300);
-      }
-    }
-    timerIOS = setTimeout(function(){
-      cleanupIOS();
-      if (!openedIOS && webUrl) {
-        try { window.location.href = webUrl; } catch(e) { openInBrowser(webUrl); }
-      }
-    }, OPEN_APP_TIMEOUT_MS + 400);
-    return;
-  }
-  var targets = buildAppTargets(query, webUrl, { includeFallback: true });
-  if (device.isAndroid && device.isChrome && targets.intentUrl) {
-    var timer = null;
-    var opened = false;
-    function cleanup(){ if (timer) clearTimeout(timer); document.removeEventListener('visibilitychange', onVis); }
-    function onVis(){ if (document.hidden) { opened = true; cleanup(); } }
-    document.addEventListener('visibilitychange', onVis);
-    try { window.location.href = targets.intentUrl; } catch(e) { /* ignore */ }
-    timer = setTimeout(function(){ cleanup(); if (!opened) openInBrowser(webUrl); }, OPEN_APP_TIMEOUT_MS);
-    return;
-  }
-  tryOpenSchemes(targets.schemes, webUrl);
+  openAppPattern1(query);
 }
 
 function openAppOnly(query, webUrl){
   var device = getDeviceInfo();
   if (!device.isMobile) return;
-  if (device.isIOS) {
-    var targetsIOS = buildAppTargets(query, webUrl, { includeFallback: false });
-    var schemesIOS = targetsIOS.schemes || [];
-    if (schemesIOS.length) {
-      var openedIOS = false;
-      var timerIOS = null;
-      function cleanupIOS(){ if (timerIOS) clearTimeout(timerIOS); document.removeEventListener('visibilitychange', onVisIOS); }
-      function onVisIOS(){ if (document.hidden) { openedIOS = true; cleanupIOS(); } }
-      document.addEventListener('visibilitychange', onVisIOS);
-      tryOpenSchemeIOS(schemesIOS[0]);
-      if (schemesIOS.length > 1) {
-        setTimeout(function(){
-          tryOpenSchemeIOS(schemesIOS[1]);
-        }, 300);
-      }
-      timerIOS = setTimeout(function(){
-        cleanupIOS();
-        if (!openedIOS && webUrl) {
-          try { window.location.href = webUrl; } catch(e) { openInBrowser(webUrl); }
-        }
-      }, OPEN_APP_TIMEOUT_MS + 400);
-    }
-    return;
-  }
-  if (!confirm('xを開きますか？')) return;
-  var targets = buildAppTargets(query, webUrl, { includeFallback: false });
-  if (device.isAndroid && device.isChrome && targets.intentUrl) {
-    try { window.location.href = targets.intentUrl; } catch(e) { /* ignore */ }
-    return;
-  }
-  tryOpenSchemes(targets.schemes, webUrl);
+  openAppPattern1(query);
 }
 
 function openSearchWithPreference(query){
@@ -236,7 +197,7 @@ function openSearchWithPreference(query){
     return openInBrowserNoApp(browserUrl);
   }
   if (mode === 'app') return openAppOnly(query, url);
-  if (device.isMobile) return openAppOrFallback(query, url);
+  if (device.isMobile) return openAppOnly(query, url);
   return openInBrowser(url);
 }
 

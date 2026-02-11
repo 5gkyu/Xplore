@@ -205,6 +205,10 @@ function openSearchWithPreference(query){
   var mode = getOpenMode();
   var device = getDeviceInfo();
   var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
+  if (device.isIOS && mode !== 'browser') {
+    try { window.location.href = buildSearchURLWithBase(query, 'https://x.com/search?q='); } catch(e) { /* ignore */ }
+    return;
+  }
   if (mode === 'browser') {
     var browserUrl = buildSearchURLWithBase(query, device.isMobile ? 'https://m.twitter.com/search?q=' : null);
     return openInBrowserNoApp(browserUrl);

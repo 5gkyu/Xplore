@@ -667,53 +667,10 @@ document.addEventListener('DOMContentLoaded', function() {
       textEl.value = queryText;
       editArea.style.display = 'block';
       try { textEl.focus(); } catch(e) {}
-      try { textEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
     });
   });
 
-  // プリセット編集エリアの入力がキーボードで隠れないようにする
-  document.addEventListener('focusin', function(e){
-    var target = e.target;
-    if (!target) return;
-    if (target.classList && target.classList.contains('preset-edit-textarea')) {
-      try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(true); } catch(e) {}
-      setTimeout(function(){
-        try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
-      }, 120);
-    }
-  });
-  document.addEventListener('focusout', function(e){
-    var target = e.target;
-    if (!target) return;
-    if (target.classList && target.classList.contains('preset-edit-textarea')) {
-      setTimeout(function(){
-        try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(false); } catch(e) {}
-      }, 180);
-    }
-  });
-
-  // プリセットモーダル内のタイトル・編集欄で一時的にスクロール許可（位置ずれ防止のため focused クラスは使わない）
-  var presetModal = document.getElementById('modal_preset');
-  if (presetModal) {
-    presetModal.addEventListener('focusin', function(e){
-      var target = e.target;
-      if (!target) return;
-      if (target.classList && (target.classList.contains('preset-title') || target.classList.contains('preset-edit-textarea'))) {
-        try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(true); } catch(e) {}
-        setTimeout(function(){
-          try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
-        }, 120);
-      }
-    });
-    presetModal.addEventListener('focusout', function(){
-      setTimeout(function(){
-        var active = document.activeElement;
-        if (!active || !presetModal.contains(active)) {
-          try { if (typeof setMobileScrollAllowed === 'function') setMobileScrollAllowed(false); } catch(e) {}
-        }
-      }, 180);
-    });
-  }
+  // フォーカス時の強制スクロールは画面ズレの原因になるため無効化
 
   document.querySelectorAll('.preset-load-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -1808,85 +1765,23 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
-  // iOS Safari キーボード表示時のページズレ対策
-  if (window.visualViewport) {
-    var initialHeight = window.visualViewport.height;
-    var lastScrollTop = 0;
-    
-    function handleViewportChange() {
-      var currentHeight = window.visualViewport.height;
-      var offsetTop = window.visualViewport.offsetTop;
-      
-      // キーボードが表示された（ビューポートが縮小された）場合
-      if (currentHeight < initialHeight * 0.85) {
-        // ページのスクロールを元に戻す
-        window.scrollTo(0, 0);
-        document.body.style.position = 'fixed';
-        document.body.style.top = '0';
-        document.body.style.left = '0';
-        document.body.style.right = '0';
-        document.body.style.bottom = 'auto';
-      } else {
-        // キーボードが非表示になった場合
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.left = '';
-        document.body.style.right = '';
-        document.body.style.bottom = '';
-        window.scrollTo(0, 0);
-      }
-    }
-    
-    window.visualViewport.addEventListener('resize', handleViewportChange);
-    window.visualViewport.addEventListener('scroll', function() {
-      // ビューポートのスクロールを防ぐ
-      window.scrollTo(0, 0);
-    });
-  }
-
-  // フォーカス時にスクロール許可＋入力を表示（iOS Safari含む）
-  function setMobileScrollAllowed(allow){
+  // 実効ビューポート高をCSS変数へ反映（キーボード表示時のずれ軽減）
+  function syncAppViewportHeight(){
     try {
-      var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints>0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints>0);
-      if (!isTouch) return;
-      var html = document.documentElement;
-      var body = document.body;
-      if (allow) {
-        html.classList.add('allow-scroll-mobile');
-        body.classList.add('allow-scroll-mobile');
-      } else {
-        html.classList.remove('allow-scroll-mobile');
-        body.classList.remove('allow-scroll-mobile');
-      }
-    } catch(e){ console.warn('setMobileScrollAllowed failed', e); }
+      var vh = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-vh', (vh * 0.01) + 'px');
+    } catch(e){}
+  }
+  syncAppViewportHeight();
+  window.addEventListener('resize', syncAppViewportHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncAppViewportHeight);
   }
 
-  var inputFields = document.querySelectorAll('input[type="text"], textarea, select');
-  inputFields.forEach(function(field) {
-    field.addEventListener('focus', function() {
-      setMobileScrollAllowed(true);
-      setTimeout(function() {
-        try { field.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
-      }, 100);
-    });
-    field.addEventListener('blur', function() {
-      setTimeout(function(){ setMobileScrollAllowed(false); }, 150);
-    });
-  });
-
-  // モーダル内の入力フィールドがキーボードで隠れないようにする
-  var modalInputs = document.querySelectorAll('.section-modal input[type="text"], .section-modal textarea');
-  modalInputs.forEach(function(input) {
-    input.addEventListener('focus', function(e) {
-      var modal = input.closest('.section-modal');
-      if (modal) {
-        setTimeout(function() {
-          // 入力フィールドがモーダル内で見えるようにスクロール
-          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-      }
-    });
-  });
+  // 旧: フォーカス時スクロール許可はズレ要因になるため無効化
+  function setMobileScrollAllowed(allow){
+    return;
+  }
 
   // 旧プリセット編集モーダルは廃止
 

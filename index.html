@@ -39,10 +39,11 @@
   <link rel="apple-touch-icon" href="ogp.png" />
   
   <style>
-:root{ --bg:#f6fbfb; --card:#ffffff; --card-rgb:255,255,255; --accent-1:#0fb8bf; --accent-2:#8fe3dd; --text:#073a46; --muted:#57727a; --input-bg:#ffffff; --input-border:rgba(6,50,58,0.08); --shadow:0 10px 30px rgba(2,18,22,0.06); --radius:12px; --collapse-header-bg:#f3f3f3; --collapse-content-bg:#fafafa; --collapse-border:rgba(6,50,58,0.06); --miku-headset-red-1:#ff2d55; --miku-headset-red-2:#ff6b7a; --bottom-bar-height:64px; --footer-height:56px; }
+:root{ --bg:#f6fbfb; --card:#ffffff; --card-rgb:255,255,255; --accent-1:#0fb8bf; --accent-2:#8fe3dd; --text:#073a46; --muted:#57727a; --input-bg:#ffffff; --input-border:rgba(6,50,58,0.08); --shadow:0 10px 30px rgba(2,18,22,0.06); --radius:12px; --collapse-header-bg:#f3f3f3; --collapse-content-bg:#fafafa; --collapse-border:rgba(6,50,58,0.06); --miku-headset-red-1:#ff2d55; --miku-headset-red-2:#ff6b7a; --bottom-bar-height:64px; --footer-height:56px; --app-vh:1vh; }
 html.theme-kohane{ --bg:#ffdada; --card:#ffffff; --accent-1:#ff6b8a; --accent-2:#ff9eb0; --text:#5c3a3a; --muted:#8a6565; --input-bg:#fff8f5; --collapse-header-bg:#fff0ed; --collapse-content-bg:#fff8f5; }
 html,body{
-  min-height:100vh;
+  min-height:calc(var(--app-vh) * 100);
+  height:calc(var(--app-vh) * 100);
   margin:0;
   font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
   color:var(--text);
@@ -173,8 +174,10 @@ html.allow-scroll-mobile, body.allow-scroll-mobile{
   border-radius:14px;
   max-width:500px;
   width:100%;
-  max-height:85vh;
+  max-height:calc(var(--app-vh) * 85);
   overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   box-shadow:0 10px 40px rgba(2,12,20,0.4);
   border:1px solid rgba(6,50,58,0.04);
 }
@@ -203,7 +206,7 @@ html.allow-scroll-mobile, body.allow-scroll-mobile{
   justify-content:center;
   box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
-.card{ width:100%; max-width:500px; margin:0 auto; background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid rgba(6,50,58,0.04); box-sizing:border-box; min-width:0; overflow-x:hidden; max-height:calc(100vh - 48px); overflow:hidden; }
+.card{ width:100%; max-width:500px; margin:0 auto; background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid rgba(6,50,58,0.04); box-sizing:border-box; min-width:0; overflow-x:hidden; max-height:calc((var(--app-vh) * 100) - 48px); overflow:hidden; }
 header{display:flex;gap:12px;align-items:center}
 .logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-1);color:white;font-weight:800;font-size:20px}
 h1{margin:0;font-size:18px}
@@ -528,6 +531,7 @@ textarea{min-height:88px;resize:vertical}
 .modal-overlay.active{ display:flex; }
 .modal-overlay.focused{ align-items:flex-start; padding-top:12px; }
 .modal-panel{ position:relative; background:var(--card); padding:12px; border-radius:10px; max-width:500px; width:92%; max-height:80vh; overflow:auto; box-shadow:0 10px 40px rgba(2,12,20,0.4); border:1px solid rgba(6,50,58,0.04); }
+.modal-panel{ max-height:calc(var(--app-vh) * 80); -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
 .modal-overlay.focused .modal-panel{ margin-top:0; max-height:90vh; }
 .modal-panel h3{ margin:0 0 10px 0; color:var(--text); font-size:15px; }
 .modal-close-btn{
@@ -586,7 +590,7 @@ textarea{min-height:88px;resize:vertical}
   .period-buttons button{ flex:1 1 0 }
 }
 .date-input{ width:120px; padding:6px 8px; border-radius:8px; text-align:center; font-size:13px; border:1px solid var(--input-border); background:var(--input-bg); }
-.wrap{ padding-top:0; padding-bottom:16px; display:flex;flex-direction:column;align-items:center; min-height:100vh; }
+.wrap{ padding-top:0; padding-bottom:16px; display:flex;flex-direction:column;align-items:center; min-height:calc(var(--app-vh) * 100); }
 
 /* iOS Safari キーボード対策 */
 @supports (-webkit-touch-callout: none) {
@@ -675,12 +679,12 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
   #modal_type .section-modal {
     max-width: 720px;
     width: min(96%, 720px);
-    max-height: 92vh;
+    max-height: calc(var(--app-vh) * 92);
     overflow: visible; /* allow content to expand without inner scroll */
     padding: 18px;
   }
   @media(max-width:520px){
-    #modal_type .section-modal { width: 96%; max-width: 520px; max-height: 92vh; overflow:auto; }
+    #modal_type .section-modal { width: 96%; max-width: 520px; max-height: calc(var(--app-vh) * 92); overflow:auto; }
   }
   </style>
 </head>

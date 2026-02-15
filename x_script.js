@@ -196,9 +196,7 @@ function openAppOnly(query, webUrl){
 }
 
 function openSearchWithPreference(query){
-  var device = getDeviceInfo();
-  var url = buildSearchURL ? buildSearchURL(query) : ('https://x.com/search?q=' + encodeURIComponent(query));
-  if (device.isMobile) return openAppOnly(query, url);
+  var url = buildSearchURL ? buildSearchURL(query) : ('https://twitter.com/search?q=' + encodeURIComponent(query));
   return openInBrowser(url);
 }
 
@@ -1342,7 +1340,7 @@ function buildQuery() {
 
 function buildSearchURLWithBase(query, basePrefix) {
   var encoded = encodeURIComponent(query || '');
-  var base = basePrefix ? (basePrefix + encoded) : ('https://x.com/search?q=' + encoded);
+  var base = basePrefix ? (basePrefix + encoded) : ('https://twitter.com/search?q=' + encoded);
   var fParam = null;
   try {
     var mediaTab = document.getElementById('tab_media');

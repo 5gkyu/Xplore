@@ -193,19 +193,22 @@ html.allow-scroll-mobile, body.allow-scroll-mobile{
   position:absolute;
   right:12px;
   top:12px;
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  background:#ff6699;
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:#475569; /* muted slate */
   color:white;
-  border:0;
+  border:1px solid rgba(0,0,0,0.06);
   cursor:pointer;
   font-size:18px;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  box-shadow:none;
+  transition:transform .14s ease, background .14s ease;
 }
+.section-modal-close:hover{ background:#394852; transform:translateY(-1px); }
+.section-modal-close:active{ transform:translateY(0) scale(0.98); }
 .card{ width:100%; max-width:500px; margin:0 auto; background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid rgba(6,50,58,0.04); box-sizing:border-box; min-width:0; overflow-x:hidden; max-height:calc((var(--app-vh) * 100) - 48px); overflow:hidden; }
 header{display:flex;gap:12px;align-items:center}
 .logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-1);color:white;font-weight:800;font-size:20px}
@@ -345,13 +348,13 @@ textarea{min-height:88px;resize:vertical}
   padding:8px;
 }
 .engagement-columns .engagement-buttons{
-  margin-top:6px;
-  gap:6px;
+  margin-top:10px;
+  gap:10px;
 }
 .engagement-columns .engagement-buttons button{
-  padding:6px 0;
+  padding:8px 0;
   font-size:11px;
-  border-radius:6px;
+  border-radius:10px;
   box-shadow:none;
 }
 @media(max-width:520px){
@@ -398,22 +401,25 @@ textarea{min-height:88px;resize:vertical}
 /* リセットボタン色を統一（スマホと同じパステルピンク） */
 .engagement-reset-btn {
   text-align: center;
-  padding: 4px 10px;
-  font-size: 11px;
-  border-radius: 4px;
-  background: #e3f5ff;
-  color: var(--text);
-  border: 1px solid var(--input-border);
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 10px;
+  background: #f0f5ff;
+  color: #2a3f66;
+  border: 1px solid #c9d7ff;
   cursor: pointer;
   vertical-align: middle;
   line-height: 1.1;
-  transition: background 0.2s;
+  font-weight: 800;
+  transition: background 0.2s, transform .14s ease;
   white-space: nowrap;
   width: auto;
 }
 .engagement-reset-btn:hover {
-  background: #d6eaff;
+  background: #e5eeff;
+  transform: translateY(-1px);
 }
+.engagement-reset-btn:active { transform: translateY(0) scale(0.98); }
 /* いいね用ボタン色（パステルピンク） */
 .engagement-buttons .like-btn {
   background: #ffe3ea;
@@ -538,41 +544,55 @@ textarea{min-height:88px;resize:vertical}
   position:absolute;
   right:12px;
   top:10px;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  background:#ff6699;
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:#475569; /* muted slate */
   color:white;
-  border:1px solid #ff9eb0;
+  border:1px solid rgba(0,0,0,0.06);
   cursor:pointer;
   font-size:18px;
   display:flex;
   align-items:center;
   justify-content:center;
   box-shadow:none;
+  transition:transform .14s ease, background .14s ease;
 }
+.modal-close-btn:hover{ background:#394852; transform:translateY(-1px); }
+.modal-close-btn:active{ transform:translateY(0) scale(0.98); }
 .modal-copy-btn{ position:absolute; right:56px; top:8px; padding:6px 10px; border-radius:8px; background:var(--accent-1); color:white; border:1px solid var(--accent-2); cursor:pointer; font-size:13px; }
 /* action-styled buttons inside modal (not absolutely positioned) */
-.modal-action-btn{ padding:6px 10px; border-radius:8px; background:var(--accent-1); color:white; border:1px solid var(--accent-2); cursor:pointer; font-size:13px; }
+.modal-action-btn{ padding:9px 14px; border-radius:10px; background:#2f6fa6; color:#fff; border:1px solid rgba(47,111,166,0.16); cursor:pointer; font-size:13px; font-weight:700; letter-spacing:.01em; transition:transform .14s ease, background .14s ease; }
+.modal-action-btn:hover{ background:#255f92; transform:translateY(-1px); }
+.modal-action-btn:active{ transform:translateY(0) scale(0.98); }
 .open-intermediate-url{ margin-top:8px; padding:8px 10px; background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; font-size:12px; color:var(--muted); word-break:break-all; }
 .open-intermediate-actions{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .open-intermediate-actions .secondary{ font-weight:700; }
 .query-analysis{ background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; padding:10px; font-size:12px; color:var(--text); line-height:1.6; }
 .query-analysis ul{ margin:6px 0 0 18px; padding:0; }
 .query-analysis li{ margin:2px 0; }
-.preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); flex-wrap:wrap; }
+.preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:10px; background:#fbfdff; border-radius:8px; border:1px solid rgba(6,50,58,0.04); flex-wrap:wrap; }
 .preset-row input{ flex:1; padding:8px; border-radius:6px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; }
-.preset-row button{ padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:0; }
-.preset-edit-btn{ background:#ffe7b3; color:var(--text); border:1px solid var(--input-border); }
-.preset-edit-btn:hover{ background:#ffefc9; }
+.preset-row button{ padding:9px 13px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; border:1px solid transparent; transition:transform .14s ease, background .14s ease; }
+.preset-row button:hover{ transform:translateY(-1px); }
+.preset-row button:active{ transform:translateY(0) scale(0.98); }
+.preset-edit-btn{ background:#eef2f6; color:#0f1724; border-color:#d6e1ea; }
+.preset-edit-btn:hover{ background:#e6edf2; }
 .preset-edit-area{ display:none; width:100%; margin-top:8px; }
-.preset-edit-area textarea{ width:100%; height:110px; padding:10px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); box-sizing:border-box; }
+.preset-edit-area textarea{ width:100%; height:110px; padding:10px; border-radius:8px; border:1px solid rgba(6,50,58,0.06); background:var(--input-bg); color:var(--text); box-sizing:border-box; }
 .preset-edit-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
-.preset-edit-actions button{ padding:6px 10px; border-radius:8px; border:0; font-size:12px; font-weight:700; cursor:pointer; }
-.preset-edit-actions .preset-save-current-btn{ background:#e7e3ff; color:var(--text); border:1px solid var(--input-border); }
-.preset-edit-actions .preset-save-btn-inline{ background:#ffe3ea; color:var(--text); border:1px solid var(--input-border); }
-.preset-save-btn{ background:#c9f2d1; color:var(--text); border:1px solid var(--input-border); }
-.preset-load-btn{ background:#d8f1ff; color:var(--text); border:1px solid var(--input-border); }
+.preset-edit-actions button{ padding:8px 12px; border-radius:10px; border:1px solid transparent; font-size:12px; font-weight:800; cursor:pointer; transition:transform .14s ease, background .14s ease; }
+.preset-edit-actions button:hover{ transform:translateY(-1px); }
+.preset-edit-actions button:active{ transform:translateY(0) scale(0.98); }
+.preset-edit-actions .secondary{ background:#f5f7fa; color:#0f1724; border-color:#e2e8f0; }
+.preset-edit-actions .secondary:hover{ background:#eef2f6; }
+.preset-edit-actions .preset-save-current-btn{ background:#2f6fa6; color:white; border-color:transparent; }
+.preset-edit-actions .preset-save-current-btn:hover{ background:#255f92; }
+.preset-edit-actions .preset-save-btn-inline{ background:#64748b; color:white; border-color:transparent; }
+.preset-edit-actions .preset-save-btn-inline:hover{ background:#596778; }
+.preset-save-btn{ background:#10b981; color:white; border:1px solid rgba(16,185,129,0.12); }
+.reset-preset-save-btn:hover{ opacity:0.95 }
+.preset-load-btn{ background:#eaf4ff; color:#0b2b44; border:1px solid #cfe6ff; }
 .preset-actions{ display:flex; gap:8px; }
 .history-row{ display:flex; gap:8px; align-items:center; padding:10px 8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); margin-bottom:6px; cursor:pointer; }
 .history-row:hover{ background:var(--collapse-header-bg); }
@@ -924,10 +944,10 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
               <input id="q_min_replies" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 3" inputmode="numeric" maxlength="6" />
               <div class="engagement-buttons">
                 <button type="button" class="reply-btn" data-target="q_min_replies" data-value="1">1</button>
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="3">3</button>
                 <button type="button" class="reply-btn" data-target="q_min_replies" data-value="5">5</button>
                 <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
                 <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
+                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="50">50</button>
               </div>
             </div>
 
@@ -1139,6 +1159,12 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
                     
           <div style="margin-top:10px">
             <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
+          </div>
+          <div style="margin-top:8px">
+            <a href="https://5gkyu.github.io/KyuLink/" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">🔗 KyuLink</a>
+          </div>
+          <div style="margin-top:8px">
+            <a href="https://x.com/i/bookmarks" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">🔖 ブックマーク</a>
           </div>
           <div style="margin-top:10px">
             <label class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">📺 結果表示</label>

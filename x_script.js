@@ -545,156 +545,39 @@ bindExclusive(document.getElementById('only_verified'), document.getElementById(
 bindExclusive(document.getElementById('only_following'), document.getElementById('exclude_following'));
 // --- 以下は x.html のインラインスクリプトを統合したもの ---
 document.addEventListener('DOMContentLoaded', function() {
-  // プリセット機能
-  var presets = JSON.parse(localStorage.getItem('x_presets') || '{}');
-  if (!presets[1]) presets[1] = {};
-  var preset1Updated = false;
-  if (!presets[1].title) { presets[1].title = 'タイムライン'; preset1Updated = true; }
-  if (!presets[1].rawQuery) { presets[1].rawQuery = 'filter:follows include:nativeretweets -filter:replies'; preset1Updated = true; }
-  if (preset1Updated) localStorage.setItem('x_presets', JSON.stringify(presets));
-  function loadPresetTitles() {
-    for (var i = 1; i <= 5; i++) {
-      var row = document.querySelector('.preset-row[data-preset="' + i + '"]');
-      if (row && presets[i] && presets[i].title) {
-        row.querySelector('.preset-title').value = presets[i].title;
-      }
-    }
-  }
-  loadPresetTitles();
-
-  // プリセットタイトルは自動保存
-  document.querySelectorAll('.preset-row .preset-title').forEach(function(titleInput){
-    titleInput.addEventListener('click', function(e){
-      if (titleInput.readOnly) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    });
-    titleInput.addEventListener('pointerdown', function(e){
-      if (titleInput.readOnly) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    });
-    titleInput.addEventListener('input', function(){
-      var row = titleInput.closest('.preset-row');
-      if (!row) return;
-      var idx = row.getAttribute('data-preset');
-      if (!presets[idx]) presets[idx] = {};
-      presets[idx].title = titleInput.value;
-      localStorage.setItem('x_presets', JSON.stringify(presets));
-    });
-  });
-
-  // プリセットのクエリ内容をインラインで編集
-  document.querySelectorAll('.preset-edit-btn').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var row = btn.closest('.preset-row');
-      if (!row) return;
-      var idx = row.getAttribute('data-preset');
-      var preset = presets[idx] || {};
-      var editArea = row.querySelector('.preset-edit-area');
-      var titleInput = row.querySelector('.preset-title');
-      if (!editArea) return;
-
-      // toggle edit area
-      if (editArea.style.display === 'block') {
-        editArea.style.display = 'none';
-        if (titleInput) titleInput.readOnly = true;
-        return;
-      }
-      if (titleInput) titleInput.readOnly = false;
-
-      // 初回のみ編集UIを生成
-      if (!editArea.hasChildNodes()) {
-        editArea.innerHTML = '';
-        var textarea = document.createElement('textarea');
-        textarea.className = 'preset-edit-textarea';
-        var actions = document.createElement('div');
-        actions.className = 'preset-edit-actions';
-        var cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.textContent = '閉じる';
-        cancelBtn.className = 'secondary';
-        var saveCurrentBtn = document.createElement('button');
-        saveCurrentBtn.type = 'button';
-        saveCurrentBtn.textContent = '現在のクエリを保存';
-        saveCurrentBtn.className = 'preset-save-current-btn';
-        var saveBtn = document.createElement('button');
-        saveBtn.type = 'button';
-        saveBtn.textContent = '保存';
-        saveBtn.className = 'preset-save-btn-inline';
-        actions.appendChild(cancelBtn);
-        actions.appendChild(saveCurrentBtn);
-        actions.appendChild(saveBtn);
-        editArea.appendChild(textarea);
-        editArea.appendChild(actions);
-
-        cancelBtn.addEventListener('click', function(){
-          editArea.style.display = 'none';
-          if (titleInput) titleInput.readOnly = true;
-        });
-        saveCurrentBtn.addEventListener('click', function(){
-          var currentQuery = '';
-          try { currentQuery = buildQuery(); } catch(e){ currentQuery = ''; }
-          textarea.value = (currentQuery || '').trim();
-        });
-        saveBtn.addEventListener('click', function(){
-          var newTitle = row.querySelector('.preset-title').value;
-          var newQuery = textarea.value || '';
-          if (!presets[idx]) presets[idx] = {};
-          presets[idx].title = newTitle;
-          presets[idx].rawQuery = newQuery;
-          localStorage.setItem('x_presets', JSON.stringify(presets));
-          alert('プリセット「' + newTitle + '」を保存しました');
-        });
-      }
-
-      // 内容をセットして表示
-      var textEl = editArea.querySelector('textarea');
-      var queryText = (preset.rawQuery || '').trim();
-      if (!queryText && preset.data) {
-        Object.keys(preset.data).forEach(function(key){
-          var el = document.getElementById(key);
-          if (el) el.value = preset.data[key];
-        });
-        try { queryText = buildQuery(); } catch(e){ queryText = ''; }
-      }
-      textEl.value = queryText;
-      editArea.style.display = 'block';
-      try { textEl.focus(); } catch(e) {}
-    });
-  });
+  // ショートカット機能（呼出専用・固定）
+  var presets = {
+    1: { title: 'タイムライン', rawQuery: 'filter:follows include:nativeretweets -filter:replies' },
+    2: { title: 'ブックマーク', url: 'https://x.com/i/bookmarks' },
+    3: { title: 'DM', url: 'https://x.com/messages' },
+    4: { title: '通知', url: 'https://x.com/notifications' },
+    5: { title: 'Grok', url: 'https://x.com/i/grok' }
+  };
 
   // フォーカス時の強制スクロールは画面ズレの原因になるため無効化
 
-  document.querySelectorAll('.preset-load-btn').forEach(function(btn) {
+  document.querySelectorAll('.preset-load-btn[data-preset]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var row = btn.closest('.preset-row');
-      var idx = row.getAttribute('data-preset');
+      var idx = btn.getAttribute('data-preset');
       var preset = presets[idx] || null;
       if (!preset) {
-        alert('このプリセットは保存されていません');
+        alert('このショートカットは使用できません');
         return;
       }
 
-      var hasData = preset.data && Object.keys(preset.data).length > 0;
       var hasRawQuery = preset.rawQuery && String(preset.rawQuery).trim();
+      var hasUrl = preset.url && String(preset.url).trim();
 
-      if (!hasData && !hasRawQuery) {
-        alert('このプリセットは保存されていません');
+      if (!hasRawQuery && !hasUrl) {
+        alert('このショートカットは使用できません');
         return;
       }
 
-      if (hasData && !hasRawQuery) {
-        Object.keys(preset.data).forEach(function(key) {
-          var el = document.getElementById(key);
-          if (el) el.value = preset.data[key];
-        });
-        markAutoQueryUpdate();
-        if (typeof updatePreview === 'function') updatePreview();
+      if (hasUrl) {
+        document.getElementById('modal_preset').classList.remove('active');
+        openInBrowser(String(preset.url).trim());
+        alert('ショートカット「' + (preset.title || '') + '」を開きました');
+        return;
       }
 
       if (hasRawQuery) {
@@ -716,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
           openSearchWithPreference(q);
         }
       } catch(e) { console.warn('preset quick search failed', e); }
-      alert('プリセット「' + (preset.title || '') + '」を呼び出しました');
+      alert('ショートカット「' + (preset.title || '') + '」を呼び出しました');
     });
   });
 
@@ -805,6 +688,67 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // X風ボトムメニュー
+  function runMainSearchFromBottom() {
+    var quick = document.getElementById('btn_quick_search');
+    if (quick) {
+      quick.click();
+      return;
+    }
+    var top = document.getElementById('top_btn_search');
+    if (top) top.click();
+  }
+
+  var bottomTimelineBtn = document.getElementById('bottom_nav_timeline');
+  if (bottomTimelineBtn) {
+    bottomTimelineBtn.addEventListener('click', function() {
+      var timelineShortcutBtn = document.querySelector('.preset-load-btn[data-preset="1"]');
+      if (timelineShortcutBtn) {
+        timelineShortcutBtn.click();
+        return;
+      }
+      manualQueryOverride = 'filter:follows include:nativeretweets -filter:replies';
+      userEditedQuery = true;
+      if (typeof updatePreview === 'function') updatePreview();
+      runMainSearchFromBottom();
+    });
+  }
+
+  var bottomSearchBtn = document.getElementById('bottom_nav_search');
+  if (bottomSearchBtn) {
+    bottomSearchBtn.addEventListener('click', function() {
+      runMainSearchFromBottom();
+    });
+  }
+
+  var bottomGrokBtn = document.getElementById('bottom_nav_grok');
+  if (bottomGrokBtn) {
+    bottomGrokBtn.addEventListener('click', function() {
+      openInBrowser('https://x.com/i/grok');
+    });
+  }
+
+  var bottomNotificationsBtn = document.getElementById('bottom_nav_notifications');
+  if (bottomNotificationsBtn) {
+    bottomNotificationsBtn.addEventListener('click', function() {
+      openInBrowser('https://x.com/notifications');
+    });
+  }
+
+  var bottomDmBtn = document.getElementById('bottom_nav_dm');
+  if (bottomDmBtn) {
+    bottomDmBtn.addEventListener('click', function() {
+      openInBrowser('https://x.com/messages');
+    });
+  }
+
+  var bookmarksCardBtn = document.getElementById('btn_bookmarks');
+  if (bookmarksCardBtn) {
+    bookmarksCardBtn.addEventListener('click', function() {
+      openInBrowser('https://x.com/i/bookmarks');
+    });
+  }
+
   var clearHistoryBtn = document.getElementById('btn_clear_history');
   if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', function() {
@@ -824,21 +768,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function closePresetModal(){
     var modal = document.getElementById('modal_preset');
     if (!modal) return;
-    modal.querySelectorAll('.preset-row').forEach(function(row){
-      var idx = row.getAttribute('data-preset');
-      if (!idx) return;
-      if (!presets[idx]) presets[idx] = {};
-      var titleInput = row.querySelector('.preset-title');
-      if (titleInput) presets[idx].title = titleInput.value;
-      var editArea = row.querySelector('.preset-edit-area');
-      if (editArea) {
-        var textarea = editArea.querySelector('textarea');
-        if (textarea) presets[idx].rawQuery = textarea.value || '';
-        editArea.style.display = 'none';
-      }
-      if (titleInput) titleInput.readOnly = true;
-    });
-    localStorage.setItem('x_presets', JSON.stringify(presets));
     modal.classList.remove('active');
   }
 

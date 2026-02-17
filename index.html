@@ -231,9 +231,20 @@ p.lead{margin:6px 0 14px;color:var(--muted);font-size:13px}
 }
 label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
 
+/* ミニアプリカード */
+.mini-apps-wrap{ margin-top:12px; }
+.mini-apps{ display:flex; flex-direction:column; gap:12px; }
+.mini-app-card{ display:flex; flex-direction:row; align-items:center; gap:12px; padding:14px; border-radius:14px; background:var(--card); border:1px solid rgba(6,50,58,0.04); box-shadow:0 8px 20px rgba(3,12,18,0.04); text-decoration:none; color:var(--text); width:100%; box-sizing:border-box; }
+.mini-app-card:hover{ transform:translateY(-3px); box-shadow:0 14px 28px rgba(3,12,18,0.08); }
+.mini-app-card .mini-head{ display:flex; align-items:center; gap:12px }
+.mini-app-card .mini-icon{ width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent-1); color:white; font-size:20px; flex:0 0 48px }
+.mini-app-card .mini-title{ font-weight:800; font-size:15px }
+.mini-app-card .mini-desc{ font-size:13px; color:var(--muted); line-height:1.3 }
+.mini-app-card .mini-action{ margin-left:auto; padding:8px 12px; border-radius:12px; background:var(--accent-1); color:white; font-weight:800; font-size:13px; box-shadow:0 4px 10px rgba(11,94,100,0.08); text-decoration:none }
+@media(max-width:520px){ .mini-apps{ gap:10px } .mini-app-card{ padding:12px } .mini-app-card .mini-desc{ display:none } .mini-app-card .mini-action{ padding:8px 10px } }
+
 /* 基本検索内部はラベルと入力の隙間を詰める */
 .basic-section label{ margin-bottom:0; }
-.preset-row input{ flex:1; padding:8px; border-radius:6px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; color:var(--text); }
 input[type=text], select, textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px; box-sizing:border-box; box-shadow: inset 0 1px 0 rgba(2,12,14,0.02); }
 input::placeholder, textarea::placeholder { color: var(--muted); }
 
@@ -277,7 +288,7 @@ textarea{min-height:88px;resize:vertical}
 
 /* モバイルで入力フォーカス時に自動拡大されるのを防ぐ */
 @media (max-width: 600px){
-  input[type=text], select, textarea, .preset-row input{ font-size:16px; }
+  input[type=text], select, textarea{ font-size:16px; }
 }
 .secondary{background:#ffffff;border:1px solid rgba(6,50,58,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-weight:700;cursor:pointer}
 /* Make glossary/history action buttons match the large menu buttons */
@@ -459,7 +470,7 @@ textarea{min-height:88px;resize:vertical}
 }
 @media(max-width:520px){
   .account-type-row {
-    gap: 4px;
+  input[type=text], select, textarea{ font-size:16px; }
     row-gap: 2px;
     margin-bottom: 0;
   }
@@ -570,6 +581,14 @@ textarea{min-height:88px;resize:vertical}
   height:22px;
   display:block;
 }
+.x-bottom-nav .bottom-btn.grok-btn .grok-text{
+  font-weight:800;
+  font-size:18px;
+  line-height:1;
+  display:inline-block;
+}
+.x-bottom-nav .bottom-btn{ color:var(--accent-1); }
+.x-bottom-nav .bottom-btn.grok-btn{ color:#EE1166; }
 .x-bottom-nav.fixed-bottom-bar{
   padding:0;
   padding-bottom:env(safe-area-inset-bottom);
@@ -616,56 +635,11 @@ textarea{min-height:88px;resize:vertical}
 .query-analysis{ background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; padding:10px; font-size:12px; color:var(--text); line-height:1.6; }
 .query-analysis ul{ margin:6px 0 0 18px; padding:0; }
 .query-analysis li{ margin:2px 0; }
-.preset-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; padding:10px; background:#fbfdff; border-radius:8px; border:1px solid rgba(6,50,58,0.04); flex-wrap:wrap; }
-.preset-row input{ flex:1; padding:8px; border-radius:6px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; }
-.preset-row button{ padding:9px 13px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; border:1px solid transparent; transition:transform .14s ease, background .14s ease; }
-.preset-row button:hover{ transform:translateY(-1px); }
-.preset-row button:active{ transform:translateY(0) scale(0.98); }
-.preset-edit-btn{ background:#eef2f6; color:#0f1724; border-color:#d6e1ea; }
-.preset-edit-btn:hover{ background:#e6edf2; }
-.preset-edit-area{ display:none; width:100%; margin-top:8px; }
-.preset-edit-area textarea{ width:100%; height:110px; padding:10px; border-radius:8px; border:1px solid rgba(6,50,58,0.06); background:var(--input-bg); color:var(--text); box-sizing:border-box; }
-.preset-edit-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
-.preset-edit-actions button{ padding:8px 12px; border-radius:10px; border:1px solid transparent; font-size:12px; font-weight:800; cursor:pointer; transition:transform .14s ease, background .14s ease; }
-.preset-edit-actions button:hover{ transform:translateY(-1px); }
-.preset-edit-actions button:active{ transform:translateY(0) scale(0.98); }
-.preset-edit-actions .secondary{ background:#f5f7fa; color:#0f1724; border-color:#e2e8f0; }
-.preset-edit-actions .secondary:hover{ background:#eef2f6; }
-.preset-edit-actions .preset-save-current-btn{ background:#2f6fa6; color:white; border-color:transparent; }
-.preset-edit-actions .preset-save-current-btn:hover{ background:#255f92; }
-.preset-edit-actions .preset-save-btn-inline{ background:#64748b; color:white; border-color:transparent; }
-.preset-edit-actions .preset-save-btn-inline:hover{ background:#596778; }
-.preset-save-btn{ background:#10b981; color:white; border:1px solid rgba(16,185,129,0.12); }
-.reset-preset-save-btn:hover{ opacity:0.95 }
-.preset-load-btn{ background:#eaf4ff; color:#0b2b44; border:1px solid #cfe6ff; }
-.preset-actions{ display:flex; gap:8px; }
-.preset-call-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-top:8px; }
-.preset-call-btn{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  min-height:96px;
-  padding:14px 10px;
-  border-radius:14px;
-  border:1px solid rgba(6,50,58,0.07);
-  background:var(--card);
-  box-shadow:0 6px 16px rgba(2,12,20,0.08), 0 1px 0 rgba(255,255,255,0.7) inset;
-  cursor:pointer;
-}
-.preset-call-btn:hover{ transform:translateY(-1px); }
-.preset-call-btn .icon{ display:flex; align-items:center; justify-content:center; }
-.preset-call-btn .icon img{ width:24px; height:24px; display:block; }
-.preset-call-btn .label{ font-size:14px; font-weight:800; color:var(--text); }
-.preset-call-btn .sublabel{ font-size:11px; color:var(--muted); }
-@media(max-width:520px){
-  .preset-call-grid{ grid-template-columns:repeat(2, 1fr); gap:8px; }
-  .preset-call-btn{ min-height:88px; padding:12px 8px; }
-}
 .history-row{ display:flex; gap:8px; align-items:center; padding:10px 8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); margin-bottom:6px; cursor:pointer; }
 .history-row:hover{ background:var(--collapse-header-bg); }
-.history-date{ flex:0 0 90px; font-size:12px; color:var(--muted); }
+.history-date{ flex:0 0 145px; font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.history-day{ color:var(--muted); }
+.history-time{ color:var(--muted); opacity:0.9; }
 .history-query{ flex:1; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .clear-history-btn{ width:100%; margin-top:12px; padding:10px; border-radius:8px; background:var(--miku-headset-red-2); color:white; border:1px solid var(--miku-headset-red-1); cursor:pointer; font-weight:700; }
 .period-buttons{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
@@ -700,9 +674,6 @@ textarea{min-height:88px;resize:vertical}
   .wrap{ padding-top:0; padding-bottom:220px; }
 }
 
-@media(max-width:520px){
-  .preset-row input.preset-title{ font-size:16px; }
-}
 
 /* Footer (参考: linklocal.html) */
 footer.site-footer{
@@ -779,7 +750,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
 </head>
 <body>
   <div class="wrap">
-    <!-- top bar (常設) -->
     <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
       <button type="button" class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</button>
       <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
@@ -788,47 +758,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
 
     <div class="card" role="region" aria-label="X検索補助ツール">
 
-      <!-- fixed bottom bar removed; preset/history buttons moved into main card -->
-
-      <!-- プリセットモーダル -->
-      <div class="modal-overlay" id="modal_preset">
-        <div class="modal-panel">
-          <button class="modal-close-btn" id="close_preset"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/folder.svg" alt="" aria-hidden="true" /> ショートカット</h3>
-          <div id="preset_list" class="preset-call-grid">
-            <button type="button" class="preset-call-btn preset-load-btn" data-preset="1">
-              <span class="icon"><img src="./image/folder.svg" alt="" aria-hidden="true" /></span>
-              <span class="label">タイムライン</span>
-              <span class="sublabel">フォロー中心検索</span>
-            </button>
-            <button type="button" class="preset-call-btn preset-load-btn" data-preset="2">
-              <span class="icon"><img src="./image/heart.svg" alt="" aria-hidden="true" /></span>
-              <span class="label">ブックマーク</span>
-              <span class="sublabel">保存済みポスト</span>
-            </button>
-            <button type="button" class="preset-call-btn preset-load-btn" data-preset="3">
-              <span class="icon"><img src="./image/chat-circle.svg" alt="" aria-hidden="true" /></span>
-              <span class="label">DM</span>
-              <span class="sublabel">メッセージ</span>
-            </button>
-            <button type="button" class="preset-call-btn preset-load-btn" data-preset="4">
-              <span class="icon"><img src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
-              <span class="label">通知</span>
-              <span class="sublabel">通知タブ</span>
-            </button>
-            <button type="button" class="preset-call-btn preset-load-btn" data-preset="5">
-              <span class="icon"><img src="./image/gear.svg" alt="" aria-hidden="true" /></span>
-              <span class="label">Grok</span>
-              <span class="sublabel">AIアシスタント</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- プリセット編集モーダル -->
-      <!-- プリセット編集モーダルはインライン編集UIに置き換え -->
-
-      <!-- 検索履歴モーダル -->
       <div class="modal-overlay" id="modal_history">
         <div class="modal-panel">
           <button class="modal-close-btn" id="close_history"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
@@ -842,7 +771,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
         </div>
       </div>
 
-      <!-- 検索クエリ全文表示モーダル -->
       <div class="modal-overlay" id="modal_query">
         <div class="modal-panel">
           <button class="modal-close-btn" id="close_query"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
@@ -854,7 +782,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
           <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
             <button class="modal-action-btn" id="modal_query_select_all" title="全選択">全選択</button>
             <button class="modal-action-btn" id="modal_query_copy" title="コピー">コピー</button>
-            <!-- 保存ボタンは要望により削除 -->
           </div>
         </div>
       </div>
@@ -862,8 +789,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
 
 
 
-      <!-- 2×3 メニューボタングリッド -->
-      <!-- 基本検索をメイン画面に常設 -->
       <div class="basic-section search-hero" style="margin-top:0;">
         <div style="display:flex;flex-direction:column;gap:8px">
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
@@ -895,12 +820,12 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
         <button class="menu-btn" id="btn_bookmarks">
           <span class="icon"><img src="./image/bookmark.svg" alt="" aria-hidden="true" /></span>
           <span class="label">ブックマーク</span>
-          <span class="sublabel">保存済みポスト</span>
+          <span class="sublabel">ブックマークを開く</span>
         </button>
         <button class="menu-btn" id="btn_history">
           <span class="icon"><img src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
           <span class="label">検索履歴</span>
-          <span class="sublabel">条件の再利用</span>
+          <span class="sublabel">30件まで履歴を保存</span>
         </button>
         <button class="menu-btn" data-modal="modal_other">
           <span class="icon"><img src="./image/gear.svg" alt="" aria-hidden="true" /></span>
@@ -1217,16 +1142,31 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
           <div style="margin-top:10px">
             <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
           </div>
-          <div style="margin-top:8px">
-            <a href="https://5gkyu.github.io/KyuLink/" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">🔗 KyuLink</a>
-          </div>
-          <div style="margin-top:8px">
-            <a href="https://x.com/i/bookmarks" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">🔖 ブックマーク</a>
-          </div>
-          <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border)">
-            <label class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)"><b>🧩 ミニアプリ</b></label>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
-              <a href="https://5gkyu.github.io/app/intent/intent.html" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">✍️ Intentリンク作成</a>
+          <div style="margin-top:12px;">
+            <div class="mini-apps-wrap">
+              <label class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>🧩 ミニアプリ</b></label>
+              <div class="mini-apps">
+                <a class="mini-app-card" href="https://5gkyu.github.io/app/intent/intent.html" target="_blank" rel="noopener noreferrer">
+                  <div class="mini-head">
+                    <div class="mini-icon">✍️</div>
+                    <div>
+                      <div class="mini-title">Intentリンク作成</div>
+                      <div class="mini-desc">ツイート用テキストを作って短縮・テストできます（280字）</div>
+                    </div>
+                  </div>
+                  <div class="mini-action">開く</div>
+                </a>
+                <a class="mini-app-card" href="https://5gkyu.github.io/app/dm/dm.html" target="_blank" rel="noopener noreferrer">
+                  <div class="mini-head">
+                    <div class="mini-icon">💬</div>
+                    <div>
+                      <div class="mini-title">DMボタン作成</div>
+                      <div class="mini-desc">DM用リンクやボタンを簡単に生成</div>
+                    </div>
+                  </div>
+                  <div class="mini-action">開く</div>
+                </a>
+              </div>
             </div>
           </div>
           <div style="margin-top:10px">
@@ -1242,18 +1182,18 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
         </div>
       </div>
 
-    </div><!-- .card -->
+    </div>
 
     <nav class="fixed-bottom-bar x-bottom-nav" aria-label="X風ボトムメニュー">
       <div class="fixed-bottom-inner">
-        <button type="button" id="bottom_nav_timeline" class="bottom-btn" title="タイムライン"><img src="./image/bookmark.svg" alt="タイムライン" /></button>
+        <button type="button" id="bottom_nav_timeline" class="bottom-btn" title="タイムライン"><img src="./image/house-line.svg" alt="タイムライン" /></button>
         <button type="button" id="bottom_nav_search" class="bottom-btn" title="検索"><img src="./image/magnifying-glass.svg" alt="検索" /></button>
-        <button type="button" id="bottom_nav_grok" class="bottom-btn" title="Grok"><img src="./image/gear.svg" alt="Grok" /></button>
-        <button type="button" id="bottom_nav_notifications" class="bottom-btn" title="通知"><img src="./image/notification.svg" alt="通知" /></button>
+        <button type="button" id="bottom_nav_grok" class="bottom-btn grok-btn" title="Grok"><span class="grok-text" aria-hidden="true">G</span></button>
+        <button type="button" id="bottom_nav_notifications" class="bottom-btn" title="通知"><img src="./image/bell.svg" alt="通知" /></button>
         <button type="button" id="bottom_nav_dm" class="bottom-btn" title="DM"><img src="./image/envelope.svg" alt="DM" /></button>
       </div>
     </nav>
-  </div><!-- .wrap -->
+  </div>
 
   <script src="x_script.js"></script>
 </body>

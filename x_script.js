@@ -545,73 +545,51 @@ bindExclusive(document.getElementById('only_verified'), document.getElementById(
 bindExclusive(document.getElementById('only_following'), document.getElementById('exclude_following'));
 // --- 以下は x.html のインラインスクリプトを統合したもの ---
 document.addEventListener('DOMContentLoaded', function() {
-  // ショートカット機能（呼出専用・固定）
-  var presets = {
-    1: { title: 'タイムライン', rawQuery: 'filter:follows include:nativeretweets -filter:replies' },
-    2: { title: 'ブックマーク', url: 'https://x.com/i/bookmarks' },
-    3: { title: 'DM', url: 'https://x.com/messages' },
-    4: { title: '通知', url: 'https://x.com/notifications' },
-    5: { title: 'Grok', url: 'https://x.com/i/grok' }
-  };
-
   // フォーカス時の強制スクロールは画面ズレの原因になるため無効化
-
-  document.querySelectorAll('.preset-load-btn[data-preset]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var idx = btn.getAttribute('data-preset');
-      var preset = presets[idx] || null;
-      if (!preset) {
-        alert('このショートカットは使用できません');
-        return;
-      }
-
-      var hasRawQuery = preset.rawQuery && String(preset.rawQuery).trim();
-      var hasUrl = preset.url && String(preset.url).trim();
-
-      if (!hasRawQuery && !hasUrl) {
-        alert('このショートカットは使用できません');
-        return;
-      }
-
-      if (hasUrl) {
-        document.getElementById('modal_preset').classList.remove('active');
-        openInBrowser(String(preset.url).trim());
-        alert('ショートカット「' + (preset.title || '') + '」を開きました');
-        return;
-      }
-
-      if (hasRawQuery) {
-        manualQueryOverride = String(preset.rawQuery).trim();
-        userEditedQuery = true;
-        if (typeof updatePreview === 'function') updatePreview();
-      }
-
-      // 即検索: クエリを構築して履歴に追加、好みの方法で開く
-      try {
-        var q = (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) ? manualQueryOverride : buildQuery();
-        if (q && q.trim()) {
-          var formData = {};
-          document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
-            formData[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
-          });
-          addHistory(q, formData);
-          document.getElementById('modal_preset').classList.remove('active');
-          openSearchWithPreference(q);
-        }
-      } catch(e) { console.warn('preset quick search failed', e); }
-      alert('ショートカット「' + (preset.title || '') + '」を呼び出しました');
-    });
-  });
 
   // 検索履歴機能
   var history = JSON.parse(localStorage.getItem('x_history') || '[]');
+  function pad2(num) {
+    return String(num).padStart(2, '0');
+  }
+  function resolveHistoryDateTime(item) {
+    var dateText = (item && typeof item.date === 'string') ? item.date : '';
+    var timeText = (item && typeof item.time === 'string') ? item.time : '';
+
+    if ((!dateText || !timeText) && item && item.createdAt) {
+      var dt = new Date(item.createdAt);
+      if (!Number.isNaN(dt.getTime())) {
+        if (!dateText) {
+          dateText = dt.getFullYear() + '/' + pad2(dt.getMonth() + 1) + '/' + pad2(dt.getDate());
+        }
+        if (!timeText) {
+          timeText = pad2(dt.getHours()) + ':' + pad2(dt.getMinutes());
+        }
+      }
+    }
+
+    if (!timeText && dateText) {
+      var m = dateText.match(/^(\d{4}\/\d{2}\/\d{2})\s+(\d{2}:\d{2})$/);
+      if (m) {
+        dateText = m[1];
+        timeText = m[2];
+      }
+    }
+
+    return {
+      date: dateText,
+      time: timeText
+    };
+  }
+
   function renderHistory() {
     var list = document.getElementById('history_list');
     list.innerHTML = '';
     history.slice(0, 30).forEach(function(item, idx) {
       var row = document.createElement('div');
       row.className = 'history-row';
-      row.innerHTML = '<div class="history-date">' + item.date + '</div><div class="history-query">' + item.query + '</div>';
+      var dt = resolveHistoryDateTime(item);
+      row.innerHTML = '<div class="history-date"><span class="history-day">' + (dt.date || '') + '</span><span class="history-time">' + (dt.time || '') + '</span></div><div class="history-query">' + item.query + '</div>';
       row.addEventListener('click', function() {
         if (item.data) {
           if (!confirm('検索条件をこの履歴で上書きしますか？')) return;
@@ -639,7 +617,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function addHistory(query, formData) {
     var now = new Date();
     var dateStr = now.getFullYear() + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + String(now.getDate()).padStart(2, '0');
-    history.unshift({ date: dateStr, query: query, data: formData });
+    var timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    history.unshift({ date: dateStr, time: timeStr, createdAt: now.toISOString(), query: query, data: formData });
     if (history.length > 30) history = history.slice(0, 30);
     localStorage.setItem('x_history', JSON.stringify(history));
   }
@@ -702,11 +681,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var bottomTimelineBtn = document.getElementById('bottom_nav_timeline');
   if (bottomTimelineBtn) {
     bottomTimelineBtn.addEventListener('click', function() {
-      var timelineShortcutBtn = document.querySelector('.preset-load-btn[data-preset="1"]');
-      if (timelineShortcutBtn) {
-        timelineShortcutBtn.click();
-        return;
-      }
       manualQueryOverride = 'filter:follows include:nativeretweets -filter:replies';
       userEditedQuery = true;
       if (typeof updatePreview === 'function') updatePreview();
@@ -745,7 +719,38 @@ document.addEventListener('DOMContentLoaded', function() {
   var bookmarksCardBtn = document.getElementById('btn_bookmarks');
   if (bookmarksCardBtn) {
     bookmarksCardBtn.addEventListener('click', function() {
-      openInBrowser('https://x.com/i/bookmarks');
+      var query = '';
+      try {
+        if (typeof userEditedQuery !== 'undefined' && userEditedQuery && typeof manualQueryOverride === 'string' && manualQueryOverride.trim()) {
+          query = manualQueryOverride;
+        } else if (typeof buildQuery === 'function') {
+          query = buildQuery() || '';
+        }
+      } catch (e) {
+        query = '';
+      }
+      query = (query || '').trim();
+      if (query) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(query).then(function() {
+            openInBrowser('https://x.com/i/bookmarks');
+          }).catch(function() {
+            openInBrowser('https://x.com/i/bookmarks');
+          });
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = query;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          openInBrowser('https://x.com/i/bookmarks');
+        }
+      } else {
+        openInBrowser('https://x.com/i/bookmarks');
+      }
     });
   }
 
@@ -765,21 +770,12 @@ document.addEventListener('DOMContentLoaded', function() {
   if (btnHistory) btnHistory.addEventListener('click', function() { renderHistory(); document.getElementById('modal_history').classList.add('active'); });
   var closeHistory = document.getElementById('close_history');
   if (closeHistory) closeHistory.addEventListener('click', function() { document.getElementById('modal_history').classList.remove('active'); });
-  function closePresetModal(){
-    var modal = document.getElementById('modal_preset');
-    if (!modal) return;
-    modal.classList.remove('active');
-  }
-
-  var closePreset = document.getElementById('close_preset');
-  if (closePreset) closePreset.addEventListener('click', function() { closePresetModal(); });
 
   // モーダル背景クリックで閉じる
   document.querySelectorAll('.modal-overlay').forEach(function(modal) {
     modal.addEventListener('click', function(e) {
       if (e.target === modal) {
-        if (modal.id === 'modal_preset') closePresetModal();
-        else modal.classList.remove('active');
+        modal.classList.remove('active');
       }
     });
   });

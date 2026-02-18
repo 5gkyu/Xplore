@@ -243,6 +243,19 @@ label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
 .mini-app-card .mini-action{ margin-left:auto; padding:8px 12px; border-radius:12px; background:var(--accent-1); color:white; font-weight:800; font-size:13px; box-shadow:0 4px 10px rgba(11,94,100,0.08); text-decoration:none }
 @media(max-width:520px){ .mini-apps{ gap:10px } .mini-app-card{ padding:12px } .mini-app-card .mini-desc{ display:none } .mini-app-card .mini-action{ padding:8px 10px } }
 
+/* ポストID検索（モバイルは2段表示） */
+.post-id-tool{ display:flex; gap:8px; align-items:center; }
+.post-id-input{ flex:1; }
+.post-id-actions{ display:flex; gap:8px; align-items:center; }
+.post-id-actions #btn_paste_id{ white-space:nowrap; flex:0 0 96px; }
+.post-id-actions #btn_open_by_id{ white-space:nowrap; }
+@media(max-width:520px){
+  .post-id-tool{ flex-direction:column; align-items:stretch; }
+  .post-id-actions{ width:100%; }
+  .post-id-actions #btn_paste_id,
+  .post-id-actions #btn_open_by_id{ flex:1 1 0; width:100%; }
+}
+
 /* 基本検索内部はラベルと入力の隙間を詰める */
 .basic-section label{ margin-bottom:0; }
 input[type=text], select, textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px; box-sizing:border-box; box-shadow: inset 0 1px 0 rgba(2,12,14,0.02); }
@@ -815,12 +828,12 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
         <button class="menu-btn" data-modal="modal_account">
           <span class="icon"><img src="./image/user-circle.svg" alt="" aria-hidden="true" /></span>
           <span class="label">アカウント</span>
-          <span class="sublabel">from / to / @ / lang</span>
+          <span class="sublabel">from / to / @ / 言語</span>
         </button>
         <button class="menu-btn" id="btn_bookmarks">
           <span class="icon"><img src="./image/bookmark.svg" alt="" aria-hidden="true" /></span>
           <span class="label">ブックマーク</span>
-          <span class="sublabel">ブックマークを開く</span>
+          <span class="sublabel">自動コピーしてブクマを開く</span>
         </button>
         <button class="menu-btn" id="btn_history">
           <span class="icon"><img src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
@@ -968,11 +981,13 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
 
           <!-- ポストIDでリプライと引用を開く -->
           <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
-            <label class="muted-small" for="q_post_id" style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ポストIDを貼り付け</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="q_post_id" type="text" placeholder="例: 1255050733675704320 または https://x.com/.../status/ID" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
-              <button id="btn_paste_id" type="button" class="secondary" style="white-space:nowrap;flex:0 0 78px">📋 ペースト</button>
-              <button id="btn_open_by_id" type="button" class="engagement-reset-btn" style="white-space:nowrap">検索実行</button>
+            <label class="muted-small" for="q_post_id" style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ツイートのURLを貼り付けて返信と引用を一括表示</label>
+            <div class="post-id-tool">
+              <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320 または https://x.com/.../status/ID" style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
+              <div class="post-id-actions">
+                <button id="btn_paste_id" type="button" class="secondary">📋 ペースト</button>
+                <button id="btn_open_by_id" type="button" class="engagement-reset-btn">検索実行</button>
+              </div>
             </div>
             <div class="hint" style="margin-top:8px;color:var(--muted)">貼り付けたIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の取得）。</div>
           </div>
@@ -1139,16 +1154,21 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
             このサイトは <b>X（旧Twitter）公式とは無関係の非公式ツール</b>です。仕様変更や表示差異が発生する場合があります。
           </div>
                     
-          <div style="margin-top:10px">
-            <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
-          </div>
           <div style="margin-top:12px;">
             <div class="mini-apps-wrap">
               <label class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>🧩 ミニアプリ</b></label>
               <div class="mini-apps">
+                <a class="mini-app-card" href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer">
+                  <div class="mini-head">
+                    <div>
+                      <div class="mini-title">コマンド説明</div>
+                      <div class="mini-desc">実用的な検索コマンド一覧を確認できます</div>
+                    </div>
+                  </div>
+                  <div class="mini-action">開く</div>
+                </a>
                 <a class="mini-app-card" href="https://5gkyu.github.io/app/intent/intent.html" target="_blank" rel="noopener noreferrer">
                   <div class="mini-head">
-                    <div class="mini-icon">✍️</div>
                     <div>
                       <div class="mini-title">Intentリンク作成</div>
                       <div class="mini-desc">ツイート用テキストを作って短縮・テストできます（280字）</div>
@@ -1158,7 +1178,6 @@ html.theme-kohane body{ background-image: url('bg.png'); background-color: var(-
                 </a>
                 <a class="mini-app-card" href="https://5gkyu.github.io/app/dm/dm.html" target="_blank" rel="noopener noreferrer">
                   <div class="mini-head">
-                    <div class="mini-icon">💬</div>
                     <div>
                       <div class="mini-title">DMボタン作成</div>
                       <div class="mini-desc">DM用リンクやボタンを簡単に生成</div>

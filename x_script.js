@@ -44,6 +44,21 @@ function openInBrowser(url){
   }
 }
 
+function openBookmarksPage(){
+  var url = 'https://x.com/i/bookmarks';
+  var device = getDeviceInfo();
+  if (device && device.isMobile) {
+    try {
+      window.location.assign(url);
+      return;
+    } catch (e) {
+      window.location.href = url;
+      return;
+    }
+  }
+  openInBrowser(url);
+}
+
 function openInBrowserNoApp(url, query){
   var device = getDeviceInfo();
   if (device && device.isIOS) {
@@ -733,9 +748,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (query) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(query).then(function() {
-            openInBrowser('https://x.com/i/bookmarks');
+            setTimeout(function(){ openBookmarksPage(); }, 120);
           }).catch(function() {
-            openInBrowser('https://x.com/i/bookmarks');
+            openBookmarksPage();
           });
         } else {
           var ta = document.createElement('textarea');
@@ -746,10 +761,10 @@ document.addEventListener('DOMContentLoaded', function() {
           ta.select();
           try { document.execCommand('copy'); } catch (e) {}
           document.body.removeChild(ta);
-          openInBrowser('https://x.com/i/bookmarks');
+          openBookmarksPage();
         }
       } else {
-        openInBrowser('https://x.com/i/bookmarks');
+        openBookmarksPage();
       }
     });
   }

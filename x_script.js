@@ -35,6 +35,11 @@ function getDeviceInfo(){
   return { isAndroid: isAndroid, isIOS: isIOS, isMobile: isMobile, isChrome: isChrome };
 }
 
+function isXInAppWebView(){
+  var ua = navigator.userAgent || '';
+  return /Twitter|TwitterAndroid|Twitter for iPhone|Twitter for iPad|X\//i.test(ua);
+}
+
 function openInBrowser(url){
   try {
     var w = window.open(url, '_blank');
@@ -302,8 +307,14 @@ function openAppOnly(query, webUrl){
   openAppPattern2(query);
 }
 
-function openSearchWithPreference(query){
+function openSearchWithPreference(query, options){
   var url = buildSearchURL ? buildSearchURL(query) : ('https://twitter.com/search?q=' + encodeURIComponent(query));
+  var device = getDeviceInfo();
+  var inApp = isXInAppWebView();
+  var forceSameTab = !!(options && options.forceSameTab);
+  if (forceSameTab || (device && device.isIOS && inApp)) {
+    try { window.location.assign(url); return; } catch (e) { window.location.href = url; return; }
+  }
   return openInBrowser(url);
 }
 
@@ -820,13 +831,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  var bookmarksCardBtn = document.getElementById('btn_bookmarks');
-  if (bookmarksCardBtn) {
-    bookmarksCardBtn.addEventListener('click', function() {
+  var followTimelineBtn = document.getElementById('btn_follow_timeline');
+  if (followTimelineBtn) {
+    followTimelineBtn.addEventListener('click', function() {
       manualQueryOverride = 'filter:follows include:nativeretweets -filter:replies';
       userEditedQuery = true;
       if (typeof updatePreview === 'function') updatePreview();
-      runMainSearchFromBottom();
+      var query = manualQueryOverride;
+      if (query && query.trim()) {
+        var formData = {};
+        document.querySelectorAll('input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]').forEach(function(el) {
+          formData[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+        });
+        addHistory(query, formData);
+        openSearchWithPreference(query, { forceSameTab: true });
+      }
     });
   }
 

@@ -50,6 +50,17 @@ function openBookmarksPage(){
   var ua = navigator.userAgent || '';
   var isXInApp = /Twitter|TwitterAndroid|Twitter for iPhone|Twitter for iPad|X\//i.test(ua);
   if (device && device.isMobile) {
+    if (isXInApp && device.isIOS) {
+      try {
+        window.location.replace(url);
+      } catch (e) {
+        try { window.location.assign(url); } catch (e2) { window.location.href = url; }
+      }
+      setTimeout(function(){
+        try { window.close(); } catch (e) {}
+      }, 700);
+      return;
+    }
     if (isXInApp) {
       var opened = false;
       var timer = null;

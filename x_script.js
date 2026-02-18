@@ -44,8 +44,25 @@ function openInBrowser(url){
   }
 }
 
-function openBookmarksPage(){
+function openBookmarksPage(method){
   var url = 'https://x.com/i/bookmarks';
+  var mode = method || 'auto';
+  if (mode === 'web_same') {
+    try { window.location.assign(url); return; } catch (e0) { window.location.href = url; return; }
+  }
+  if (mode === 'web_new') {
+    openInBrowser(url);
+    return;
+  }
+  if (mode === 'x_scheme') {
+    try { window.location.href = 'x://bookmarks'; } catch (e1) { window.location.assign(url); }
+    return;
+  }
+  if (mode === 'twitter_scheme') {
+    try { window.location.href = 'twitter://bookmarks'; } catch (e2) { window.location.assign(url); }
+    return;
+  }
+
   var device = getDeviceInfo();
   var ua = navigator.userAgent || '';
   var isXInApp = /Twitter|TwitterAndroid|Twitter for iPhone|Twitter for iPad|X\//i.test(ua);
@@ -98,6 +115,40 @@ function openBookmarksPage(){
     }
   }
   openInBrowser(url);
+}
+
+function resolveCurrentQuery(){
+  var query = '';
+  try {
+    if (typeof userEditedQuery !== 'undefined' && userEditedQuery && typeof manualQueryOverride === 'string' && manualQueryOverride.trim()) {
+      query = manualQueryOverride;
+    } else if (typeof buildQuery === 'function') {
+      query = buildQuery() || '';
+    }
+  } catch (e) {
+    query = '';
+  }
+  return (query || '').trim();
+}
+
+function copyTextToClipboard(text){
+  var value = (text || '').trim();
+  if (!value) return Promise.resolve(false);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(value).then(function(){ return true; }).catch(function(){ return false; });
+  }
+  return new Promise(function(resolve){
+    var ta = document.createElement('textarea');
+    ta.value = value;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    resolve(!!ok);
+  });
 }
 
 function openInBrowserNoApp(url, query){
@@ -769,44 +820,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bottomDmBtn) {
     bottomDmBtn.addEventListener('click', function() {
       openInBrowser('https://x.com/messages');
-    });
-  }
-
-  var bookmarksCardBtn = document.getElementById('btn_bookmarks');
-  if (bookmarksCardBtn) {
-    bookmarksCardBtn.addEventListener('click', function() {
-      var query = '';
-      try {
-        if (typeof userEditedQuery !== 'undefined' && userEditedQuery && typeof manualQueryOverride === 'string' && manualQueryOverride.trim()) {
-          query = manualQueryOverride;
-        } else if (typeof buildQuery === 'function') {
-          query = buildQuery() || '';
-        }
-      } catch (e) {
-        query = '';
-      }
-      query = (query || '').trim();
-      if (query) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(query).then(function() {
-            setTimeout(function(){ openBookmarksPage(); }, 120);
-          }).catch(function() {
-            openBookmarksPage();
-          });
-        } else {
-          var ta = document.createElement('textarea');
-          ta.value = query;
-          ta.style.position = 'fixed';
-          ta.style.left = '-9999px';
-          document.body.appendChild(ta);
-          ta.select();
-          try { document.execCommand('copy'); } catch (e) {}
-          document.body.removeChild(ta);
-          openBookmarksPage();
-        }
-      } else {
-        openBookmarksPage();
-      }
     });
   }
 
@@ -1512,6 +1525,25 @@ document.addEventListener('DOMContentLoaded', function(){
     overlay.addEventListener('click', function(e){
       if (e.target === overlay) {
         overlay.classList.remove('active');
+      }
+    });
+  });
+
+  // ブックマークの開き方ボタン
+  document.querySelectorAll('[data-bookmark-method]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var method = btn.getAttribute('data-bookmark-method') || 'auto';
+      var needCopy = btn.getAttribute('data-copy-query') === 'true';
+      var query = resolveCurrentQuery();
+      var openAction = function(){
+        var modal = document.getElementById('modal_bookmarks');
+        if (modal) modal.classList.remove('active');
+        setTimeout(function(){ openBookmarksPage(method); }, 80);
+      };
+      if (needCopy && query) {
+        copyTextToClipboard(query).finally(openAction);
+      } else {
+        openAction();
       }
     });
   });

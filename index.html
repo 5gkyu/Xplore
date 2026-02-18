@@ -830,10 +830,10 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <span class="label">アカウント</span>
           <span class="sublabel">from / to / @ / 言語</span>
         </button>
-        <button class="menu-btn" id="btn_bookmarks">
+        <button class="menu-btn" id="btn_bookmarks" data-modal="modal_bookmarks">
           <span class="icon"><img src="./image/bookmark.svg" alt="" aria-hidden="true" /></span>
           <span class="label">ブックマーク</span>
-          <span class="sublabel">自動コピーしてブクマを開く</span>
+          <span class="sublabel">開き方を選択</span>
         </button>
         <button class="menu-btn" id="btn_history">
           <span class="icon"><img src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /></span>
@@ -1140,6 +1140,26 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             <input type="checkbox" id="only_verified"><input type="checkbox" id="exclude_verified">
             <input type="checkbox" id="only_following">
             <input type="checkbox" id="exclude_following">
+          </div>
+        </div>
+      </div>
+
+      <!-- ブックマークモーダル -->
+      <div class="section-modal-overlay" id="modal_bookmarks">
+        <div class="section-modal">
+          <button class="section-modal-close" data-close="modal_bookmarks"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <h3><img class="icon-inline" src="./image/bookmark.svg" alt="" aria-hidden="true" /> ブックマークの開き方</h3>
+          <div style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);color:var(--muted);font-size:12px;line-height:1.6">
+            「検索欄あり」を優先する場合は <b>Web版（同一タブ）</b> を試してください。<br>
+            Xアプリ内ブラウザではアプリ仕様で閉じ方・表示が端末差で変わることがあります。
+          </div>
+
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+            <button type="button" class="secondary" data-bookmark-method="web_same" data-copy-query="true" style="width:100%;text-align:left">コピーして Web版ブックマークを開く（同一タブ / 検索欄あり優先）</button>
+            <button type="button" class="secondary" data-bookmark-method="web_new" data-copy-query="true" style="width:100%;text-align:left">コピーして Web版ブックマークを開く（新規タブ）</button>
+            <button type="button" class="secondary" data-bookmark-method="auto" data-copy-query="true" style="width:100%;text-align:left">コピーして 自動判定で開く（従来）</button>
+            <button type="button" class="secondary" data-bookmark-method="x_scheme" style="width:100%;text-align:left">Xアプリスキームで開く（x://bookmarks）</button>
+            <button type="button" class="secondary" data-bookmark-method="twitter_scheme" style="width:100%;text-align:left">Twitterスキームで開く（twitter://bookmarks）</button>
           </div>
         </div>
       </div>

@@ -788,10 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var bottomTimelineBtn = document.getElementById('bottom_nav_timeline');
   if (bottomTimelineBtn) {
     bottomTimelineBtn.addEventListener('click', function() {
-      manualQueryOverride = 'filter:follows include:nativeretweets -filter:replies';
-      userEditedQuery = true;
-      if (typeof updatePreview === 'function') updatePreview();
-      runMainSearchFromBottom();
+      openInBrowser('https://x.com/home');
     });
   }
 
@@ -820,6 +817,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (bottomDmBtn) {
     bottomDmBtn.addEventListener('click', function() {
       openInBrowser('https://x.com/messages');
+    });
+  }
+
+  var bookmarksCardBtn = document.getElementById('btn_bookmarks');
+  if (bookmarksCardBtn) {
+    bookmarksCardBtn.addEventListener('click', function() {
+      manualQueryOverride = 'filter:follows include:nativeretweets -filter:replies';
+      userEditedQuery = true;
+      if (typeof updatePreview === 'function') updatePreview();
+      runMainSearchFromBottom();
     });
   }
 

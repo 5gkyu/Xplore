@@ -818,12 +818,12 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
         <button class="menu-btn" data-modal="modal_engagement">
           <span class="icon"><img src="./image/heart.svg" alt="" aria-hidden="true" /></span>
           <span class="label">反応数</span>
-          <span class="sublabel">いいね / RT / 返信</span>
+          <span class="sublabel">いいね / RT / 返信 / </span>
         </button>
         <button class="menu-btn" data-modal="modal_type">
           <span class="icon"><img src="./image/toggle-left.svg" alt="" aria-hidden="true" /></span>
           <span class="label">投稿タイプ</span>
-          <span class="sublabel">限定 / 除外</span>
+          <span class="sublabel">url / 限定 / 除外</span>
         </button>
         <button class="menu-btn" data-modal="modal_account">
           <span class="icon"><img src="./image/user-circle.svg" alt="" aria-hidden="true" /></span>
@@ -983,13 +983,13 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
             <label class="muted-small" for="q_post_id" style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ツイートのURLを貼り付けて返信と引用を一括表示</label>
             <div class="post-id-tool">
-              <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320 または https://x.com/.../status/ID" style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
+              <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320" style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
               <div class="post-id-actions">
                 <button id="btn_paste_id" type="button" class="secondary">📋 ペースト</button>
                 <button id="btn_open_by_id" type="button" class="engagement-reset-btn">検索実行</button>
               </div>
             </div>
-            <div class="hint" style="margin-top:8px;color:var(--muted)">貼り付けたIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の取得）。</div>
+            <div class="hint" style="margin-top:8px;color:var(--muted)">ペーストボタンからURLをペーストするとIDを自動で抽出します。抽出したIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の一括取得）。</div>
           </div>
         </div>
       </div>

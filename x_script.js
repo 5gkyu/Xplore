@@ -47,7 +47,37 @@ function openInBrowser(url){
 function openBookmarksPage(){
   var url = 'https://x.com/i/bookmarks';
   var device = getDeviceInfo();
+  var ua = navigator.userAgent || '';
+  var isXInApp = /Twitter|TwitterAndroid|Twitter for iPhone|Twitter for iPad|X\//i.test(ua);
   if (device && device.isMobile) {
+    if (isXInApp) {
+      var opened = false;
+      var timer = null;
+      function onVis(){
+        if (document.hidden) {
+          opened = true;
+          cleanup();
+        }
+      }
+      function cleanup(){
+        if (timer) clearTimeout(timer);
+        document.removeEventListener('visibilitychange', onVis);
+      }
+      document.addEventListener('visibilitychange', onVis);
+      try { window.location.href = 'x://bookmarks'; } catch(e) {}
+      timer = setTimeout(function(){
+        cleanup();
+        if (!opened) {
+          try { window.location.href = 'twitter://bookmarks'; } catch(e) {}
+          setTimeout(function(){
+            if (!document.hidden) {
+              try { window.location.assign(url); } catch(e2) { window.location.href = url; }
+            }
+          }, 450);
+        }
+      }, 500);
+      return;
+    }
     try {
       window.location.assign(url);
       return;
@@ -1281,18 +1311,9 @@ function buildQuery() {
 function buildSearchURLWithBase(query, basePrefix) {
   var encoded = encodeURIComponent(query || '');
   var base = basePrefix ? (basePrefix + encoded) : ('https://twitter.com/search?q=' + encoded);
-  var fParam = null;
+  var fParam = 'live';
   try {
-    var mediaTab = document.getElementById('tab_media');
-    var latestTab = document.getElementById('tab_latest');
-    var topTab = document.getElementById('tab_top');
-    if (mediaTab && mediaTab.getAttribute('aria-selected') === 'true') fParam = 'media';
-    else if (latestTab && latestTab.getAttribute('aria-selected') === 'true') fParam = 'live';
-    else if (topTab && topTab.getAttribute('aria-selected') === 'true') fParam = null;
-    // override by explicit filters in query
-    if (/filter:images/.test(query)) fParam = 'images';
-    if (/filter:videos/.test(query)) fParam = 'videos';
-    if (/filter:media/.test(query)) fParam = 'media';
+    // 常に最新タブ（f=live）固定
   } catch (e) { /* ignore */ }
   if (fParam) base += (base.indexOf('?') >= 0 ? '&' : '?') + 'f=' + encodeURIComponent(fParam);
   return base;
@@ -1422,21 +1443,6 @@ document.addEventListener('DOMContentLoaded', function(){
   syncTriToggleUI();
   updatePreview();
 });
-
-// bind result tabs (話題 / 最新 / メディア) to allow selection
-document.addEventListener('DOMContentLoaded', function(){
-  var tabs = document.querySelectorAll('#result_tabs .tab');
-  if (!tabs || tabs.length === 0) return;
-  tabs.forEach(function(tab){
-    tab.addEventListener('click', function(){
-      tabs.forEach(function(t){ t.setAttribute('aria-selected', 'false'); t.setAttribute('tabindex', '-1'); });
-      tab.setAttribute('aria-selected', 'true'); tab.setAttribute('tabindex', '0');
-      updatePreview();
-    });
-    tab.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tab.click(); } });
-  });
-});
-
 
 // Reset all inputs to defaults
 function resetAllInputs() {

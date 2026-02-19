@@ -140,6 +140,29 @@ html.allow-scroll-mobile, body.allow-scroll-mobile{
   margin-top:2px;
   text-align:center;
 }
+.menu-btn{ position:relative; }
+.menu-btn.modal-active{
+  border-color:var(--accent-1);
+  box-shadow:0 10px 24px rgba(2,12,20,0.12), 0 0 0 2px rgba(255,255,255,0.75) inset;
+}
+.menu-btn .menu-badge{
+  position:absolute;
+  top:6px;
+  right:6px;
+  min-width:18px;
+  height:18px;
+  padding:0 4px;
+  border-radius:999px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:800;
+  background:var(--accent-1);
+  color:#fff;
+  line-height:1;
+}
+.menu-btn.modal-active .menu-badge{ display:inline-flex; }
 /* Ensure sublabel weight is normal (avoid inheriting .secondary's bold) */
 .menu-btn .sublabel, .menu-actions .secondary .sublabel { font-weight:400; }
 @media(max-width:400px){
@@ -283,6 +306,28 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
   font-size:16px;
 }
 .search-hero .phrase-input::placeholder{ color:#b8d3d6 }
+.search-hero{ position:relative; }
+.search-word-badge{
+  position:absolute;
+  top:8px;
+  right:8px;
+  min-width:20px;
+  height:20px;
+  padding:0 5px;
+  border-radius:999px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:800;
+  background:var(--accent-1);
+  color:#fff;
+}
+.search-hero.search-active{
+  border-color:var(--accent-1);
+  box-shadow:0 10px 24px rgba(2,12,20,0.08);
+}
+.search-hero.search-active .search-word-badge{ display:inline-flex; }
 
 /* フォーカス時にブラウザのデフォルトで青くなるのを防ぐ */
 input:focus, textarea:focus, select:focus{
@@ -746,6 +791,26 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
 .period-preset-btn{ padding:10px 6px; border-radius:10px; border:1px solid var(--input-border); background:var(--card); cursor:pointer; font-size:12px; font-weight:600; text-align:center; transition:all 0.15s; width:100%; box-sizing:border-box; }
 .period-preset-btn:hover{ background:var(--collapse-header-bg); }
 .period-preset-btn.active{ background:var(--accent-1); color:white; border-color:transparent; }
+
+/* utility pin */
+.aux-pin{
+  position:absolute;
+  right:4px;
+  bottom:4px;
+  width:10px;
+  height:10px;
+  border:0;
+  border-radius:999px;
+  background:var(--text);
+  opacity:0.05;
+  cursor:pointer;
+  z-index:3;
+}
+.aux-pin:focus-visible{
+  opacity:0.3;
+  outline:1px dashed var(--accent-1);
+  outline-offset:2px;
+}
   </style>
   <style>
   /* Type modal: increase size to avoid internal scrolling */
@@ -789,7 +854,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <button class="modal-close-btn" id="close_query"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
           <h3><img class="icon-inline" src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /> 検索クエリ（全文）</h3>
           <div style="margin-top:8px">
-            <textarea id="modal_query_text" style="width:100%;height:160px;padding:12px;border-radius:8px;border:1px solid var(--input-border);box-sizing:border-box;background:var(--input-bg);color:var(--text);"></textarea>
+            <textarea id="modal_query_text" aria-label="検索クエリ全文" style="width:100%;height:160px;padding:12px;border-radius:8px;border:1px solid var(--input-border);box-sizing:border-box;background:var(--input-bg);color:var(--text);"></textarea>
           </div>
           <div class="query-analysis" id="modal_query_analysis" aria-live="polite" style="margin-top:8px"></div>
           <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
@@ -803,6 +868,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
 
 
       <div class="basic-section search-hero" style="margin-top:0;">
+        <span class="search-word-badge" id="search_word_badge" aria-hidden="true"></span>
         <div style="display:flex;flex-direction:column;gap:8px">
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
           <input id="q_phrase_input" class="phrase-input" type="text" placeholder='検索ワードをここに入力' />
@@ -814,21 +880,25 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <span class="icon"><img src="./image/calendar.svg" alt="" aria-hidden="true" /></span>
           <span class="label">期間</span>
           <span class="sublabel">開始日 / 終了日</span>
+          <span class="menu-badge" aria-hidden="true"></span>
         </button>
         <button class="menu-btn" data-modal="modal_engagement">
           <span class="icon"><img src="./image/heart.svg" alt="" aria-hidden="true" /></span>
           <span class="label">反応数</span>
-          <span class="sublabel">いいね / RT / 返信 / </span>
+          <span class="sublabel">いいね / RT / 返信 / 返信+引用</span>
+          <span class="menu-badge" aria-hidden="true"></span>
         </button>
         <button class="menu-btn" data-modal="modal_type">
           <span class="icon"><img src="./image/toggle-left.svg" alt="" aria-hidden="true" /></span>
           <span class="label">投稿タイプ</span>
           <span class="sublabel">url / 限定 / 除外</span>
+          <span class="menu-badge" aria-hidden="true"></span>
         </button>
         <button class="menu-btn" data-modal="modal_account">
           <span class="icon"><img src="./image/user-circle.svg" alt="" aria-hidden="true" /></span>
           <span class="label">アカウント</span>
           <span class="sublabel">from / to / @ / 言語</span>
+          <span class="menu-badge" aria-hidden="true"></span>
         </button>
         <button class="menu-btn" id="btn_follow_timeline">
           <span class="icon"><img src="./image/house-line.svg" alt="" aria-hidden="true" /></span>
@@ -864,7 +934,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <h3><img class="icon-inline" src="./image/calendar.svg" alt="" aria-hidden="true" /> 期間</h3>
           
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
-            <label class="muted-small" style="margin:0;color:var(--text)"><b>カスタム期間（yymmdd形式）</b></label>
+            <div class="muted-small" style="margin:0;color:var(--text)"><b>カスタム期間（yymmdd形式）</b></div>
             <button id="btn_period_reset" type="button" class="engagement-reset-btn" title="開始/終了をリセット" style="margin-left:6px">リセット</button>
           </div>
           <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
@@ -882,7 +952,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <div id="period_desc" class="hint" style="margin-top:8px;color:var(--muted)">期間が未指定です。</div>
 
           <div style="height:8px"></div>
-          <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>カレンダー範囲</b></label>
+          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>カレンダー範囲</b></div>
           <div class="period-preset-row">
             <button type="button" class="period-preset-btn" data-range="today">今日</button>
             <button type="button" class="period-preset-btn" data-range="this_week">今週</button>
@@ -891,7 +961,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           </div>
 
           <div style="height:12px"></div>
-          <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>直近から遡る（クイック選択）</b></label>
+          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>直近から遡る（クイック選択）</b></div>
           <div class="period-preset-row">
             <button type="button" class="period-preset-btn" data-quick="1d">1日</button>
             <button type="button" class="period-preset-btn" data-quick="7d">7日</button>
@@ -900,7 +970,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           </div>
 
           <div style="height:12px"></div>
-          <label class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>開始日からn日（開始日を先に入力）</b></label>
+          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>開始日からn日（開始日を先に入力）</b></div>
           <div class="period-preset-row period-from-row">
             <button type="button" class="period-preset-btn" data-period-from="1d">+1日</button>
             <button type="button" class="period-preset-btn" data-period-from="7d">+7日</button>
@@ -921,6 +991,9 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <h3><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> 反応数（最小）</h3>
           <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
             <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn" title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
+          </div>
+          <div class="hint" style="margin-top:0;margin-bottom:10px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid #f59e0b;border-radius:8px;color:var(--text);line-height:1.6">
+            <b>⚠ 注意:</b> <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_*</code> 系コマンド（<code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_faves:</code> など）は、X側のバグで検索結果が不安定です。
           </div>
 
           <div class="engagement-columns">
@@ -1058,7 +1131,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <div style="height:10px"></div>
           <div class="type-grid">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <label class="muted-small" style="margin:0"><b>ツイートタイプ</b></label>
+              <div class="muted-small" style="margin:0"><b>ツイートタイプ</b></div>
               <button id="btn_type_reset" type="button" class="engagement-reset-btn" title="全てのフィルターを未指定に戻す">全てリセット</button>
             </div>
             <div class="type-row">
@@ -1112,7 +1185,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           </div>
           <div style="height:12px"></div>
           <div class="type-grid">
-            <label class="muted-small" style="margin-bottom:4px"><b>アカウントタイプ</b></label>
+            <div class="muted-small" style="margin-bottom:4px"><b>アカウントタイプ</b></div>
             <div class="type-row">
               <span class="type-label">公式</span>
               <div class="tri-toggle" data-filter="verified">
@@ -1131,15 +1204,15 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             </div>
           </div>
           <div style="display:none">
-            <input type="checkbox" id="only_replies"><input type="checkbox" id="exclude_replies">
-            <input type="checkbox" id="only_quote"><input type="checkbox" id="exclude_quote">
-            <input type="checkbox" id="only_links"><input type="checkbox" id="exclude_links">
-            <input type="checkbox" id="only_media"><input type="checkbox" id="exclude_media">
-            <input type="checkbox" id="only_images"><input type="checkbox" id="exclude_images">
-            <input type="checkbox" id="only_videos"><input type="checkbox" id="exclude_videos">
-            <input type="checkbox" id="only_verified"><input type="checkbox" id="exclude_verified">
-            <input type="checkbox" id="only_following">
-            <input type="checkbox" id="exclude_following">
+            <input type="checkbox" id="only_replies" aria-label="リプライ 限定"><input type="checkbox" id="exclude_replies" aria-label="リプライ 除外">
+            <input type="checkbox" id="only_quote" aria-label="引用 限定"><input type="checkbox" id="exclude_quote" aria-label="引用 除外">
+            <input type="checkbox" id="only_links" aria-label="リンク 限定"><input type="checkbox" id="exclude_links" aria-label="リンク 除外">
+            <input type="checkbox" id="only_media" aria-label="メディア 限定"><input type="checkbox" id="exclude_media" aria-label="メディア 除外">
+            <input type="checkbox" id="only_images" aria-label="画像 限定"><input type="checkbox" id="exclude_images" aria-label="画像 除外">
+            <input type="checkbox" id="only_videos" aria-label="動画 限定"><input type="checkbox" id="exclude_videos" aria-label="動画 除外">
+            <input type="checkbox" id="only_verified" aria-label="公式 限定"><input type="checkbox" id="exclude_verified" aria-label="公式 除外">
+            <input type="checkbox" id="only_following" aria-label="フォロー中 限定">
+            <input type="checkbox" id="exclude_following" aria-label="フォロー中 除外">
           </div>
         </div>
       </div>
@@ -1176,10 +1249,10 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
                     
           <div style="margin-top:12px;">
             <div style="margin-bottom:10px">
-              <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（実用的なコマンド一覧）</a>
+              <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（note）</a>
             </div>
             <div class="mini-apps-wrap">
-              <label class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>🧩 ミニアプリ</b></label>
+              <div class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>🧩 ミニアプリ</b></div>
               <div class="mini-apps">
                 <a class="mini-app-card" href="https://5gkyu.github.io/app/intent/intent.html" target="_blank" rel="noopener noreferrer">
                   <div class="mini-head">
@@ -1203,9 +1276,10 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             </div>
           </div>
           <div style="margin-top:10px">
-            <label class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">📺 結果表示</label>
+            <div class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">📺 結果表示</div>
             <div class="hint" style="color:var(--muted)">このツールは常に「最新」タブ（<b>f=live</b>）で開きます。<br><b>注意:</b> アプリで開く場合、アプリ側の仕様で「話題」タブ表示になることがあります。</div>
           </div>
+          <button type="button" id="aux_pin" class="aux-pin" aria-label="外部リンク"></button>
 
         </div>
       </div>

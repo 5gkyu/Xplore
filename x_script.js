@@ -9,11 +9,46 @@ const ICON_COLLAPSED = 'image/open.png';
 const STORAGE_KEY = 'xsearch_state_v3';
 const SAVE_DEBOUNCE_MS = 200;
 const OPEN_APP_TIMEOUT_MS = 1200;
+const STATE_FIELDS_SELECTOR = 'input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]';
 
 function debounce(fn, ms){ let t; return function(){ clearTimeout(t); t = setTimeout(fn, ms); } }
 function splitTrim(s){ return s? String(s).trim().split(/\s+/).filter(x=>x):[] }
 function isNumeric(s){ return String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()) }
 function collapseSpaces(str){ return String(str||'').split(/\s+/).filter(x=>x && x.length>0).join(' ') }
+
+function tokenizePhraseInput(input){
+  var text = String(input || '');
+  var tokens = [];
+  var buf = '';
+  var inQuote = false;
+  for (var i = 0; i < text.length; i++){
+    var ch = text[i];
+    if (ch === '"') {
+      buf += ch;
+      inQuote = !inQuote;
+      continue;
+    }
+    if (!inQuote && (ch === '(' || ch === ')')) {
+      if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
+      tokens.push(ch);
+      continue;
+    }
+    if (!inQuote && /\s/.test(ch)) {
+      if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
+      continue;
+    }
+    buf += ch;
+  }
+  if (buf.trim()) tokens.push(buf.trim());
+  return tokens;
+}
+
+function countSearchTerms(input){
+  return tokenizePhraseInput(input).filter(function(token){
+    var upper = String(token || '').toUpperCase();
+    return token !== '(' && token !== ')' && upper !== 'OR';
+  }).length;
+}
 
 function escapeHtml(str){
   return String(str)
@@ -831,6 +866,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  var auxPin = document.getElementById('aux_pin');
+  if (auxPin) {
+    auxPin.addEventListener('click', function() {
+      openInBrowser('https://5gkyu.github.io/KyuLink/');
+    });
+  }
+
   var followTimelineBtn = document.getElementById('btn_follow_timeline');
   if (followTimelineBtn) {
     followTimelineBtn.addEventListener('click', function() {
@@ -1228,33 +1270,7 @@ function buildQuery() {
   var phraseInput = document.getElementById('q_phrase_input');
   var phraseRaw = (phraseInput && phraseInput.value) ? phraseInput.value.trim() : '';
 
-  function tokenizePhrase(input){
-    var tokens = [];
-    var buf = '';
-    var inQuote = false;
-    for (var i = 0; i < input.length; i++){
-      var ch = input[i];
-      if (ch === '"') {
-        buf += ch;
-        inQuote = !inQuote;
-        continue;
-      }
-      if (!inQuote && (ch === '(' || ch === ')')) {
-        if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
-        tokens.push(ch);
-        continue;
-      }
-      if (!inQuote && /\s/.test(ch)) {
-        if (buf.trim()) { tokens.push(buf.trim()); buf = ''; }
-        continue;
-      }
-      buf += ch;
-    }
-    if (buf.trim()) tokens.push(buf.trim());
-    return tokens;
-  }
-
-  var tokens = tokenizePhrase(phraseRaw);
+  var tokens = tokenizePhraseInput(phraseRaw);
   if (tokens.length) {
     var processed = tokens.map(function(t) {
       var upper = t.toUpperCase();
@@ -1413,6 +1429,57 @@ function updatePeriodDescription(){
   el.textContent = text;
 }
 
+function countFilledFields(ids){
+  return ids.reduce(function(total, id){
+    var el = document.getElementById(id);
+    if (!el) return total;
+    return (String(el.value || '').trim() !== '') ? total + 1 : total;
+  }, 0);
+}
+
+function countTriToggleActive(filters){
+  return filters.reduce(function(total, filter){
+    var onlyEl = document.getElementById('only_' + filter);
+    var excludeEl = document.getElementById('exclude_' + filter);
+    return (onlyEl && onlyEl.checked) || (excludeEl && excludeEl.checked) ? total + 1 : total;
+  }, 0);
+}
+
+function updateModalUsageIndicators(){
+  var counts = {
+    modal_period: countFilledFields(['q_since_date', 'q_until_date']),
+    modal_engagement: countFilledFields(['q_min_likes', 'q_min_retweets', 'q_min_replies', 'q_post_id']),
+    modal_type: countFilledFields(['q_url']) + countTriToggleActive(['replies','quote','links','media','images','videos','verified','following']),
+    modal_account: countFilledFields(['q_from', 'q_to', 'q_at_search', 'q_lang_select'])
+  };
+
+  Object.keys(counts).forEach(function(modalId){
+    var btn = document.querySelector('.menu-btn[data-modal="' + modalId + '"]');
+    if (!btn) return;
+    var badge = btn.querySelector('.menu-badge');
+    var count = counts[modalId];
+    if (count > 0) {
+      btn.classList.add('modal-active');
+      if (badge) badge.textContent = String(count > 99 ? '99+' : count);
+    } else {
+      btn.classList.remove('modal-active');
+      if (badge) badge.textContent = '';
+    }
+  });
+
+  var phraseInput = document.getElementById('q_phrase_input');
+  var searchHero = document.querySelector('.search-hero');
+  var searchBadge = document.getElementById('search_word_badge');
+  var tokenCount = countSearchTerms(phraseInput ? phraseInput.value : '');
+  if (searchHero) {
+    if (tokenCount > 0) searchHero.classList.add('search-active');
+    else searchHero.classList.remove('search-active');
+  }
+  if (searchBadge) {
+    searchBadge.textContent = tokenCount > 99 ? '99+' : (tokenCount > 0 ? String(tokenCount) : '');
+  }
+}
+
 function updatePreview() {
   try {
     if (forceAutoQueryUpdate) {
@@ -1430,6 +1497,7 @@ function updatePreview() {
     }
   } finally {
     updatePeriodDescription();
+    updateModalUsageIndicators();
     scheduleSaveState();
   }
 }
@@ -1437,7 +1505,7 @@ function updatePreview() {
 // schedule save state implementation
 function collectState() {
   var state = { values: {} };
-  document.querySelectorAll('input[id^="q_"], select[id^="q_"]').forEach(function(el){
+  document.querySelectorAll(STATE_FIELDS_SELECTOR).forEach(function(el){
     if (el.type === 'checkbox') state.values[el.id] = el.checked;
     else state.values[el.id] = el.value;
   });
@@ -1479,7 +1547,7 @@ scheduleSaveState = debounce(function(){
 
 // bind inputs to preview
 document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('input[id^="q_"], select[id^="q_"]').forEach(function(el){
+  document.querySelectorAll(STATE_FIELDS_SELECTOR).forEach(function(el){
     if (el.type === 'checkbox' || el.tagName.toLowerCase() === 'select') {
       el.addEventListener('change', function(){ userEditedQuery = false; manualQueryOverride = null; updatePreview(); });
     } else {

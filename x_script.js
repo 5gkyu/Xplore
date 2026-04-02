@@ -1278,7 +1278,7 @@ function buildQuery() {
       if (upper === 'OR' || t === '(' || t === ')') return t;
       if (t.startsWith('"') && t.endsWith('"')) return t;
       // 通常ワードはダブルクォートで囲む
-      return '"' + t.replace(/"/g, '\\"') + '"';
+      return '"""' + t.replace(/"/g, '\\"') + '"""';
     });
     parts.push(processed.join(' '));
   }

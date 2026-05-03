@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost in the void?</title>
+    <meta name="description" content="A quiet blank space where a page used to be. It seems the fragment you are looking for has drifted away." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Yomogi&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://5gkyu.github.io/icon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://5gkyu.github.io/icon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://5gkyu.github.io/icon/favicon-16x16.png">
+    <link rel="manifest" href="https://5gkyu.github.io/icon/site.webmanifest">
+    
+    <link rel="preload" href="https://5gkyu.github.io/icon/404list.png" as="image">
+
+    <meta property="og:title" content="Halcyon">
+    <meta property="og:description" content="Where the world falls silent, we found our own halcyon days.">
+    <meta property="og:image" content="https://5gkyu.github.io/icon/ogp.png">
+    <meta property="og:url" content="https://5gkyu.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="5gkyu">
+
+    <style>
+        /* グローバルスタイル */
+        :root {
+            --bg-color: #FDF2E4;
+            --text-color: #555c4d;
+            --accent-green: #acc693;
+            --hover-green: #92b069;
+            --accent-peach: #c97a5a;
+            --button-text: #ffffff;
+            --font-family: 'Caveat', 'Yomogi', cursive;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-family);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+
+            /* --- フェードイン（登場）用の初期状態 --- */
+            opacity: 0;
+            transform: translateY(10px);
+            /* loading.js の世界観に合わせて 0.5s ease-in-out で統一 */
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        /* 読み込み完了時に付与されるクラス */
+        body.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- フェードアウト時に付与されるクラス --- 
+           loading.jsと完全に同じ挙動（opacityのみ変化、誤クリック防止） */
+        body.hl-page-fade-out {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.5s ease-in-out !important;
+        }
+
+        /* コンテナ */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        /* 画像スタイル */
+        .error-image {
+            max-width: 80%;
+            height: auto;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            object-fit: cover;
+            transform: translateX(2%);
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+
+        /* テキストエリア */
+        .text-group h1 {
+            font-size: 5rem;
+            color: var(--hover-green);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .text-group h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .text-group p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* ボタンエリア */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-green);
+            color: var(--button-text);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--hover-green);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            border-color: var(--accent-peach);
+            color: var(--accent-peach);
+            background-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f5e6de;
+            color: var(--accent-peach);
+            transform: translateY(-2px);
+        }
+
+        /* 落ち葉・花びら Canvas */
+        #petals-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- レスポンシブ --- */
+        @media (min-width: 601px) {
+            body { overflow: hidden; }
+            .container { max-width: 640px; }
+            .error-image {
+                max-width: 100%;
+                max-height: 36vh;
+                margin-bottom: 16px;
+                transform: translateX(2%);
+            }
+            .text-group h1 { font-size: 3.8rem; margin-bottom: 4px; }
+            .text-group h2 { font-size: 1.6rem; margin-bottom: 10px; }
+            .text-group p { font-size: 1.1rem; margin-bottom: 16px; line-height: 1.5; }
+            .btn { padding: 10px 22px; font-size: 0.95rem; }
+        }
+
+        @media (max-height: 700px) {
+            body { overflow: hidden; }
+            .error-image { max-height: 30vh; margin-bottom: 2vh; }
+            .text-group h1 { font-size: clamp(2.5rem, 8vh, 3.8rem); margin-bottom: 0; }
+            .text-group h2 { font-size: clamp(1.2rem, 4vh, 1.6rem); margin-bottom: 1vh; }
+            .text-group p { font-size: clamp(0.9rem, 3vh, 1.1rem); margin-bottom: 3vh; }
+            .btn { padding: 8px 18px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="petals-canvas"></canvas>
+
+    <div class="container">
+        <img src="https://5gkyu.github.io/icon/404list.png" alt="ページが見つかりません" class="error-image">
+
+        <div class="text-group">
+            <h1>404</h1>
+            <h2>That page isn't here.</h2>
+            <p>
+                Oh... I’m so sorry, <br>
+                but I can’t seem to find the page you’re looking for.<br>
+                Perhaps the link has wandered off, <br>
+                or it’s simply no longer here.
+            </p>
+        </div>
+
+        <div class="button-group">
+            <a href="https://5gkyu.github.io/home/" class="btn btn-primary">Return Home</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
+        </div>
+    </div>
+
+    <script>
+    // --- ページ読み込み時のフェードイン処理 ---
+    window.addEventListener('load', () => {
+        document.body.classList.add('loaded');
+    });
+
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+
+    // --- 自動フェードアウト処理 (loading.js と同じロジック) ---
+    document.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (!anchor) return;
+
+        const href = anchor.getAttribute('href');
+        const target = anchor.getAttribute('target');
+
+        // Go Back ボタン用（javascript:history.back() は特別に許可する）
+        const isHistoryBack = href === 'javascript:history.back()';
+        const isJavascript = href && href.startsWith('javascript:');
+
+        if (href && !href.startsWith('#') && target !== '_blank' && (!isJavascript || isHistoryBack)) {
+            e.preventDefault(); // デフォルトの遷移をキャンセル
+            
+            // フェードアウト用のクラスを付与
+            document.body.classList.add('hl-page-fade-out');
+
+            // 0.5秒後に遷移を実行
+            setTimeout(() => {
+                if (isHistoryBack) {
+                    history.back();
+                } else {
+                    window.location.href = anchor.href;
+                }
+            }, 500); 
+        }
+    });
+
+    // --- パーティクルアニメーション処理 ---
+    (function() {
+        const canvas = document.getElementById('petals-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const SHAPES = [
+            { type: 'leaf',  color: '#acc693', size: 10 },
+            { type: 'leaf',  color: '#c8dba8', size:  8 },
+            { type: 'petal', color: '#edb39b', size:  9 },
+            { type: 'petal', color: '#f5cfc0', size:  7 },
+        ];
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        const groundPile = [];
+        function initGroundPile() {
+            groundPile.length = 0;
+            for (let i = 0; i < 60; i++) {
+                const s = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                groundPile.push({
+                    x:       rand(0, canvas.width),
+                    y:       canvas.height - rand(2, 38),
+                    size:    rand(s.size * 0.8, s.size * 2.0),
+                    color:   s.color,
+                    type:    s.type,
+                    angle:   rand(-Math.PI / 2.2, Math.PI / 2.2),
+                    opacity: rand(0.28, 0.65),
+                });
+            }
+        }
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initGroundPile();
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const COUNT = 18;
+        const particles = [];
+
+        function createParticle(startAtTop) {
+            const s = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+            return {
+                x:     rand(0, canvas.width),
+                y:     startAtTop ? rand(-80, -10) : rand(-canvas.height, 0),
+                size:  rand(s.size * 0.8, s.size * 1.4),
+                color: s.color,
+                type:  s.type,
+                speed: rand(0.6, 1.6),
+                drift: rand(-0.4, 0.4),
+                angle: rand(0, Math.PI * 2),
+                spin:  rand(-0.02, 0.02),
+                sway:  rand(0.3, 0.8),
+                swaySpeed: rand(0.01, 0.025),
+                swayOffset: rand(0, Math.PI * 2),
+                opacity: rand(0.55, 0.85),
+            };
+        }
+
+        for (let i = 0; i < COUNT; i++) {
+            particles.push(createParticle(false));
+        }
+
+        function drawLeaf(ctx, size) {
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.bezierCurveTo( size * 0.8, -size * 0.5,  size * 0.8,  size * 0.5, 0,  size);
+            ctx.bezierCurveTo(-size * 0.8,  size * 0.5, -size * 0.8, -size * 0.5, 0, -size);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.9);
+            ctx.lineTo(0,  size * 0.9);
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+        }
+
+        function drawPetal(ctx, size) {
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.5, size * 0.55, size, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            groundPile.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.globalAlpha = p.opacity;
+                ctx.fillStyle   = p.color;
+                if (p.type === 'leaf') drawLeaf(ctx, p.size);
+                else                   drawPetal(ctx, p.size);
+                ctx.restore();
+            });
+
+            const now = performance.now() * 0.001;
+
+            particles.forEach(p => {
+                p.y     += p.speed;
+                p.x     += p.drift + Math.sin(now * p.swaySpeed * 60 + p.swayOffset) * p.sway;
+                p.angle += p.spin;
+
+                if (p.y > canvas.height + 20) {
+                    Object.assign(p, createParticle(true));
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.globalAlpha = p.opacity;
+                ctx.fillStyle   = p.color;
+
+                if (p.type === 'leaf')  drawLeaf(ctx, p.size);
+                else                    drawPetal(ctx, p.size);
+
+                ctx.restore();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    })();
+    </script>
+</body>
+</html>

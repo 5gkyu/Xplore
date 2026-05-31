@@ -307,6 +307,39 @@ input::placeholder, textarea::placeholder { color: var(--muted); }
 }
 .search-hero .phrase-input::placeholder{ color:#b8d3d6 }
 .search-hero{ position:relative; }
+.phrase-mode-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.phrase-mode-label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+}
+.phrase-mode-row{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.phrase-mode-chip{
+  border:1px solid var(--input-border);
+  background:#fff;
+  color:var(--text);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.phrase-mode-chip:hover{ transform:translateY(-1px); }
+.phrase-mode-chip:active{ transform:translateY(0) scale(0.98); }
+.phrase-mode-chip.active{
+  background:var(--accent-1);
+  border-color:var(--accent-1);
+  color:#fff;
+}
 .search-word-badge{
   position:absolute;
   top:8px;
@@ -589,7 +622,6 @@ textarea{min-height:88px;resize:vertical}
 }
 @media(max-width:520px){
   .num-small{width:64px}
-  .wrap{padding-bottom:220px}
   .collapsible-header img.icon{ width:36px; height:36px; border-radius:8px; }
   .collapsible-header{padding:6px; gap:8px;}
   .collapsible-header .title{font-size:13px}
@@ -603,56 +635,7 @@ textarea{min-height:88px;resize:vertical}
 /* copy button moved inside query modal */
 
 /* 下部メニュー */
-.fixed-bottom-bar{ position:fixed; bottom:0; left:0; right:0; z-index:1600; display:flex; gap:8px; align-items:center; justify-content:space-between; background:var(--card); box-shadow:0 -6px 24px rgba(2,12,20,0.06); padding:8px 16px; box-sizing:border-box; height:var(--bottom-bar-height); padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
-.bottom-btn{ flex:1; padding:12px 16px; border-radius:8px; background:var(--accent-1); color:white; border:0; cursor:pointer; font-size:14px; text-align:center; font-weight:700; height:100%; }
 
-/* inner container centers buttons and limits width on larger screens */
-.fixed-bottom-inner{ width:100%; display:flex; gap:8px; align-items:center; justify-content:space-between; padding:0 6px; box-sizing:border-box }
-@media(min-width:768px){
-  .fixed-bottom-inner{ max-width:980px; margin:0 auto; padding:0 12px }
-}
-
-/* Xアプリ風の下部5ボタン */
-.x-bottom-nav{ height:var(--bottom-bar-height); }
-.x-bottom-nav .fixed-bottom-inner{
-  display:grid;
-  grid-template-columns:repeat(5, 1fr);
-  gap:0;
-  width:100%;
-  max-width:none;
-  margin:0;
-  padding:0;
-}
-.x-bottom-nav .bottom-btn{
-  height:100%;
-  padding:0;
-  border-radius:0;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.x-bottom-nav .bottom-btn img{
-  width:22px;
-  height:22px;
-  display:block;
-}
-.x-bottom-nav .bottom-btn.grok-btn .grok-text{
-  font-weight:800;
-  font-size:18px;
-  line-height:1;
-  display:inline-block;
-}
-.x-bottom-nav .bottom-btn{ color:var(--accent-1); }
-.x-bottom-nav .bottom-btn.grok-btn{ color:#EE1166; }
-.x-bottom-nav.fixed-bottom-bar{
-  padding:0;
-  padding-bottom:env(safe-area-inset-bottom);
-  box-shadow:none;
-  background:var(--card);
-}
 
 /* モーダル */
 .modal-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:2000; }
@@ -729,7 +712,7 @@ textarea{min-height:88px;resize:vertical}
 @media(max-width:420px){
   html,body{ overflow-y:hidden !important; }
   .card{ max-height:none !important; overflow:visible !important; }
-  .wrap{ padding-top:0; padding-bottom:220px; }
+  .wrap{ padding-top:0; padding-bottom:16px; }
 }
 
 
@@ -870,8 +853,17 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
       <div class="basic-section search-hero" style="margin-top:0;">
         <span class="search-word-badge" id="search_word_badge" aria-hidden="true"></span>
         <div style="display:flex;flex-direction:column;gap:8px">
+          <input id="q_phrase_mode" type="hidden" value="triple" />
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
           <input id="q_phrase_input" class="phrase-input" type="text" placeholder='検索ワードをここに入力' />
+          <div class="phrase-mode-wrap" role="group" aria-label="検索ワードの囲み方">
+            <span class="phrase-mode-label">囲み方</span>
+            <div class="phrase-mode-row">
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="double" aria-pressed="false">"ワード"</button>
+              <button type="button" class="phrase-mode-chip active" data-phrase-mode="triple" aria-pressed="true">"""ワード"""</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="plain" aria-pressed="false">ワード</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1182,6 +1174,14 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
                 <button type="button" data-val="exclude">除外</button>
               </div>
             </div>
+            <div class="type-row">
+              <span class="type-label">RT</span>
+              <div class="tri-toggle" data-filter="retweets">
+                <button type="button" data-val="none" class="active-none">未指定</button>
+                <button type="button" data-val="only">RTのみ</button>
+                <button type="button" data-val="exclude">RT除外</button>
+              </div>
+            </div>
           </div>
           <div style="height:12px"></div>
           <div class="type-grid">
@@ -1213,6 +1213,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             <input type="checkbox" id="only_verified" aria-label="公式 限定"><input type="checkbox" id="exclude_verified" aria-label="公式 除外">
             <input type="checkbox" id="only_following" aria-label="フォロー中 限定">
             <input type="checkbox" id="exclude_following" aria-label="フォロー中 除外">
+            <input type="checkbox" id="only_retweets" aria-label="RT 限定"><input type="checkbox" id="exclude_retweets" aria-label="RT 除外">
           </div>
         </div>
       </div>
@@ -1287,15 +1288,6 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
 
     </div>
 
-    <nav class="fixed-bottom-bar x-bottom-nav" aria-label="X風ボトムメニュー">
-      <div class="fixed-bottom-inner">
-        <button type="button" id="bottom_nav_timeline" class="bottom-btn" title="タイムライン"><img src="./image/house-line.svg" alt="タイムライン" /></button>
-        <button type="button" id="bottom_nav_search" class="bottom-btn" title="検索"><img src="./image/magnifying-glass.svg" alt="検索" /></button>
-        <button type="button" id="bottom_nav_grok" class="bottom-btn grok-btn" title="Grok"><span class="grok-text" aria-hidden="true">G</span></button>
-        <button type="button" id="bottom_nav_notifications" class="bottom-btn" title="通知"><img src="./image/bell.svg" alt="通知" /></button>
-        <button type="button" id="bottom_nav_dm" class="bottom-btn" title="DM"><img src="./image/envelope.svg" alt="DM" /></button>
-      </div>
-    </nav>
   </div>
 
   <script src="x_script.js"></script>

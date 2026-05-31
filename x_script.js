@@ -10,11 +10,42 @@ const STORAGE_KEY = 'xsearch_state_v3';
 const SAVE_DEBOUNCE_MS = 200;
 const OPEN_APP_TIMEOUT_MS = 1200;
 const STATE_FIELDS_SELECTOR = 'input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]';
+const DEFAULT_PHRASE_WRAP_MODE = 'triple';
 
 function debounce(fn, ms){ let t; return function(){ clearTimeout(t); t = setTimeout(fn, ms); } }
 function splitTrim(s){ return s? String(s).trim().split(/\s+/).filter(x=>x):[] }
 function isNumeric(s){ return String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()) }
 function collapseSpaces(str){ return String(str||'').split(/\s+/).filter(x=>x && x.length>0).join(' ') }
+
+function normalizePhraseWrapMode(mode){
+  var m = String(mode || '').toLowerCase();
+  if (m === 'double' || m === 'triple' || m === 'plain') return m;
+  return DEFAULT_PHRASE_WRAP_MODE;
+}
+
+function getPhraseWrapMode(){
+  var el = document.getElementById('q_phrase_mode');
+  return normalizePhraseWrapMode(el ? el.value : '');
+}
+
+function syncPhraseWrapModeUI(){
+  var current = getPhraseWrapMode();
+  var hidden = document.getElementById('q_phrase_mode');
+  if (hidden) hidden.value = current;
+  document.querySelectorAll('.phrase-mode-chip[data-phrase-mode]').forEach(function(btn){
+    var mode = normalizePhraseWrapMode(btn.getAttribute('data-phrase-mode'));
+    var active = mode === current;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function setPhraseWrapMode(mode){
+  var hidden = document.getElementById('q_phrase_mode');
+  var next = normalizePhraseWrapMode(mode);
+  if (hidden) hidden.value = next;
+  syncPhraseWrapModeUI();
+}
 
 function tokenizePhraseInput(input){
   var text = String(input || '');
@@ -696,6 +727,7 @@ bindExclusive(document.getElementById('only_images'), document.getElementById('e
 bindExclusive(document.getElementById('only_videos'), document.getElementById('exclude_videos'));
 bindExclusive(document.getElementById('only_verified'), document.getElementById('exclude_verified'));
 bindExclusive(document.getElementById('only_following'), document.getElementById('exclude_following'));
+bindExclusive(document.getElementById('only_retweets'), document.getElementById('exclude_retweets'));
 // --- 以下は x.html のインラインスクリプトを統合したもの ---
 document.addEventListener('DOMContentLoaded', function() {
   // フォーカス時の強制スクロールは画面ズレの原因になるため無効化
@@ -817,52 +849,6 @@ document.addEventListener('DOMContentLoaded', function() {
           alert('検索クエリが空です');
         }
       }
-    });
-  }
-
-  // X風ボトムメニュー
-  function runMainSearchFromBottom() {
-    var quick = document.getElementById('btn_quick_search');
-    if (quick) {
-      quick.click();
-      return;
-    }
-    var top = document.getElementById('top_btn_search');
-    if (top) top.click();
-  }
-
-  var bottomTimelineBtn = document.getElementById('bottom_nav_timeline');
-  if (bottomTimelineBtn) {
-    bottomTimelineBtn.addEventListener('click', function() {
-      openInBrowser('https://x.com/home');
-    });
-  }
-
-  var bottomSearchBtn = document.getElementById('bottom_nav_search');
-  if (bottomSearchBtn) {
-    bottomSearchBtn.addEventListener('click', function() {
-      runMainSearchFromBottom();
-    });
-  }
-
-  var bottomGrokBtn = document.getElementById('bottom_nav_grok');
-  if (bottomGrokBtn) {
-    bottomGrokBtn.addEventListener('click', function() {
-      openInBrowser('https://x.com/i/grok');
-    });
-  }
-
-  var bottomNotificationsBtn = document.getElementById('bottom_nav_notifications');
-  if (bottomNotificationsBtn) {
-    bottomNotificationsBtn.addEventListener('click', function() {
-      openInBrowser('https://x.com/notifications');
-    });
-  }
-
-  var bottomDmBtn = document.getElementById('bottom_nav_dm');
-  if (bottomDmBtn) {
-    bottomDmBtn.addEventListener('click', function() {
-      openInBrowser('https://x.com/messages');
     });
   }
 
@@ -1269,6 +1255,7 @@ function buildQuery() {
   // phrases (space separated tokens) - OR, (), "" は引用符で囲まない
   var phraseInput = document.getElementById('q_phrase_input');
   var phraseRaw = (phraseInput && phraseInput.value) ? phraseInput.value.trim() : '';
+  var phraseWrapMode = getPhraseWrapMode();
 
   var tokens = tokenizePhraseInput(phraseRaw);
   if (tokens.length) {
@@ -1277,8 +1264,10 @@ function buildQuery() {
       // OR, 括弧、既にダブルクォート付きはそのまま
       if (upper === 'OR' || t === '(' || t === ')') return t;
       if (t.startsWith('"') && t.endsWith('"')) return t;
-      // 通常ワードはダブルクォートで囲む
-      return '"""' + t.replace(/"/g, '\\"') + '"""';
+      if (phraseWrapMode === 'plain') return t;
+      var escaped = t.replace(/"/g, '\\"');
+      if (phraseWrapMode === 'double') return '"' + escaped + '"';
+      return '"""' + escaped + '"""';
     });
     parts.push(processed.join(' '));
   }
@@ -1336,6 +1325,11 @@ function buildQuery() {
   if (excludeImages && excludeImages.checked) parts.push('-filter:images');
   if (onlyVideos && onlyVideos.checked) parts.push('filter:videos');
   if (excludeVideos && excludeVideos.checked) parts.push('-filter:videos');
+
+  var onlyRetweets = document.getElementById('only_retweets');
+  var excludeRetweets = document.getElementById('exclude_retweets');
+  if (onlyRetweets && onlyRetweets.checked) parts.push('filter:retweets');
+  if (excludeRetweets && excludeRetweets.checked) parts.push('-filter:retweets');
 
   // numeric mins
   var minLikes = document.getElementById('q_min_likes');
@@ -1449,7 +1443,7 @@ function updateModalUsageIndicators(){
   var counts = {
     modal_period: countFilledFields(['q_since_date', 'q_until_date']),
     modal_engagement: countFilledFields(['q_min_likes', 'q_min_retweets', 'q_min_replies', 'q_post_id']),
-    modal_type: countFilledFields(['q_url']) + countTriToggleActive(['replies','quote','links','media','images','videos','verified','following']),
+    modal_type: countFilledFields(['q_url']) + countTriToggleActive(['replies','quote','links','media','images','videos','verified','following','retweets']),
     modal_account: countFilledFields(['q_from', 'q_to', 'q_at_search', 'q_lang_select'])
   };
 
@@ -1547,6 +1541,15 @@ scheduleSaveState = debounce(function(){
 
 // bind inputs to preview
 document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.phrase-mode-chip[data-phrase-mode]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      setPhraseWrapMode(btn.getAttribute('data-phrase-mode'));
+      userEditedQuery = false;
+      manualQueryOverride = null;
+      updatePreview();
+    });
+  });
+
   document.querySelectorAll(STATE_FIELDS_SELECTOR).forEach(function(el){
     if (el.type === 'checkbox' || el.tagName.toLowerCase() === 'select') {
       el.addEventListener('change', function(){ userEditedQuery = false; manualQueryOverride = null; updatePreview(); });
@@ -1559,6 +1562,7 @@ document.addEventListener('DOMContentLoaded', function(){
   // initial restore and preview
   restoreState();
   syncTriToggleUI();
+  syncPhraseWrapModeUI();
   updatePreview();
 });
 
@@ -1572,6 +1576,9 @@ function resetAllInputs() {
     try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){}
     try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch(e){}
   });
+  var phraseMode = document.getElementById('q_phrase_mode');
+  if (phraseMode) phraseMode.value = DEFAULT_PHRASE_WRAP_MODE;
+  syncPhraseWrapModeUI();
   // clear phrase hidden list if present
   var ph = document.getElementById('q_phrase_list'); if (ph) ph.value = '[]';
   // clear any manual raw-query override when resetting inputs

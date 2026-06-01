@@ -15,12 +15,12 @@
     
     <link rel="preload" href="https://5gkyu.github.io/icon/404list.png" as="image">
 
-    <meta property="og:title" content="Halcyon">
+    <meta property="og:title" content="404 Not Found | Halcyon - 5Gkyu">
     <meta property="og:description" content="Where the world falls silent, we found our own halcyon days.">
     <meta property="og:image" content="https://5gkyu.github.io/icon/ogp.png">
-    <meta property="og:url" content="https://5gkyu.github.io/">
+    <meta property="og:url" content="https://5gkyu.github.io/404.html">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="5gkyu">
+    <meta property="og:site_name" content="Halcyon">
 
     <style>
         /* グローバルスタイル */
@@ -223,7 +223,7 @@
         </div>
 
         <div class="button-group">
-            <a href="https://5gkyu.github.io/home/" class="btn btn-primary">Return Home</a>
+            <a href="https://5gkyu.github.io/" class="btn btn-primary">Return Home</a>
             <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
         </div>
     </div>
@@ -283,7 +283,7 @@
         const groundPile = [];
         function initGroundPile() {
             groundPile.length = 0;
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 150; i++) {
                 const s = SHAPES[Math.floor(Math.random() * SHAPES.length)];
                 groundPile.push({
                     x:       rand(0, canvas.width),
@@ -305,7 +305,7 @@
         window.addEventListener('resize', resize);
         resize();
 
-        const COUNT = 18;
+        const COUNT = 45;
         const particles = [];
 
         function createParticle(startAtTop) {

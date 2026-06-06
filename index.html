@@ -509,15 +509,15 @@ textarea{min-height:88px;resize:vertical}
   .engagement-buttons { gap: 6px; margin-top: 6px; }
   .engagement-buttons button { flex: 1 1 32px; padding: 6px 0; font-size: 12px; border-radius: 6px; box-shadow: none; font-weight: 700; }
 }
-/* リセットボタン色を統一（スマホと同じパステルピンク） */
+/* リセットボタン色統一 */
 .engagement-reset-btn {
   text-align: center;
   padding: 8px 12px;
   font-size: 12px;
   border-radius: 10px;
-  background: #f0f5ff;
-  color: #2a3f66;
-  border: 1px solid #c9d7ff;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
   cursor: pointer;
   vertical-align: middle;
   line-height: 1.1;
@@ -527,35 +527,36 @@ textarea{min-height:88px;resize:vertical}
   width: auto;
 }
 .engagement-reset-btn:hover {
-  background: #e5eeff;
+  background: var(--collapse-header-bg);
   transform: translateY(-1px);
 }
 .engagement-reset-btn:active { transform: translateY(0) scale(0.98); }
-/* いいね用ボタン色（パステルピンク） */
+/* いいね用ボタン色 */
 .engagement-buttons .like-btn {
-  background: #ffe3ea;
-  color: var(--text);
-}
-.engagement-buttons .like-btn:hover {
-  background: #ffd6e0;
-  color: var(--text);
-}
-/* リツイート用ボタン色（パステルグリーン） */
-.engagement-buttons .retweet-btn {
-  background: #e3ffe3;
-}
-.engagement-buttons .retweet-btn:hover {
-  background: #d6ffe0;
-}
-/* ensure retweet button text is readable in light mode */
-.engagement-buttons .retweet-btn { color: var(--text); border:1px solid var(--input-border); }
-/* リプライ用ボタン色（淡め） */
-.engagement-buttons .reply-btn {
-  background: #eef3ff;
+  background: var(--input-bg);
   color: var(--text);
   border: 1px solid var(--input-border);
 }
-.engagement-buttons .reply-btn:hover { background: #e6ecff; color: var(--text); }
+.engagement-buttons .like-btn:hover {
+  background: var(--collapse-header-bg);
+  color: var(--text);
+}
+/* リツイート用ボタン色 */
+.engagement-buttons .retweet-btn {
+  background: var(--input-bg);
+}
+.engagement-buttons .retweet-btn:hover {
+  background: var(--collapse-header-bg);
+}
+/* ensure retweet button text is readable in light mode */
+.engagement-buttons .retweet-btn { color: var(--text); border:1px solid var(--input-border); }
+/* リプライ用ボタン色 */
+.engagement-buttons .reply-btn {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+}
+.engagement-buttons .reply-btn:hover { background: var(--collapse-header-bg); color: var(--text); }
 @media(min-width:768px){
   .engagement-buttons .retweet-btn { color: var(--text); }
 }
@@ -667,8 +668,8 @@ textarea{min-height:88px;resize:vertical}
 .modal-close-btn:active{ transform:translateY(0) scale(0.98); }
 .modal-copy-btn{ position:absolute; right:56px; top:8px; padding:6px 10px; border-radius:8px; background:var(--accent-1); color:white; border:1px solid var(--accent-2); cursor:pointer; font-size:13px; }
 /* action-styled buttons inside modal (not absolutely positioned) */
-.modal-action-btn{ padding:9px 14px; border-radius:10px; background:#2f6fa6; color:#fff; border:1px solid rgba(47,111,166,0.16); cursor:pointer; font-size:13px; font-weight:700; letter-spacing:.01em; transition:transform .14s ease, background .14s ease; }
-.modal-action-btn:hover{ background:#255f92; transform:translateY(-1px); }
+.modal-action-btn{ padding:9px 14px; border-radius:10px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; font-size:13px; font-weight:700; letter-spacing:.01em; transition:transform .14s ease, background .14s ease; }
+.modal-action-btn:hover{ background:var(--collapse-header-bg); transform:translateY(-1px); }
 .modal-action-btn:active{ transform:translateY(0) scale(0.98); }
 .open-intermediate-url{ margin-top:8px; padding:8px 10px; background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; font-size:12px; color:var(--muted); word-break:break-all; }
 .open-intermediate-actions{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
@@ -682,13 +683,15 @@ textarea{min-height:88px;resize:vertical}
 .history-day{ color:var(--muted); }
 .history-time{ color:var(--muted); opacity:0.9; }
 .history-query{ flex:1; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.clear-history-btn{ width:100%; margin-top:12px; padding:10px; border-radius:8px; background:var(--miku-headset-red-2); color:white; border:1px solid var(--miku-headset-red-1); cursor:pointer; font-weight:700; }
+.clear-history-btn{ width:100%; margin-top:12px; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; font-weight:700; transition:background .14s ease; }
+.clear-history-btn:hover{ background:var(--collapse-header-bg); }
 .period-buttons{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
-.period-buttons button{ flex:1 1 0; padding:6px 4px; font-size:11px; border-radius:6px; background:#e3f5ff; color:var(--text); border:1px solid var(--input-border); cursor:pointer; min-width:0; box-sizing:border-box; text-align:center; }
-.period-buttons.period-from-row button{ background:#fff1d6; color:var(--text); }
-/* 直近ボタンを青系ではない色にする（パステルピンク） */
-.period-row-wrap:first-of-type .period-buttons button{ background:#ffe3ea; color:var(--text); }
-.period-row-wrap:first-of-type .period-buttons button:hover{ background:#ffd6e0; }
+.period-buttons button{ flex:1 1 0; padding:6px 4px; font-size:11px; border-radius:6px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; min-width:0; box-sizing:border-box; text-align:center; transition:background .14s ease; }
+.period-buttons button:hover{ background:var(--collapse-header-bg); }
+.period-buttons.period-from-row button{ background:var(--input-bg); color:var(--text); }
+/* 直近ボタン色統一 */
+.period-row-wrap:first-of-type .period-buttons button{ background:var(--input-bg); color:var(--text); }
+.period-row-wrap:first-of-type .period-buttons button:hover{ background:var(--collapse-header-bg); }
 @media(min-width:768px){
   .period-buttons{ flex-wrap:nowrap }
   .period-buttons button{ flex:1 1 0 }
@@ -985,7 +988,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn" title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
           </div>
           <div class="hint" style="margin-top:0;margin-bottom:10px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid #f59e0b;border-radius:8px;color:var(--text);line-height:1.6">
-            <b>⚠ 注意:</b> <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_*</code> 系コマンド（<code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_faves:</code> など）は、X側のバグで検索結果が不安定です。
+            <b>注意:</b> <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_*</code> 系コマンド（<code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_faves:</code> など）は、X側のバグで検索結果が不安定です。
           </div>
 
           <div class="engagement-columns">
@@ -1050,7 +1053,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             <div class="post-id-tool">
               <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320" style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
               <div class="post-id-actions">
-                <button id="btn_paste_id" type="button" class="secondary">📋 ペースト</button>
+                <button id="btn_paste_id" type="button" class="secondary">ペースト</button>
                 <button id="btn_open_by_id" type="button" class="engagement-reset-btn">検索実行</button>
               </div>
             </div>
@@ -1083,7 +1086,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             <button type="button" class="engagement-reset-btn" data-reset="q_at_search">リセット</button>
           </div>
           <div style="margin-top:10px">
-            <label class="muted-small" for="q_lang_select" style="color:var(--text)">🌐 言語</label>
+            <label class="muted-small" for="q_lang_select" style="color:var(--text)">言語</label>
             <select id="q_lang_select" aria-label="言語指定" style="width:200px;color:var(--text);background:var(--input-bg);">
               <option value="">自動</option>
               <option value="ja">日本語 (ja)</option>
@@ -1097,7 +1100,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             </select>
           </div>
           <div class="hint" style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--text)">
-            <div style="margin-bottom:6px"><b>📝 コマンドの違い:</b></div>
+            <div style="margin-bottom:6px"><b>コマンドの違い:</b></div>
             <div style="font-size:12px;margin-bottom:4px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">from:</code> — 指定アカウントが投稿したポスト</div>
             <div style="font-size:12px;margin-bottom:4px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">to:</code> — 指定アカウント<b>への返信（リプライ）</b>のみ</div>
             <div style="font-size:12px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">@</code> — 本文中に@ユーザー名が含まれる投稿（<b>メンション検索</b>、リプライ以外も含む）</div>
@@ -1250,12 +1253,12 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
                     
           <div style="margin-top:12px;">
             <div style="margin-bottom:10px">
-              <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">📘 コマンド説明（note）</a>
+              <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">コマンド説明（note）</a>
             </div>
             <div class="mini-apps-wrap">
-              <div class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>🧩 ミニアプリ</b></div>
+              <div class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>ミニアプリ</b></div>
               <div class="mini-apps">
-                <a class="mini-app-card" href="https://5gkyu.github.io/app/intent/intent.html" target="_blank" rel="noopener noreferrer">
+                <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/intent/" target="_blank" rel="noopener noreferrer">
                   <div class="mini-head">
                     <div>
                       <div class="mini-title">Intentリンク作成</div>
@@ -1264,7 +1267,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
                   </div>
                   <div class="mini-action">開く</div>
                 </a>
-                <a class="mini-app-card" href="https://5gkyu.github.io/app/dm/dm.html" target="_blank" rel="noopener noreferrer">
+                <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/dm/" target="_blank" rel="noopener noreferrer">
                   <div class="mini-head">
                     <div>
                       <div class="mini-title">DMボタン作成</div>
@@ -1277,7 +1280,7 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
             </div>
           </div>
           <div style="margin-top:10px">
-            <div class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">📺 結果表示</div>
+            <div class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">結果表示</div>
             <div class="hint" style="color:var(--muted)">このツールは常に「最新」タブ（<b>f=live</b>）で開きます。<br><b>注意:</b> アプリで開く場合、アプリ側の仕様で「話題」タブ表示になることがあります。</div>
             <div class="hint">UIアイコンはPhosphor Iconsを使用しています。</div>
           </div>

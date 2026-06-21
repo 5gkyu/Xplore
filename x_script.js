@@ -965,8 +965,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (modalQueryCopy) {
       modalQueryCopy.addEventListener('click', function() {
         var text = modalQueryText.value || '';
-        if (text.trim()) {
-          navigator.clipboard.writeText(text).then(function() { alert('クエリをコピーしました'); });
+        if (!text.trim()) return;
+
+        var copied = false;
+        try {
+          if (modalQueryText) {
+            modalQueryText.focus();
+            modalQueryText.select();
+            try { modalQueryText.setSelectionRange(0, modalQueryText.value.length); } catch(e){}
+            copied = document.execCommand('copy');
+          }
+        } catch(e) { console.warn('select and copy failed', e); }
+
+        if (!copied) {
+          copyTextToClipboard(text);
         }
       });
     }
@@ -982,19 +994,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-      // 全選択ボタン（主にモバイル向け）
-      var modalQuerySelect = document.getElementById('modal_query_select_all');
-      if (modalQuerySelect) {
-        modalQuerySelect.addEventListener('click', function() {
-          try {
-            if (modalQueryText) {
-              modalQueryText.focus();
-              modalQueryText.select();
-              try { modalQueryText.setSelectionRange(0, modalQueryText.value.length); } catch(e){}
-            }
-          } catch(e) { console.warn('select all failed', e); }
-        });
-      }
+
   }
 
   // エンゲージボタン

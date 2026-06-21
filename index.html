@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="ja" class="theme-awake">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>X検索補助ツール</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-  
+
   <!-- OGP / Open Graph Protocol -->
   <meta property="og:title" content="X検索補助ツール" />
   <meta property="og:description" content="スマホ用のXの検索を効率化するための補助ツール。期間指定、エンゲージメント、アカウント指定など高度な検索を簡単に実行できます。" />
@@ -20,7 +21,7 @@
   <meta property="og:url" content="https://5gkyu.github.io/Xplore/" />
   <meta property="og:site_name" content="X検索コマンドツール" />
   <meta property="og:locale" content="ja_JP" />
-  
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="X検索補助ツール" />
@@ -29,806 +30,1973 @@
   <meta name="twitter:image:alt" content="X検索補助ツール のカード画像" />
   <meta name="twitter:site" content="@5gkyu" />
   <meta name="twitter:creator" content="@5gkyu" />
-  
+
   <!-- General Meta Tags -->
   <meta name="description" content="スマホ用のXの検索を効率化するための補助ツール。期間指定、エンゲージメント、アカウント指定など高度な検索を簡単に実行できます。" />
   <meta name="keywords" content="X,Twitter,検索,ツール,検索補助,高度な検索,期間指定,エンゲージメント" />
   <meta name="author" content="5gkyu" />
-  
+
   <!-- Apple Touch Icon -->
   <link rel="apple-touch-icon" href="ogp.png" />
-  
+
   <style>
-:root{ --bg:#f6fbfb; --card:#ffffff; --card-rgb:255,255,255; --accent-1:#0fb8bf; --accent-2:#8fe3dd; --text:#073a46; --muted:#57727a; --input-bg:#ffffff; --input-border:rgba(6,50,58,0.08); --shadow:0 10px 30px rgba(2,18,22,0.06); --radius:12px; --collapse-header-bg:#f3f3f3; --collapse-content-bg:#fafafa; --collapse-border:rgba(6,50,58,0.06); --miku-headset-red-1:#ff2d55; --miku-headset-red-2:#ff6b7a; --bottom-bar-height:64px; --footer-height:56px; --app-vh:1vh; }
-html.theme-awake{ --bg:#ffdada; --card:#ffffff; --accent-1:#ff6b8a; --accent-2:#ff9eb0; --text:#5c3a3a; --muted:#8a6565; --input-bg:#fff8f5; --collapse-header-bg:#fff0ed; --collapse-content-bg:#fff8f5; }
-html,body{
-  min-height:calc(var(--app-vh) * 100);
-  height:calc(var(--app-vh) * 100);
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
-  color:var(--text);
-  background:var(--bg) url('bg.png') no-repeat center center fixed;
-  background-size:cover;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  padding-bottom:env(safe-area-inset-bottom);
-  overflow:hidden; /* デフォルトではページスクロールを無効にして、大画面での 固定レイアウト を維持 */
-  scrollbar-gutter: stable;
-}
-/* モバイル向けに強制的にスクロールを禁止するクラス
+    :root {
+      --bg: #f6fbfb;
+      --card: #ffffff;
+      --card-rgb: 255, 255, 255;
+      --accent-1: #0fb8bf;
+      --accent-2: #8fe3dd;
+      --text: #073a46;
+      --muted: #57727a;
+      --input-bg: #ffffff;
+      --input-border: rgba(6, 50, 58, 0.08);
+      --shadow: 0 10px 30px rgba(2, 18, 22, 0.06);
+      --radius: 12px;
+      --collapse-header-bg: #f3f3f3;
+      --collapse-content-bg: #fafafa;
+      --collapse-border: rgba(6, 50, 58, 0.06);
+      --miku-headset-red-1: #ff2d55;
+      --miku-headset-red-2: #ff6b7a;
+      --bottom-bar-height: 64px;
+      --footer-height: 56px;
+      --app-vh: 1vh;
+    }
+
+    html.theme-awake {
+      --bg: #ffdada;
+      --card: #ffffff;
+      --accent-1: #ff6b8a;
+      --accent-2: #ff9eb0;
+      --text: #5c3a3a;
+      --muted: #8a6565;
+      --input-bg: #fff8f5;
+      --collapse-header-bg: #fff0ed;
+      --collapse-content-bg: #fff8f5;
+    }
+
+    html,
+    body {
+      min-height: calc(var(--app-vh) * 100);
+      height: calc(var(--app-vh) * 100);
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color: var(--text);
+      background: var(--bg) url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: env(safe-area-inset-bottom);
+      overflow: hidden;
+      /* デフォルトではページスクロールを無効にして、大画面での 固定レイアウト を維持 */
+      scrollbar-gutter: stable;
+    }
+
+    /* モバイル向けに強制的にスクロールを禁止するクラス
    タッチ移動を無効化し、オーバースクロールを抑制します */
-html.no-scroll-mobile, body.no-scroll-mobile, .no-scroll-mobile{
-  overflow: hidden !important;
-  height: 100% !important;
-  touch-action: auto !important;
-  -webkit-overflow-scrolling: auto !important;
-  overscroll-behavior: none !important;
-}
-/* 入力フォーカス時のみスクロールを許可（モバイル） */
-html.allow-scroll-mobile, body.allow-scroll-mobile{
-  overflow: auto !important;
-  height: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior: contain !important;
-}
-/* 大きなボタングリッド（2×3） */
-.menu-grid{
-  display:grid;
-  grid-template-columns:repeat(2, 1fr);
-  gap:12px;
-  width:100%;
-  margin-top:8px;
-}
-/* Ensure the bottom action buttons match the menu grid layout */
-.menu-actions{
-  display:grid !important;
-  grid-template-columns:repeat(2, 1fr) !important;
-  gap:12px !important;
-  width:100%;
-  margin-top:8px;
-}
-.menu-btn{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:20px 10px;
-  border-radius:14px;
-  border:1px solid var(--input-border);
-  background:var(--card);
-  box-shadow:0 8px 20px rgba(2,12,20,0.08), 0 1px 0 rgba(255,255,255,0.7) inset;
-  cursor:pointer;
-  transition:transform 0.15s, box-shadow 0.15s;
-  min-height:90px;
-}
-.menu-btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 12px 24px rgba(2,12,20,0.12), 0 1px 0 rgba(255,255,255,0.75) inset;
-}
-.menu-btn:active{
-  transform:scale(0.97);
-}
-.menu-btn .icon{
-  font-size:28px;
-  margin-bottom:6px;
-}
-.menu-btn .icon img{ width:28px; height:28px; display:block; }
-.icon-inline{ width:18px; height:18px; display:inline-block; vertical-align:-3px; }
-.top-reset-btn img,
-.top-search-btn img{
-  width:24px;
-  height:24px;
-  display:block;
-  filter:brightness(0) invert(1);
-}
-.modal-close-btn img,
-.section-modal-close img{
-  width:16px;
-  height:16px;
-  display:block;
-  filter:brightness(0) invert(1);
-}
-.menu-btn .label{
-  font-size:14px;
-  font-weight:700;
-  color:var(--text);
-  text-align:center;
-}
-.menu-btn .sublabel{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:2px;
-  text-align:center;
-}
-.menu-btn{ position:relative; }
-.menu-btn.modal-active{
-  border-color:var(--accent-1);
-  box-shadow:0 10px 24px rgba(2,12,20,0.12), 0 0 0 2px rgba(255,255,255,0.75) inset;
-}
-.menu-btn .menu-badge{
-  position:absolute;
-  top:6px;
-  right:6px;
-  min-width:18px;
-  height:18px;
-  padding:0 4px;
-  border-radius:999px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  font-weight:800;
-  background:var(--accent-1);
-  color:#fff;
-  line-height:1;
-}
-.menu-btn.modal-active .menu-badge{ display:inline-flex; }
-/* Ensure sublabel weight is normal (avoid inheriting .secondary's bold) */
-.menu-btn .sublabel, .menu-actions .secondary .sublabel { font-weight:400; }
-@media(max-width:400px){
-  .menu-btn{
-    padding:16px 8px;
-    min-height:80px;
-  }
-  .menu-btn .icon{
-    font-size:24px;
-  }
-  .menu-btn .label{
-    font-size:13px;
-  }
-  .menu-btn .sublabel{
-    font-size:10px;
-  }
-}
-/* セクション用モーダル */
-.section-modal-overlay{
-  position:fixed;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,0.5);
-  z-index:2000;
-  padding:16px;
-  box-sizing:border-box;
-}
-.section-modal-overlay.active{
-  display:flex;
-}
-.section-modal{
-  position:relative;
-  background:var(--card);
-  padding:16px;
-  border-radius:14px;
-  max-width:500px;
-  width:100%;
-  max-height:calc(var(--app-vh) * 85);
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
-  box-shadow:0 10px 40px rgba(2,12,20,0.4);
-  border:1px solid rgba(6,50,58,0.04);
-}
-.section-modal h3{
-  margin:0 0 12px 0;
-  color:var(--text);
-  font-size:16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.section-modal-close{
-  position:absolute;
-  right:12px;
-  top:12px;
-  width:36px;
-  height:36px;
-  border-radius:10px;
-  background:#475569; /* muted slate */
-  color:white;
-  border:1px solid rgba(0,0,0,0.06);
-  cursor:pointer;
-  font-size:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:none;
-  transition:transform .14s ease, background .14s ease;
-}
-.section-modal-close:hover{ background:#394852; transform:translateY(-1px); }
-.section-modal-close:active{ transform:translateY(0) scale(0.98); }
-.card{ width:100%; max-width:500px; margin:0 auto; background:var(--card); border-radius:var(--radius); padding:6px 16px 16px; box-shadow:0 20px 40px rgba(2,12,20,0.12), 0 2px 0 rgba(255,255,255,0.8) inset; border:1px solid rgba(6,50,58,0.06); box-sizing:border-box; min-width:0; overflow-x:hidden; max-height:calc((var(--app-vh) * 100) - 48px); overflow:hidden; }
-header{display:flex;gap:12px;align-items:center}
-.logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--accent-1);color:white;font-weight:800;font-size:20px}
-h1{margin:0;font-size:18px}
-p.lead{margin:6px 0 14px;color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
-@media(min-width:768px){
-  .grid{grid-template-columns:1fr 1fr}
-}
-/* その他入力欄を下部に配置 */
-.misc-section{
-  margin-top:10px;
-  padding-top:10px;
-  border-top:1px solid var(--input-border);
-}
-label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    html.no-scroll-mobile,
+    body.no-scroll-mobile,
+    .no-scroll-mobile {
+      overflow: hidden !important;
+      height: 100% !important;
+      touch-action: auto !important;
+      -webkit-overflow-scrolling: auto !important;
+      overscroll-behavior: none !important;
+    }
 
-/* ミニアプリカード */
-.mini-apps-wrap{ margin-top:12px; }
-.mini-apps{ display:flex; flex-direction:column; gap:12px; }
-.mini-app-card{ display:flex; flex-direction:row; align-items:center; gap:12px; padding:14px; border-radius:14px; background:var(--card); border:1px solid rgba(6,50,58,0.04); box-shadow:0 8px 20px rgba(3,12,18,0.04); text-decoration:none; color:var(--text); width:100%; box-sizing:border-box; }
-.mini-app-card:hover{ transform:translateY(-3px); box-shadow:0 14px 28px rgba(3,12,18,0.08); }
-.mini-app-card .mini-head{ display:flex; align-items:center; gap:12px }
-.mini-app-card .mini-icon{ width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent-1); color:white; font-size:20px; flex:0 0 48px }
-.mini-app-card .mini-title{ font-weight:800; font-size:15px }
-.mini-app-card .mini-desc{ font-size:13px; color:var(--muted); line-height:1.3 }
-.mini-app-card .mini-action{ margin-left:auto; padding:8px 12px; border-radius:12px; background:var(--accent-1); color:white; font-weight:800; font-size:13px; box-shadow:0 4px 10px rgba(11,94,100,0.08); text-decoration:none }
-@media(max-width:520px){ .mini-apps{ gap:10px } .mini-app-card{ padding:12px } .mini-app-card .mini-desc{ display:none } .mini-app-card .mini-action{ padding:8px 10px } }
+    /* 入力フォーカス時のみスクロールを許可（モバイル） */
+    html.allow-scroll-mobile,
+    body.allow-scroll-mobile {
+      overflow: auto !important;
+      height: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+    }
 
-/* ポストID検索（モバイルは2段表示） */
-.post-id-tool{ display:flex; gap:8px; align-items:center; }
-.post-id-input{ flex:1; }
-.post-id-actions{ display:flex; gap:8px; align-items:center; }
-.post-id-actions #btn_paste_id{ white-space:nowrap; flex:0 0 96px; }
-.post-id-actions #btn_open_by_id{ white-space:nowrap; }
-@media(max-width:520px){
-  .post-id-tool{ flex-direction:column; align-items:stretch; }
-  .post-id-actions{ width:100%; }
-  .post-id-actions #btn_paste_id,
-  .post-id-actions #btn_open_by_id{ flex:1 1 0; width:100%; }
-}
+    /* 大きなボタングリッド（2×3） */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
 
-/* 基本検索内部はラベルと入力の隙間を詰める */
-.basic-section label{ margin-bottom:0; }
-input[type=text], select, textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text); font-size:14px; box-sizing:border-box; box-shadow: inset 0 1px 0 rgba(2,12,14,0.02); }
-input::placeholder, textarea::placeholder { color: var(--muted); }
+    /* Ensure the bottom action buttons match the menu grid layout */
+    .menu-actions {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 12px !important;
+      width: 100%;
+      margin-top: 8px;
+    }
 
-/* 検索ワード用ヒーロー背景（ピンク） と入力欄の対比 */
-.search-hero{
-  background: #fff5f8;
-  border:1px solid rgba(240,180,200,0.25);
-  padding:8px 12px 12px;
-  border-radius:12px;
-}
-.basic-section.search-hero{
-  margin-top:0 !important;
-  padding-top:0;
-}
-.search-hero label{ font-weight:800; color:var(--text); margin-bottom:6px; display:block }
-.search-hero .phrase-input{
-  background: #ffffff;
-  color: var(--text);
-  padding:14px 12px;
-  border-radius:10px;
-  border:1px solid rgba(6,50,58,0.06);
-  box-shadow: 0 8px 24px rgba(6,50,58,0.04);
-  font-size:16px;
-}
-.search-hero .phrase-input::placeholder{ color:#b8d3d6 }
-.search-hero{ position:relative; }
-.phrase-mode-wrap{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.phrase-mode-label{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:700;
-}
-.phrase-mode-row{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-}
-.phrase-mode-chip{
-  border:1px solid var(--input-border);
-  background:#fff;
-  color:var(--text);
-  border-radius:999px;
-  padding:6px 10px;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-  transition:transform .12s ease, background .12s ease, border-color .12s ease;
-}
-.phrase-mode-chip:hover{ transform:translateY(-1px); }
-.phrase-mode-chip:active{ transform:translateY(0) scale(0.98); }
-.phrase-mode-chip.active{
-  background:var(--accent-1);
-  border-color:var(--accent-1);
-  color:#fff;
-}
-.search-word-badge{
-  position:absolute;
-  top:8px;
-  right:8px;
-  min-width:20px;
-  height:20px;
-  padding:0 5px;
-  border-radius:999px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  font-size:11px;
-  font-weight:800;
-  background:var(--accent-1);
-  color:#fff;
-}
-.search-hero.search-active{
-  border-color:var(--accent-1);
-  box-shadow:0 10px 24px rgba(2,12,20,0.08);
-}
-.search-hero.search-active .search-word-badge{ display:inline-flex; }
+    .menu-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--input-border);
+      background: var(--card);
+      box-shadow: 0 8px 20px rgba(2, 12, 20, 0.08), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      min-height: 90px;
+    }
 
-/* フォーカス時にブラウザのデフォルトで青くなるのを防ぐ */
-input:focus, textarea:focus, select:focus{
-  background: var(--input-bg) !important;
-  color: var(--text) !important;
-  outline: none !important;
-  box-shadow: inset 0 1px 0 rgba(2,12,14,0.02) !important;
-}
-/* Chrome 等のオートフィルで背景が変わる問題を上書き */
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill{
-  -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
-  box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
-  -webkit-text-fill-color: var(--text) !important;
-}
-textarea{min-height:88px;resize:vertical}
+    .menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(2, 12, 20, 0.12), 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+    }
 
-/* モバイルで入力フォーカス時に自動拡大されるのを防ぐ */
-@media (max-width: 600px){
-  input[type=text], select, textarea{ font-size:16px; }
-}
-.secondary{background:#ffffff;border:1px solid rgba(6,50,58,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-weight:700;cursor:pointer}
-/* Make glossary/history action buttons match the large menu buttons */
-.menu-actions .secondary{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px 10px;
-  border-radius:14px;
-  border:1px solid var(--input-border);
-  background:var(--card);
-  box-shadow:0 4px 12px rgba(2,12,20,0.06);
-  min-height:90px;
-  width:100%;
-}
-@media(max-width:400px){
-  .menu-actions .secondary{ padding:16px 8px; min-height:80px }
-}
-/* Match internal layout (icon / label / sublabel) to .menu-btn */
-.menu-actions .secondary{ flex-direction:column; }
-.menu-actions .secondary .icon{ font-size:28px; margin-bottom:6px; display:block; }
-.menu-actions .secondary .label{ font-size:14px; font-weight:700; color:var(--text); text-align:center; }
-.menu-actions .secondary .sublabel{ font-size:11px; color:var(--muted); margin-top:2px; text-align:center; }
-.hint{font-size:12px;color:#6a8690;margin-top:6px}
-.open-mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.open-mode-option{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:13px;cursor:pointer;user-select:none}
-.open-mode-option input{accent-color:var(--accent-1)}
-.small{font-size:13px;padding:8px 10px;border-radius:8px}
-/* アカウントタイプのチェックボックス余白をスマホで詰める */
-.account-type-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 0;
-}
-/* スマホでエンゲージ指定を1行横並びに */
-.engagement-row {
-  display: flex;
-  gap: 0;
-  align-items: flex-end;
-  flex-wrap: nowrap;
-  width: 100%;
-  justify-content: space-between;
-}
-.engagement-buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-.engagement-buttons button {
-  flex: 1 1 0;
-  padding: 10px 6px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 10px;
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  cursor: pointer;
-  min-width: 0;
-  background: var(--card);
-  transition: all 0.15s;
-  box-shadow: 0 6px 18px rgba(2,12,20,0.04);
-  text-align: center;
-}
-.engagement-buttons button:hover {
-  background: var(--collapse-header-bg);
-}
-/* エンゲージ3列（モバイルでも列表示） */
-.engagement-columns{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:8px;
-}
-.engagement-columns .engagement-block{
-  margin:0;
-  padding:8px;
-}
-.engagement-columns .engagement-buttons{
-  margin-top:10px;
-  gap:10px;
-}
-.engagement-columns .engagement-buttons button{
-  padding:8px 0;
-  font-size:11px;
-  border-radius:10px;
-  box-shadow:none;
-}
-@media(max-width:520px){
-  .engagement-columns .engagement-buttons{
-    display:grid;
-    grid-template-columns:1fr;
-  }
-  .engagement-columns .engagement-buttons button{
-    width:100%;
-  }
-}
-@media(max-width:520px){
-  .engagement-row {
-    gap: 0;
-    flex-wrap: nowrap;
-    align-items: flex-end;
-    width: 100%;
-    justify-content: space-between;
-  }
-  .engagement-col {
-    width: 50%;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    box-sizing: border-box;
-    padding-right: 6px;
-    padding-left: 6px;
-  }
-  .engagement-row label.muted-small {
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-  .engagement-row .num-small {
-    width: 100%;
-    min-width: 0;
-    font-size: 13px;
-    padding: 8px;
-    box-sizing: border-box;
-  }
-  .engagement-buttons { gap: 6px; margin-top: 6px; }
-  .engagement-buttons button { flex: 1 1 32px; padding: 6px 0; font-size: 12px; border-radius: 6px; box-shadow: none; font-weight: 700; }
-}
-/* リセットボタン色統一 */
-.engagement-reset-btn {
-  text-align: center;
-  padding: 8px 12px;
-  font-size: 12px;
-  border-radius: 10px;
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  cursor: pointer;
-  vertical-align: middle;
-  line-height: 1.1;
-  font-weight: 800;
-  transition: background 0.2s, transform .14s ease;
-  white-space: nowrap;
-  width: auto;
-}
-.engagement-reset-btn:hover {
-  background: var(--collapse-header-bg);
-  transform: translateY(-1px);
-}
-.engagement-reset-btn:active { transform: translateY(0) scale(0.98); }
-/* いいね用ボタン色 */
-.engagement-buttons .like-btn {
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-}
-.engagement-buttons .like-btn:hover {
-  background: var(--collapse-header-bg);
-  color: var(--text);
-}
-/* リツイート用ボタン色 */
-.engagement-buttons .retweet-btn {
-  background: var(--input-bg);
-}
-.engagement-buttons .retweet-btn:hover {
-  background: var(--collapse-header-bg);
-}
-/* ensure retweet button text is readable in light mode */
-.engagement-buttons .retweet-btn { color: var(--text); border:1px solid var(--input-border); }
-/* リプライ用ボタン色 */
-.engagement-buttons .reply-btn {
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-}
-.engagement-buttons .reply-btn:hover { background: var(--collapse-header-bg); color: var(--text); }
-@media(min-width:768px){
-  .engagement-buttons .retweet-btn { color: var(--text); }
-}
-@media(max-width:520px){
-  .account-type-row {
-  input[type=text], select, textarea{ font-size:16px; }
-    row-gap: 2px;
-    margin-bottom: 0;
-  }
-  .account-type-row label.small {
-    padding: 6px 6px;
-    font-size: 12px;
-  }
-}
-.muted-small{font-size:12px;color:var(--muted)}
-.date-block{background:transparent;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:0}
-.date-title{font-weight:800;color:var(--muted);font-size:13px;margin-bottom:4px}
-.period-row{display:flex;gap:6px;align-items:center}
-/* period row wrapper: ラベルを左上に表示するためのラッパー */
-.period-row-wrap{ position:relative; padding-top:18px; margin-bottom:8px }
-.period-row-label{ position:absolute; left:0; top:0; font-size:12px; color:var(--muted); font-weight:700 }
-.sel-with-label{display:inline-flex;align-items:center;gap:6px}
-.sel-label{font-size:13px;color:var(--muted);min-width:28px;text-align:left}
-.num-small{width:88px;min-width:64px;padding:8px;border-radius:8px;text-align:center;font-size:13px;border:1px solid var(--input-border);background:var(--input-bg); color:var(--text)}
-.collapse-group{display:block;min-width:0}
-.collapsible-header{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:8px; background:var(--collapse-header-bg); cursor:pointer; border:1px solid var(--collapse-border); min-width:0; }
-.collapsible-header img.icon{
-  width:40px;
-  height:40px;
-  border-radius:8px;
-  object-fit:contain;
-  object-position:center;
-  background:transparent;
-  border:none;
-  box-shadow:0 2px 6px rgba(2,12,14,0.04);
-  flex-shrink:0;
-  display:block;
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  transform: rotate(0deg);
-}
-.collapse-group.collapsed .collapsible-header img.icon {
-  transform: rotate(180deg);
-}
-.collapsible-header .title{font-weight:800;color:var(--text);font-size:14px;display:flex;align-items:center;gap:8px}
-.collapsible-content{margin-top:8px;display:block;padding:8px;border-radius:8px;background:var(--collapse-content-bg);border:1px solid rgba(6,50,58,0.03);overflow-x:auto;min-width:0}
-.collapse-group.collapsed .collapsible-content{display:none}
-.phrase-row{display:flex;flex-direction:column;gap:8px}
-.phrase-actions{display:flex;gap:8px;flex-wrap:wrap}
-.phrase-actions .btn, .phrase-actions .secondary{flex:1;min-width:120px}
-.chip-container{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:999px;background:var(--collapse-content-bg);border:1px solid rgba(6,50,58,0.06);font-weight:700}
-.chip button{background:transparent;border:0;font-weight:900;cursor:pointer;color:var(--text)}
-.or-panel{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:8px;background:#fffaf0;border:1px solid rgba(179,58,80,0.06)}
-.or-panel-title{font-weight:800;color:#b33a50;display:flex;align-items:center;justify-content:space-between}
-.or-items{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.tabs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;padding:4px 4px}
-.tab{padding:6px 10px;border-radius:999px;border:1px solid rgba(6,50,58,0.12);background:transparent;color:var(--text);cursor:pointer;white-space:nowrap;font-weight:700;display:inline-flex;align-items:center;justify-content:center;min-height:32px;min-width:64px;flex:0 0 auto}
-.tab[aria-selected="true"]{background:var(--accent-1);color:white;border-color:transparent;box-shadow:none}
-.overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:1400; padding:16px; }
-.modal{ width:100%; max-width:560px; background:white; border-radius:12px; padding:14px; box-shadow:0 10px 40px rgba(2,12,20,0.4); max-height:80vh; overflow:auto; }
-@media(min-width:640px){
-  .phrase-row{flex-direction:row;align-items:center}
-  .phrase-actions .btn, .phrase-actions .secondary{flex:0 0 auto}
-}
-@media(max-width:520px){
-  .num-small{width:64px}
-  .collapsible-header img.icon{ width:36px; height:36px; border-radius:8px; }
-  .collapsible-header{padding:6px; gap:8px;}
-  .collapsible-header .title{font-size:13px}
-}
-.fixed-top-bar{ position:relative; display:flex; gap:6px; align-items:stretch; background:var(--card); box-shadow:0 6px 24px rgba(2,12,20,0.06); padding:6px 16px; box-sizing:border-box; width:100%; max-width:532px; margin-bottom:0; border-radius:var(--radius); }
-.query-display{ flex:1 1 70%; padding:12px 12px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); font-size:13px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; color:var(--text); min-width:0; display:flex; align-items:center; cursor:pointer; z-index:2; min-height:44px; align-self:stretch; position:relative; pointer-events:auto; text-align:left; appearance:none; -webkit-appearance:none; outline:none; }
-.top-reset-btn{ flex:0 0 34px; padding:6px; border-radius:8px; background:rgba(255,107,138,0.88); color:white; border:1px solid rgba(255,255,255,0.55); cursor:pointer; font-size:14px; text-align:center; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(255,107,138,0.2); }
-.top-search-btn{ flex:0 0 42px; padding:6px; border-radius:8px; background:rgba(255,107,138,0.88); color:white; border:1px solid rgba(255,255,255,0.55); cursor:pointer; font-size:14px; text-align:center; font-weight:700; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(255,107,138,0.2); }
-.top-reset-btn:hover,
-.top-search-btn:hover{ filter:brightness(0.96); }
-/* copy button moved inside query modal */
+    .menu-btn:active {
+      transform: scale(0.97);
+    }
 
-/* 下部メニュー */
+    .menu-btn .icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .menu-btn .icon img {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+
+    .icon-inline {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      vertical-align: -3px;
+    }
+
+    .top-reset-btn img,
+    .top-search-btn img {
+      width: 24px;
+      height: 24px;
+      display: block;
+      filter: brightness(0) invert(1);
+    }
+
+    .modal-close-btn img,
+    .section-modal-close img {
+      width: 16px;
+      height: 16px;
+      display: block;
+      filter: brightness(0) invert(1);
+    }
+
+    .menu-btn .label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .menu-btn .sublabel {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .menu-btn {
+      position: relative;
+    }
+
+    .menu-btn.modal-active {
+      border-color: var(--accent-1);
+      box-shadow: 0 10px 24px rgba(2, 12, 20, 0.12), 0 0 0 2px rgba(255, 255, 255, 0.75) inset;
+    }
+
+    .menu-btn .menu-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--accent-1);
+      color: #fff;
+      line-height: 1;
+    }
+
+    .menu-btn.modal-active .menu-badge {
+      display: inline-flex;
+    }
+
+    /* Ensure sublabel weight is normal (avoid inheriting .secondary's bold) */
+    .menu-btn .sublabel,
+    .menu-actions .secondary .sublabel {
+      font-weight: 400;
+    }
+
+    @media(max-width:400px) {
+      .menu-btn {
+        padding: 16px 8px;
+        min-height: 80px;
+      }
+
+      .menu-btn .icon {
+        font-size: 24px;
+      }
+
+      .menu-btn .label {
+        font-size: 13px;
+      }
+
+      .menu-btn .sublabel {
+        font-size: 10px;
+      }
+    }
+
+    /* セクション用モーダル */
+    .section-modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .section-modal-overlay.active {
+      display: flex;
+    }
+
+    .section-modal {
+      position: relative;
+      background: var(--card);
+      padding: 16px;
+      border-radius: 14px;
+      max-width: 500px;
+      width: 100%;
+      max-height: calc(var(--app-vh) * 85);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      box-shadow: 0 10px 40px rgba(2, 12, 20, 0.4);
+      border: 1px solid rgba(6, 50, 58, 0.04);
+    }
+
+    .section-modal h3 {
+      margin: 0 0 12px 0;
+      color: var(--text);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-modal-close {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #475569;
+      /* muted slate */
+      color: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      transition: transform .14s ease, background .14s ease;
+    }
+
+    .section-modal-close:hover {
+      background: #394852;
+      transform: translateY(-1px);
+    }
+
+    .section-modal-close:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 6px 16px 16px;
+      box-shadow: 0 20px 40px rgba(2, 12, 20, 0.12), 0 2px 0 rgba(255, 255, 255, 0.8) inset;
+      border: 1px solid rgba(6, 50, 58, 0.06);
+      box-sizing: border-box;
+      min-width: 0;
+      overflow-x: hidden;
+      max-height: calc((var(--app-vh) * 100) - 48px);
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-1);
+      color: white;
+      font-weight: 800;
+      font-size: 20px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px
+    }
+
+    p.lead {
+      margin: 6px 0 14px;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px
+    }
+
+    @media(min-width:768px) {
+      .grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    /* その他入力欄を下部に配置 */
+    .misc-section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--input-border);
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px
+    }
+
+    /* ミニアプリカード */
+    .mini-apps-wrap {
+      margin-top: 12px;
+    }
+
+    .mini-apps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mini-app-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--card);
+      border: 1px solid rgba(6, 50, 58, 0.04);
+      box-shadow: 0 8px 20px rgba(3, 12, 18, 0.04);
+      text-decoration: none;
+      color: var(--text);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .mini-app-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(3, 12, 18, 0.08);
+    }
+
+    .mini-app-card .mini-head {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .mini-app-card .mini-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-1);
+      color: white;
+      font-size: 20px;
+      flex: 0 0 48px
+    }
+
+    .mini-app-card .mini-title {
+      font-weight: 800;
+      font-size: 15px
+    }
+
+    .mini-app-card .mini-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.3
+    }
+
+    .mini-app-card .mini-action {
+      margin-left: auto;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--accent-1);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(11, 94, 100, 0.08);
+      text-decoration: none
+    }
+
+    @media(max-width:520px) {
+      .mini-apps {
+        gap: 10px
+      }
+
+      .mini-app-card {
+        padding: 12px
+      }
+
+      .mini-app-card .mini-desc {
+        display: none
+      }
+
+      .mini-app-card .mini-action {
+        padding: 8px 10px
+      }
+    }
+
+    /* ポストID検索（モバイルは2段表示） */
+    .post-id-tool {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .post-id-input {
+      flex: 1;
+    }
+
+    .post-id-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .post-id-actions #btn_paste_id {
+      white-space: nowrap;
+      flex: 0 0 96px;
+    }
+
+    .post-id-actions #btn_open_by_id {
+      white-space: nowrap;
+    }
+
+    @media(max-width:520px) {
+      .post-id-tool {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .post-id-actions {
+        width: 100%;
+      }
+
+      .post-id-actions #btn_paste_id,
+      .post-id-actions #btn_open_by_id {
+        flex: 1 1 0;
+        width: 100%;
+      }
+    }
+
+    /* 基本検索内部はラベルと入力の隙間を詰める */
+    .basic-section label {
+      margin-bottom: 0;
+    }
+
+    input[type=text],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14px;
+      box-sizing: border-box;
+      box-shadow: inset 0 1px 0 rgba(2, 12, 14, 0.02);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    /* 検索ワード用ヒーロー背景（ピンク） と入力欄の対比 */
+    .search-hero {
+      background: #fff5f8;
+      border: 1px solid rgba(240, 180, 200, 0.25);
+      padding: 8px 12px 12px;
+      border-radius: 12px;
+    }
+
+    .basic-section.search-hero {
+      margin-top: 0 !important;
+      padding-top: 0;
+    }
+
+    .search-hero label {
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .search-hero .phrase-input {
+      background: #ffffff;
+      color: var(--text);
+      padding: 14px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(6, 50, 58, 0.06);
+      box-shadow: 0 8px 24px rgba(6, 50, 58, 0.04);
+      font-size: 16px;
+    }
+
+    .search-hero .phrase-input::placeholder {
+      color: #b8d3d6
+    }
+
+    .search-hero {
+      position: relative;
+    }
+
+    .phrase-mode-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .phrase-mode-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .phrase-mode-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .phrase-mode-chip {
+      border: 1px solid var(--input-border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+
+    .phrase-mode-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .phrase-mode-chip:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .phrase-mode-chip.active {
+      background: var(--accent-1);
+      border-color: var(--accent-1);
+      color: #fff;
+    }
+
+    .search-word-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--accent-1);
+      color: #fff;
+    }
+
+    .search-hero.search-active {
+      border-color: var(--accent-1);
+      box-shadow: 0 10px 24px rgba(2, 12, 20, 0.08);
+    }
+
+    .search-hero.search-active .search-word-badge {
+      display: inline-flex;
+    }
+
+    /* フォーカス時にブラウザのデフォルトで青くなるのを防ぐ */
+    input:focus,
+    textarea:focus,
+    select:focus {
+      background: var(--input-bg) !important;
+      color: var(--text) !important;
+      outline: none !important;
+      box-shadow: inset 0 1px 0 rgba(2, 12, 14, 0.02) !important;
+    }
+
+    /* Chrome 等のオートフィルで背景が変わる問題を上書き */
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+      box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+      -webkit-text-fill-color: var(--text) !important;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical
+    }
+
+    /* モバイルで入力フォーカス時に自動拡大されるのを防ぐ */
+    @media (max-width: 600px) {
+
+      input[type=text],
+      select,
+      textarea {
+        font-size: 16px;
+      }
+    }
+
+    .secondary {
+      background: #ffffff;
+      border: 1px solid rgba(6, 50, 58, 0.08);
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    /* Make glossary/history action buttons match the large menu buttons */
+    .menu-actions .secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--input-border);
+      background: var(--card);
+      box-shadow: 0 4px 12px rgba(2, 12, 20, 0.06);
+      min-height: 90px;
+      width: 100%;
+    }
+
+    @media(max-width:400px) {
+      .menu-actions .secondary {
+        padding: 16px 8px;
+        min-height: 80px
+      }
+    }
+
+    /* Match internal layout (icon / label / sublabel) to .menu-btn */
+    .menu-actions .secondary {
+      flex-direction: column;
+    }
+
+    .menu-actions .secondary .icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .menu-actions .secondary .label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .menu-actions .secondary .sublabel {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #6a8690;
+      margin-top: 6px
+    }
+
+    .open-mode-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    .open-mode-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .open-mode-option input {
+      accent-color: var(--accent-1)
+    }
+
+    .small {
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 8px
+    }
+
+    /* アカウントタイプのチェックボックス余白をスマホで詰める */
+    .account-type-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    /* スマホでエンゲージ指定を1行横並びに */
+    .engagement-row {
+      display: flex;
+      gap: 0;
+      align-items: flex-end;
+      flex-wrap: nowrap;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .engagement-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .engagement-buttons button {
+      flex: 1 1 0;
+      padding: 10px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 10px;
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      min-width: 0;
+      background: var(--card);
+      transition: all 0.15s;
+      box-shadow: 0 6px 18px rgba(2, 12, 20, 0.04);
+      text-align: center;
+    }
+
+    .engagement-buttons button:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    /* エンゲージ3列（モバイルでも列表示） */
+    .engagement-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .engagement-columns .engagement-block {
+      margin: 0;
+      padding: 8px;
+    }
+
+    .engagement-columns .engagement-buttons {
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .engagement-columns .engagement-buttons button {
+      padding: 8px 0;
+      font-size: 11px;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    @media(max-width:520px) {
+      .engagement-columns .engagement-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .engagement-columns .engagement-buttons button {
+        width: 100%;
+      }
+    }
+
+    @media(max-width:520px) {
+      .engagement-row {
+        gap: 0;
+        flex-wrap: nowrap;
+        align-items: flex-end;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .engagement-col {
+        width: 50%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        box-sizing: border-box;
+        padding-right: 6px;
+        padding-left: 6px;
+      }
+
+      .engagement-row label.muted-small {
+        font-size: 11px;
+        margin-bottom: 2px;
+      }
+
+      .engagement-row .num-small {
+        width: 100%;
+        min-width: 0;
+        font-size: 13px;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+
+      .engagement-buttons {
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .engagement-buttons button {
+        flex: 1 1 32px;
+        padding: 6px 0;
+        font-size: 12px;
+        border-radius: 6px;
+        box-shadow: none;
+        font-weight: 700;
+      }
+    }
+
+    /* リセットボタン色統一 */
+    .engagement-reset-btn {
+      text-align: center;
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      vertical-align: middle;
+      line-height: 1.1;
+      font-weight: 800;
+      transition: background 0.2s, transform .14s ease;
+      white-space: nowrap;
+      width: auto;
+    }
+
+    .engagement-reset-btn:hover {
+      background: var(--collapse-header-bg);
+      transform: translateY(-1px);
+    }
+
+    .engagement-reset-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* いいね用ボタン色 */
+    .engagement-buttons .like-btn {
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+    }
+
+    .engagement-buttons .like-btn:hover {
+      background: var(--collapse-header-bg);
+      color: var(--text);
+    }
+
+    /* リツイート用ボタン色 */
+    .engagement-buttons .retweet-btn {
+      background: var(--input-bg);
+    }
+
+    .engagement-buttons .retweet-btn:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    /* ensure retweet button text is readable in light mode */
+    .engagement-buttons .retweet-btn {
+      color: var(--text);
+      border: 1px solid var(--input-border);
+    }
+
+    /* リプライ用ボタン色 */
+    .engagement-buttons .reply-btn {
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+    }
+
+    .engagement-buttons .reply-btn:hover {
+      background: var(--collapse-header-bg);
+      color: var(--text);
+    }
+
+    @media(min-width:768px) {
+      .engagement-buttons .retweet-btn {
+        color: var(--text);
+      }
+    }
+
+    @media(max-width:520px) {
+      .account-type-row {
+
+        input[type=text],
+        select,
+        textarea {
+          font-size: 16px;
+        }
+
+        row-gap: 2px;
+        margin-bottom: 0;
+      }
+
+      .account-type-row label.small {
+        padding: 6px 6px;
+        font-size: 12px;
+      }
+    }
+
+    .muted-small {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .date-block {
+      background: transparent;
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0
+    }
+
+    .date-title {
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 4px
+    }
+
+    .period-row {
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+
+    /* period row wrapper: ラベルを左上に表示するためのラッパー */
+    .period-row-wrap {
+      position: relative;
+      padding-top: 18px;
+      margin-bottom: 8px
+    }
+
+    .period-row-label {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700
+    }
+
+    .sel-with-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .sel-label {
+      font-size: 13px;
+      color: var(--muted);
+      min-width: 28px;
+      text-align: left
+    }
+
+    .num-small {
+      width: 88px;
+      min-width: 64px;
+      padding: 8px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text)
+    }
+
+    .collapse-group {
+      display: block;
+      min-width: 0
+    }
+
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--collapse-header-bg);
+      cursor: pointer;
+      border: 1px solid var(--collapse-border);
+      min-width: 0;
+    }
+
+    .collapsible-header img.icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: contain;
+      object-position: center;
+      background: transparent;
+      border: none;
+      box-shadow: 0 2px 6px rgba(2, 12, 14, 0.04);
+      flex-shrink: 0;
+      display: block;
+      transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+      transform: rotate(0deg);
+    }
+
+    .collapse-group.collapsed .collapsible-header img.icon {
+      transform: rotate(180deg);
+    }
+
+    .collapsible-header .title {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .collapsible-content {
+      margin-top: 8px;
+      display: block;
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--collapse-content-bg);
+      border: 1px solid rgba(6, 50, 58, 0.03);
+      overflow-x: auto;
+      min-width: 0
+    }
+
+    .collapse-group.collapsed .collapsible-content {
+      display: none
+    }
+
+    .phrase-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .phrase-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .phrase-actions .btn,
+    .phrase-actions .secondary {
+      flex: 1;
+      min-width: 120px
+    }
+
+    .chip-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: var(--collapse-content-bg);
+      border: 1px solid rgba(6, 50, 58, 0.06);
+      font-weight: 700
+    }
+
+    .chip button {
+      background: transparent;
+      border: 0;
+      font-weight: 900;
+      cursor: pointer;
+      color: var(--text)
+    }
+
+    .or-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fffaf0;
+      border: 1px solid rgba(179, 58, 80, 0.06)
+    }
+
+    .or-panel-title {
+      font-weight: 800;
+      color: #b33a50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .or-items {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 4px 4px
+    }
+
+    .tab {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(6, 50, 58, 0.12);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      min-width: 64px;
+      flex: 0 0 auto
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--accent-1);
+      color: white;
+      border-color: transparent;
+      box-shadow: none
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1400;
+      padding: 16px;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 560px;
+      background: white;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 10px 40px rgba(2, 12, 20, 0.4);
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    @media(min-width:640px) {
+      .phrase-row {
+        flex-direction: row;
+        align-items: center
+      }
+
+      .phrase-actions .btn,
+      .phrase-actions .secondary {
+        flex: 0 0 auto
+      }
+    }
+
+    @media(max-width:520px) {
+      .num-small {
+        width: 64px
+      }
+
+      .collapsible-header img.icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
+
+      .collapsible-header {
+        padding: 6px;
+        gap: 8px;
+      }
+
+      .collapsible-header .title {
+        font-size: 13px
+      }
+    }
+
+    .fixed-top-bar {
+      position: relative;
+      display: flex;
+      gap: 6px;
+      align-items: stretch;
+      background: var(--card);
+      box-shadow: 0 6px 24px rgba(2, 12, 20, 0.06);
+      padding: 6px 16px;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 532px;
+      margin-bottom: 0;
+      border-radius: var(--radius);
+    }
+
+    .query-display {
+      flex: 1 1 70%;
+      padding: 12px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      font-size: 13px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--text);
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      z-index: 2;
+      min-height: 44px;
+      align-self: stretch;
+      position: relative;
+      pointer-events: auto;
+      text-align: left;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+    }
+
+    .top-reset-btn {
+      flex: 0 0 34px;
+      padding: 6px;
+      border-radius: 8px;
+      background: rgba(255, 107, 138, 0.88);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(255, 107, 138, 0.2);
+    }
+
+    .top-search-btn {
+      flex: 0 0 42px;
+      padding: 6px;
+      border-radius: 8px;
+      background: rgba(255, 107, 138, 0.88);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(255, 107, 138, 0.2);
+    }
+
+    .top-reset-btn:hover,
+    .top-search-btn:hover {
+      filter: brightness(0.96);
+    }
+
+    /* copy button moved inside query modal */
+
+    /* 下部メニュー */
 
 
-/* モーダル */
-.modal-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:2000; }
-.modal-overlay.active{ display:flex; }
-.modal-overlay.focused{ align-items:flex-start; padding-top:12px; }
-.modal-panel{ position:relative; background:var(--card); padding:12px; border-radius:10px; max-width:500px; width:92%; max-height:80vh; overflow:auto; box-shadow:0 10px 40px rgba(2,12,20,0.4); border:1px solid rgba(6,50,58,0.04); }
-.modal-panel{ max-height:calc(var(--app-vh) * 80); -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
-.modal-overlay.focused .modal-panel{ margin-top:0; max-height:90vh; }
-.modal-panel h3{ margin:0 0 10px 0; color:var(--text); font-size:15px; }
-.modal-close-btn{
-  position:absolute;
-  right:12px;
-  top:10px;
-  width:38px;
-  height:38px;
-  border-radius:10px;
-  background:#475569; /* muted slate */
-  color:white;
-  border:1px solid rgba(0,0,0,0.06);
-  cursor:pointer;
-  font-size:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:none;
-  transition:transform .14s ease, background .14s ease;
-}
-.modal-close-btn:hover{ background:#394852; transform:translateY(-1px); }
-.modal-close-btn:active{ transform:translateY(0) scale(0.98); }
-.modal-copy-btn{ position:absolute; right:56px; top:8px; padding:6px 10px; border-radius:8px; background:var(--accent-1); color:white; border:1px solid var(--accent-2); cursor:pointer; font-size:13px; }
-/* action-styled buttons inside modal (not absolutely positioned) */
-.modal-action-btn{ padding:9px 14px; border-radius:10px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; font-size:13px; font-weight:700; letter-spacing:.01em; transition:transform .14s ease, background .14s ease; }
-.modal-action-btn:hover{ background:var(--collapse-header-bg); transform:translateY(-1px); }
-.modal-action-btn:active{ transform:translateY(0) scale(0.98); }
-.open-intermediate-url{ margin-top:8px; padding:8px 10px; background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; font-size:12px; color:var(--muted); word-break:break-all; }
-.open-intermediate-actions{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-.open-intermediate-actions .secondary{ font-weight:700; }
-.query-analysis{ background:var(--collapse-content-bg); border:1px dashed var(--input-border); border-radius:8px; padding:10px; font-size:12px; color:var(--text); line-height:1.6; }
-.query-analysis ul{ margin:6px 0 0 18px; padding:0; }
-.query-analysis li{ margin:2px 0; }
-.history-row{ display:flex; gap:8px; align-items:center; padding:10px 8px; background:var(--collapse-content-bg); border-radius:8px; border:1px solid rgba(6,50,58,0.06); margin-bottom:6px; cursor:pointer; }
-.history-row:hover{ background:var(--collapse-header-bg); }
-.history-date{ flex:0 0 145px; font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px; white-space:nowrap; }
-.history-day{ color:var(--muted); }
-.history-time{ color:var(--muted); opacity:0.9; }
-.history-query{ flex:1; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.clear-history-btn{ width:100%; margin-top:12px; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; font-weight:700; transition:background .14s ease; }
-.clear-history-btn:hover{ background:var(--collapse-header-bg); }
-.period-buttons{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
-.period-buttons button{ flex:1 1 0; padding:6px 4px; font-size:11px; border-radius:6px; background:var(--input-bg); color:var(--text); border:1px solid var(--input-border); cursor:pointer; min-width:0; box-sizing:border-box; text-align:center; transition:background .14s ease; }
-.period-buttons button:hover{ background:var(--collapse-header-bg); }
-.period-buttons.period-from-row button{ background:var(--input-bg); color:var(--text); }
-/* 直近ボタン色統一 */
-.period-row-wrap:first-of-type .period-buttons button{ background:var(--input-bg); color:var(--text); }
-.period-row-wrap:first-of-type .period-buttons button:hover{ background:var(--collapse-header-bg); }
-@media(min-width:768px){
-  .period-buttons{ flex-wrap:nowrap }
-  .period-buttons button{ flex:1 1 0 }
-}
-.date-input{ width:120px; padding:6px 8px; border-radius:8px; text-align:center; font-size:13px; border:1px solid var(--input-border); background:var(--input-bg); }
-.wrap{ padding-top:0; padding-bottom:16px; display:flex;flex-direction:column;align-items:center; min-height:calc(var(--app-vh) * 100); }
+    /* モーダル */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 2000;
+    }
 
-/* iOS Safari キーボード対策 */
-@supports (-webkit-touch-callout: none) {
-  html, body {
-    height: 100%;
-    height: -webkit-fill-available;
-  }
-  .wrap {
-    min-height: 100%;
-    min-height: -webkit-fill-available;
-  }
-}
+    .modal-overlay.active {
+      display: flex;
+    }
 
-/* 小さな画面ではカードの max-height 制限を解除して縦スクロールを許可 */
-@media(max-width:420px){
-  html,body{ overflow-y:hidden !important; }
-  .card{ max-height:none !important; overflow:visible !important; }
-  .wrap{ padding-top:0; padding-bottom:16px; }
-}
+    .modal-overlay.focused {
+      align-items: flex-start;
+      padding-top: 12px;
+    }
+
+    .modal-panel {
+      position: relative;
+      background: var(--card);
+      padding: 12px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 92%;
+      max-height: 80vh;
+      overflow: auto;
+      box-shadow: 0 10px 40px rgba(2, 12, 20, 0.4);
+      border: 1px solid rgba(6, 50, 58, 0.04);
+    }
+
+    .modal-panel {
+      max-height: calc(var(--app-vh) * 80);
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .modal-overlay.focused .modal-panel {
+      margin-top: 0;
+      max-height: 90vh;
+    }
+
+    .modal-panel h3 {
+      margin: 0 0 10px 0;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #475569;
+      /* muted slate */
+      color: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      transition: transform .14s ease, background .14s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #394852;
+      transform: translateY(-1px);
+    }
+
+    .modal-close-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .modal-copy-btn {
+      position: absolute;
+      right: 56px;
+      top: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: var(--accent-1);
+      color: white;
+      border: 1px solid var(--accent-2);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* action-styled buttons inside modal (not absolutely positioned) */
+    .modal-action-btn {
+      padding: 9px 14px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .01em;
+      transition: transform .14s ease, background .14s ease;
+    }
+
+    .modal-action-btn:hover {
+      background: var(--collapse-header-bg);
+      transform: translateY(-1px);
+    }
+
+    .modal-action-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .open-intermediate-url {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: var(--collapse-content-bg);
+      border: 1px dashed var(--input-border);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .open-intermediate-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .open-intermediate-actions .secondary {
+      font-weight: 700;
+    }
+
+    .query-analysis {
+      background: var(--collapse-content-bg);
+      border: 1px dashed var(--input-border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .query-analysis ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+    }
+
+    .query-analysis li {
+      margin: 2px 0;
+    }
+
+    .history-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 8px;
+      background: var(--collapse-content-bg);
+      border-radius: 8px;
+      border: 1px solid rgba(6, 50, 58, 0.06);
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .history-row:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    .history-date {
+      flex: 0 0 145px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .history-day {
+      color: var(--muted);
+    }
+
+    .history-time {
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    .history-query {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .clear-history-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      font-weight: 700;
+      transition: background .14s ease;
+    }
+
+    .clear-history-btn:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    .period-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .period-buttons button {
+      flex: 1 1 0;
+      padding: 6px 4px;
+      font-size: 11px;
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      cursor: pointer;
+      min-width: 0;
+      box-sizing: border-box;
+      text-align: center;
+      transition: background .14s ease;
+    }
+
+    .period-buttons button:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    .period-buttons.period-from-row button {
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    /* 直近ボタン色統一 */
+    .period-row-wrap:first-of-type .period-buttons button {
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    .period-row-wrap:first-of-type .period-buttons button:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    @media(min-width:768px) {
+      .period-buttons {
+        flex-wrap: nowrap
+      }
+
+      .period-buttons button {
+        flex: 1 1 0
+      }
+    }
+
+    .date-input {
+      width: 120px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+    }
+
+    .wrap {
+      padding-top: 0;
+      padding-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(var(--app-vh) * 100);
+    }
+
+    /* iOS Safari キーボード対策 */
+    @supports (-webkit-touch-callout: none) {
+
+      html,
+      body {
+        height: 100%;
+        height: -webkit-fill-available;
+      }
+
+      .wrap {
+        min-height: 100%;
+        min-height: -webkit-fill-available;
+      }
+    }
+
+    /* 小さな画面ではカードの max-height 制限を解除して縦スクロールを許可 */
+    @media(max-width:420px) {
+
+      html,
+      body {
+        overflow-y: hidden !important;
+      }
+
+      .card {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      .wrap {
+        padding-top: 0;
+        padding-bottom: 16px;
+      }
+    }
 
 
-/* Footer (参考: linklocal.html) */
-footer.site-footer{
-  position:relative;
-  left:0;
-  right:0;
-  margin:0;
-  width:100%;
-  z-index:1601;
-  background-color:#74728F;
-  color:#FFFFFFde;
-  padding:12px 0;
-  text-align:center;
-  font-size:14px;
-  border-radius:0;
-  box-sizing:border-box;
-  display:block;
-}
-footer.site-footer a{color:inherit;text-decoration:underline}
+    /* Footer (参考: linklocal.html) */
+    footer.site-footer {
+      position: relative;
+      left: 0;
+      right: 0;
+      margin: 0;
+      width: 100%;
+      z-index: 1601;
+      background-color: #74728F;
+      color: #FFFFFFde;
+      padding: 12px 0;
+      text-align: center;
+      font-size: 14px;
+      border-radius: 0;
+      box-sizing: border-box;
+      display: block;
+    }
 
-/* Footer content placed outside .wrap to allow full-bleed background */
-.site-footer-inner{ width:100%; max-width:980px; margin:0 auto; padding:0 16px; box-sizing:border-box; text-align:center }
+    footer.site-footer a {
+      color: inherit;
+      text-decoration: underline
+    }
 
-/* make filter-row single-line (限定 / 除外 を横並びに) */
-.filter-row{ display:flex; gap:12px; align-items:center; flex-wrap:nowrap; }
-.filter-card label.small{ display:inline-flex; align-items:center; gap:4px; }
+    /* Footer content placed outside .wrap to allow full-bleed background */
+    .site-footer-inner {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+      text-align: center
+    }
 
-/* ワードカード（クエリ補助用） */
-.word-cards{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; min-height:40px; padding:10px; background:var(--collapse-content-bg); border-radius:10px; border:1px dashed var(--input-border); position:relative; }
-.word-card{ display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:20px; background:var(--collapse-header-bg); border:2px solid transparent; cursor:pointer; font-weight:600; font-size:13px; transition:all 0.15s; user-select:none; }
-.word-card:hover{ background:var(--collapse-content-bg); }
-.word-card.selected{ border-color:var(--accent-1); background:var(--accent-2); }
-.word-card-or{ background:#fff3e6; color:#b35a00; font-weight:800; }
-.word-card-paren{ background:#e6e6ff; color:#5a5ab3; font-weight:800; }
+    /* make filter-row single-line (限定 / 除外 を横並びに) */
+    .filter-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
 
-/* 期間プリセットボタン改善 (視認性向上) */
-.period-preset-btn{ flex:1; min-width:60px; padding:10px 6px; border-radius:10px; border:1px solid rgba(6,50,58,0.08); background:var(--card); color:var(--text); cursor:pointer; font-size:12px; font-weight:600; text-align:center; transition:all 0.15s; box-shadow:0 6px 18px rgba(2,12,20,0.04); }
-.period-preset-btn:hover{ background:var(--collapse-header-bg); }
-.period-preset-btn.active{ background:var(--accent-1); color:white; border-color:transparent; box-shadow:0 8px 20px rgba(6,50,58,0.08); }
+    .filter-card label.small {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-/* テーマ時の背景オーバーレイ */
-html.theme-awake body{ background-image: url('bg.png'); background-color: var(--bg); }
-.tri-toggle{ display:flex; border-radius:10px; overflow:hidden; border:1px solid var(--input-border); background:var(--collapse-content-bg); flex:1 1 auto; max-width:520px; }
-.tri-toggle button{ flex:1 1 0; padding:10px 8px; border:0; background:transparent; cursor:pointer; font-size:13px; font-weight:700; color:var(--muted); transition:all 0.15s; text-align:center; }
-.tri-toggle button:not(:last-child){ border-right:1px solid var(--input-border); }
-.tri-toggle button.active-none{ background:#f0f0f0; color:var(--text); }
-.tri-toggle button.active-only{ background:#e6ffe6; color:#2a7a2a; }
-.tri-toggle button.active-exclude{ background:#ffe6e6; color:#a03030; }
+    /* ワードカード（クエリ補助用） */
+    .word-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+      min-height: 40px;
+      padding: 10px;
+      background: var(--collapse-content-bg);
+      border-radius: 10px;
+      border: 1px dashed var(--input-border);
+      position: relative;
+    }
 
-/* タイプ指定グリッド */
-.type-grid{ display:flex; flex-direction:column; gap:10px; }
-.type-row{ display:flex; align-items:center; gap:10px; }
-.type-label{ min-width:70px; font-weight:700; font-size:13px; color:var(--text); }
+    .word-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 20px;
+      background: var(--collapse-header-bg);
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s;
+      user-select: none;
+    }
 
-/* 期間プリセットボタン改善 */
-.period-preset-row{ display:grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(36px, auto); gap:8px; margin-bottom:12px; }
-.period-preset-btn{ padding:10px 6px; border-radius:10px; border:1px solid var(--input-border); background:var(--card); cursor:pointer; font-size:12px; font-weight:600; text-align:center; transition:all 0.15s; width:100%; box-sizing:border-box; }
-.period-preset-btn:hover{ background:var(--collapse-header-bg); }
-.period-preset-btn.active{ background:var(--accent-1); color:white; border-color:transparent; }
+    .word-card:hover {
+      background: var(--collapse-content-bg);
+    }
 
-/* utility pin */
-.aux-pin{
-  position:absolute;
-  right:4px;
-  bottom:4px;
-  width:10px;
-  height:10px;
-  border:0;
-  border-radius:999px;
-  background:var(--text);
-  opacity:0.05;
-  cursor:pointer;
-  z-index:3;
-}
-.aux-pin:focus-visible{
-  opacity:0.3;
-  outline:1px dashed var(--accent-1);
-  outline-offset:2px;
-}
+    .word-card.selected {
+      border-color: var(--accent-1);
+      background: var(--accent-2);
+    }
+
+    .word-card-or {
+      background: #fff3e6;
+      color: #b35a00;
+      font-weight: 800;
+    }
+
+    .word-card-paren {
+      background: #e6e6ff;
+      color: #5a5ab3;
+      font-weight: 800;
+    }
+
+    /* 期間プリセットボタン改善 (視認性向上) */
+    .period-preset-btn {
+      flex: 1;
+      min-width: 60px;
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(6, 50, 58, 0.08);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.15s;
+      box-shadow: 0 6px 18px rgba(2, 12, 20, 0.04);
+    }
+
+    .period-preset-btn:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    .period-preset-btn.active {
+      background: var(--accent-1);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 8px 20px rgba(6, 50, 58, 0.08);
+    }
+
+    /* テーマ時の背景オーバーレイ */
+    html.theme-awake body {
+      background-image: url('bg.png');
+      background-color: var(--bg);
+    }
+
+    .tri-toggle {
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--input-border);
+      background: var(--collapse-content-bg);
+      flex: 1 1 auto;
+      max-width: 520px;
+    }
+
+    .tri-toggle button {
+      flex: 1 1 0;
+      padding: 10px 8px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .tri-toggle button:not(:last-child) {
+      border-right: 1px solid var(--input-border);
+    }
+
+    .tri-toggle button.active-none {
+      background: #f0f0f0;
+      color: var(--text);
+    }
+
+    .tri-toggle button.active-only {
+      background: #e6ffe6;
+      color: #2a7a2a;
+    }
+
+    .tri-toggle button.active-exclude {
+      background: #ffe6e6;
+      color: #a03030;
+    }
+
+    /* タイプ指定グリッド */
+    .type-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .type-label {
+      min-width: 70px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* 期間プリセットボタン改善 */
+    .period-preset-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(36px, auto);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .period-preset-btn {
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.15s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .period-preset-btn:hover {
+      background: var(--collapse-header-bg);
+    }
+
+    .period-preset-btn.active {
+      background: var(--accent-1);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* utility pin */
+    .aux-pin {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      width: 10px;
+      height: 10px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--text);
+      opacity: 0.05;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .aux-pin:focus-visible {
+      opacity: 0.3;
+      outline: 1px dashed var(--accent-1);
+      outline-offset: 2px;
+    }
   </style>
   <style>
-  /* Type modal: increase size to avoid internal scrolling */
-  #modal_type .section-modal {
-    max-width: 720px;
-    width: min(96%, 720px);
-    max-height: calc(var(--app-vh) * 92);
-    overflow: visible; /* allow content to expand without inner scroll */
-    padding: 18px;
-  }
-  @media(max-width:520px){
-    #modal_type .section-modal { width: 96%; max-width: 520px; max-height: calc(var(--app-vh) * 92); overflow:auto; }
-  }
+    /* Type modal: increase size to avoid internal scrolling */
+    #modal_type .section-modal {
+      max-width: 720px;
+      width: min(96%, 720px);
+      max-height: calc(var(--app-vh) * 92);
+      overflow: visible;
+      /* allow content to expand without inner scroll */
+      padding: 18px;
+    }
+
+    @media(max-width:520px) {
+      #modal_type .section-modal {
+        width: 96%;
+        max-width: 520px;
+        max-height: calc(var(--app-vh) * 92);
+        overflow: auto;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="fixed-top-bar" role="toolbar" aria-label="検索操作">
-      <button type="button" class="query-display" id="top_query_display" role="button" tabindex="0">（検索クエリがここに表示されます）</button>
-      <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-      <button class="top-search-btn" id="top_btn_search" title="検索"><img src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /></button>
+      <button type="button" class="query-display" id="top_query_display" role="button"
+        tabindex="0">（検索クエリがここに表示されます）</button>
+      <button type="button" class="top-reset-btn" id="top_btn_reset" title="リセット"><img src="./image/x.svg" alt=""
+          aria-hidden="true" /></button>
+      <button class="top-search-btn" id="top_btn_search" title="検索"><img src="./image/magnifying-glass.svg" alt=""
+          aria-hidden="true" /></button>
     </div>
 
     <div class="card" role="region" aria-label="X検索補助ツール">
 
       <div class="modal-overlay" id="modal_history">
         <div class="modal-panel">
-          <button class="modal-close-btn" id="close_history"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <button class="modal-close-btn" id="close_history"><img src="./image/x.svg" alt=""
+              aria-hidden="true" /></button>
           <h3><img class="icon-inline" src="./image/clock-counter-clockwise.svg" alt="" aria-hidden="true" /> 検索履歴</h3>
           <button class="clear-history-btn" id="btn_clear_history">履歴全消去</button>
           <div id="history_list"></div>
-          <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:6px;color:var(--muted);font-size:12px;line-height:1.5">
+          <div
+            style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid var(--accent-1);border-radius:6px;color:var(--muted);font-size:12px;line-height:1.5">
             <b>使い方:</b> 履歴をタップすると現在の検索条件を上書きします（確認あり）。<br>
             履歴は最大30件まで保存され、古いものから自動削除されます。
           </div>
@@ -837,10 +2005,12 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
 
       <div class="modal-overlay" id="modal_query">
         <div class="modal-panel">
-          <button class="modal-close-btn" id="close_query"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
+          <button class="modal-close-btn" id="close_query"><img src="./image/x.svg" alt=""
+              aria-hidden="true" /></button>
           <h3><img class="icon-inline" src="./image/magnifying-glass.svg" alt="" aria-hidden="true" /> 検索クエリ（全文）</h3>
           <div style="margin-top:8px">
-            <textarea id="modal_query_text" aria-label="検索クエリ全文" style="width:100%;height:160px;padding:12px;border-radius:8px;border:1px solid var(--input-border);box-sizing:border-box;background:var(--input-bg);color:var(--text);"></textarea>
+            <textarea id="modal_query_text" aria-label="検索クエリ全文"
+              style="width:100%;height:160px;padding:12px;border-radius:8px;border:1px solid var(--input-border);box-sizing:border-box;background:var(--input-bg);color:var(--text);"></textarea>
           </div>
           <div class="query-analysis" id="modal_query_analysis" aria-live="polite" style="margin-top:8px"></div>
           <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
@@ -856,14 +2026,16 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
       <div class="basic-section search-hero" style="margin-top:0;">
         <span class="search-word-badge" id="search_word_badge" aria-hidden="true"></span>
         <div style="display:flex;flex-direction:column;gap:8px">
-          <input id="q_phrase_mode" type="hidden" value="triple" />
+          <input id="q_phrase_mode" type="hidden" value="double" />
           <label for="q_phrase_input">検索ワード（半角スペース区切り）</label>
           <input id="q_phrase_input" class="phrase-input" type="text" placeholder='検索ワードをここに入力' />
           <div class="phrase-mode-wrap" role="group" aria-label="検索ワードの囲み方">
             <span class="phrase-mode-label">囲み方</span>
             <div class="phrase-mode-row">
-              <button type="button" class="phrase-mode-chip" data-phrase-mode="double" aria-pressed="false">"ワード"</button>
-              <button type="button" class="phrase-mode-chip active" data-phrase-mode="triple" aria-pressed="true">"""ワード"""</button>
+              <button type="button" class="phrase-mode-chip active" data-phrase-mode="double"
+                aria-pressed="true">"ワード"</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="triple"
+                aria-pressed="false">"""ワード"""</button>
               <button type="button" class="phrase-mode-chip" data-phrase-mode="plain" aria-pressed="false">ワード</button>
             </div>
           </div>
@@ -916,383 +2088,448 @@ html.theme-awake body{ background-image: url('bg.png'); background-color: var(--
           <span class="sublabel">現在の条件で検索</span>
         </button>
       </div>
-          
-      </div>
-
-
-      <!-- ===== セクション別モーダル ===== -->
-
-      <!-- 期間モーダル -->
-      <div class="section-modal-overlay" id="modal_period">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_period"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/calendar.svg" alt="" aria-hidden="true" /> 期間</h3>
-          
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
-            <div class="muted-small" style="margin:0;color:var(--text)"><b>カスタム期間（yymmdd形式）</b></div>
-            <button id="btn_period_reset" type="button" class="engagement-reset-btn" title="開始/終了をリセット" style="margin-left:6px">リセット</button>
-          </div>
-          <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
-            <div style="flex:1;display:flex;gap:8px;align-items:center">
-              <div style="flex:1">
-                <input id="q_since_date" class="date-input" style="width:100%;color:var(--text);background:var(--input-bg)" type="text" placeholder="開始日" inputmode="numeric" maxlength="6" />
-              </div>
-              <span style="color:var(--text);font-weight:700">〜</span>
-              <div style="flex:1;display:flex;align-items:center">
-                <input id="q_until_date" class="date-input" style="width:100%;color:var(--text);background:var(--input-bg)" type="text" placeholder="終了日" inputmode="numeric" maxlength="6" />
-              </div>
-              
-            </div>
-          </div>
-          <div id="period_desc" class="hint" style="margin-top:8px;color:var(--muted)">期間が未指定です。</div>
-
-          <div style="height:8px"></div>
-          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>カレンダー範囲</b></div>
-          <div class="period-preset-row">
-            <button type="button" class="period-preset-btn" data-range="today">今日</button>
-            <button type="button" class="period-preset-btn" data-range="this_week">今週</button>
-            <button type="button" class="period-preset-btn" data-range="this_month">今月</button>
-            <button type="button" class="period-preset-btn" data-range="this_year">今年</button>
-          </div>
-
-          <div style="height:12px"></div>
-          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>直近から遡る（クイック選択）</b></div>
-          <div class="period-preset-row">
-            <button type="button" class="period-preset-btn" data-quick="1d">1日</button>
-            <button type="button" class="period-preset-btn" data-quick="7d">7日</button>
-            <button type="button" class="period-preset-btn" data-quick="31d">31日</button>
-            <button type="button" class="period-preset-btn" data-quick="365d">365日</button>
-          </div>
-
-          <div style="height:12px"></div>
-          <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>開始日からn日（開始日を先に入力）</b></div>
-          <div class="period-preset-row period-from-row">
-            <button type="button" class="period-preset-btn" data-period-from="1d">+1日</button>
-            <button type="button" class="period-preset-btn" data-period-from="7d">+7日</button>
-            <button type="button" class="period-preset-btn" data-period-from="31d">+31日</button>
-            <button type="button" class="period-preset-btn" data-period-from="365d">+365日</button>
-          </div>
-          <div class="hint" style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--muted)">
-            <div style="margin-bottom:6px">開始日を入力してから「+n日」を押すと終了日が自動計算されます</div>
-            <div>注: X の検索パラメータ <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">until:YYYY-MM-DD</code> は指定日を含みません。この UI では直感的に終了日を含めるため、内部的に終了日を1日進めて設定しています。</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 反応数モーダル -->
-      <div class="section-modal-overlay" id="modal_engagement">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_engagement"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> 反応数（最小）</h3>
-          <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
-            <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn" title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
-          </div>
-          <div class="hint" style="margin-top:0;margin-bottom:10px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid #f59e0b;border-radius:8px;color:var(--text);line-height:1.6">
-            <b>注意:</b> <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_*</code> 系コマンド（<code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_faves:</code> など）は、X側のバグで検索結果が不安定です。
-          </div>
-
-          <div class="engagement-columns">
-            <!-- リプライ数（左列） -->
-            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
-              <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/chat-circle.svg" alt="" aria-hidden="true" /> リプライ</label>
-              </div>
-              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-                <button type="button" class="engagement-reset-btn" data-reset="q_min_replies">リセット</button>
-              </div>
-              <input id="q_min_replies" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 3" inputmode="numeric" maxlength="6" />
-              <div class="engagement-buttons">
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="1">1</button>
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="5">5</button>
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
-                <button type="button" class="reply-btn" data-target="q_min_replies" data-value="50">50</button>
-              </div>
-            </div>
-
-            <!-- リツイート数（中央列） -->
-            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
-              <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/repeat.svg" alt="" aria-hidden="true" /> リツイート</label>
-              </div>
-              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-                <button type="button" class="engagement-reset-btn" data-reset="q_min_retweets">リセット</button>
-              </div>
-              <input id="q_min_retweets" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 50" inputmode="numeric" maxlength="6" />
-              <div class="engagement-buttons">
-                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="10">10</button>
-                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="50">50</button>
-                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="100">100</button>
-                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="500">500</button>
-                <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="1000">1000</button>
-              </div>
-            </div>
-
-            <!-- いいね数（右列） -->
-            <div class="engagement-block" style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
-              <div style="margin-bottom:6px;">
-                <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)"><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> いいね</label>
-              </div>
-              <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-                <button type="button" class="engagement-reset-btn" data-reset="q_min_likes">リセット</button>
-              </div>
-              <input id="q_min_likes" class="num-small" style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px" type="text" placeholder="例: 100" inputmode="numeric" maxlength="6" />
-              <div class="engagement-buttons">
-                <button type="button" class="like-btn" data-target="q_min_likes" data-value="10">10</button>
-                <button type="button" class="like-btn" data-target="q_min_likes" data-value="100">100</button>
-                <button type="button" class="like-btn" data-target="q_min_likes" data-value="500">500</button>
-                <button type="button" class="like-btn" data-target="q_min_likes" data-value="1000">1000</button>
-                <button type="button" class="like-btn" data-target="q_min_likes" data-value="10000">10000</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ポストIDでリプライと引用を開く -->
-          <div style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
-            <label class="muted-small" for="q_post_id" style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ツイートのURLを貼り付けて返信と引用を一括表示</label>
-            <div class="post-id-tool">
-              <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320" style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
-              <div class="post-id-actions">
-                <button id="btn_paste_id" type="button" class="secondary">ペースト</button>
-                <button id="btn_open_by_id" type="button" class="engagement-reset-btn">検索実行</button>
-              </div>
-            </div>
-            <div class="hint" style="margin-top:8px;color:var(--muted)">ペーストボタンからURLをペーストするとIDを自動で抽出します。抽出したIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の一括取得）。</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- アカウント指定モーダル -->
-      <div class="section-modal-overlay" id="modal_account">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_account"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/user-circle.svg" alt="" aria-hidden="true" /> アカウント指定</h3>
-          <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
-            <button id="btn_account_reset_all" type="button" class="engagement-reset-btn" title="全てのアカウント指定を未指定に戻す">全てリセット</button>
-          </div>
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
-            <div style="font-weight:800;color:var(--muted);width:44px">from</div>
-            <div style="flex:1"><input id="q_from" type="text" placeholder="例: 5gkyu" /></div>
-            <button type="button" class="engagement-reset-btn" data-reset="q_from">リセット</button>
-          </div>
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
-            <div style="font-weight:800;color:var(--muted);width:44px">to</div>
-            <div style="flex:1"><input id="q_to" type="text" placeholder="例: 5gkyu" /></div>
-            <button type="button" class="engagement-reset-btn" data-reset="q_to">リセット</button>
-          </div>
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
-            <div style="font-weight:800;color:var(--muted);width:44px">@</div>
-            <div style="flex:1"><input id="q_at_search" type="text" placeholder="例: 5gkyu" /></div>
-            <button type="button" class="engagement-reset-btn" data-reset="q_at_search">リセット</button>
-          </div>
-          <div style="margin-top:10px">
-            <label class="muted-small" for="q_lang_select" style="color:var(--text)">言語</label>
-            <select id="q_lang_select" aria-label="言語指定" style="width:200px;color:var(--text);background:var(--input-bg);">
-              <option value="">自動</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="en">英語 (en)</option>
-              <option value="zh-CN">中国語（簡体） (zh-CN)</option>
-              <option value="zh-TW">中国語（繁体） (zh-TW)</option>
-              <option value="ko">韓国語 (ko)</option>
-              <option value="es">スペイン語 (es)</option>
-              <option value="fr">フランス語 (fr)</option>
-              <option value="de">ドイツ語 (de)</option>
-            </select>
-          </div>
-          <div class="hint" style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--text)">
-            <div style="margin-bottom:6px"><b>コマンドの違い:</b></div>
-            <div style="font-size:12px;margin-bottom:4px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">from:</code> — 指定アカウントが投稿したポスト</div>
-            <div style="font-size:12px;margin-bottom:4px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">to:</code> — 指定アカウント<b>への返信（リプライ）</b>のみ</div>
-            <div style="font-size:12px">• <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">@</code> — 本文中に@ユーザー名が含まれる投稿（<b>メンション検索</b>、リプライ以外も含む）</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 投稿タイプモーダル -->
-      <div class="section-modal-overlay" id="modal_type">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_type"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/toggle-left.svg" alt="" aria-hidden="true" /> 投稿タイプ</h3>
-          <div style="height:6px"></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div style="flex:1">
-              <label class="muted-small" for="q_url" style="display:block;margin-bottom:6px"><b>URL検索（url:）</b></label>
-              <input id="q_url" type="text" placeholder="例: reddit.com" style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
-            </div>
-            <div style="flex:0 0 90px">
-              <button type="button" class="engagement-reset-btn" data-reset="q_url" style="width:100%">リセット</button>
-            </div>
-          </div>
-          <div style="height:10px"></div>
-          <div class="type-grid">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-              <div class="muted-small" style="margin:0"><b>ツイートタイプ</b></div>
-              <button id="btn_type_reset" type="button" class="engagement-reset-btn" title="全てのフィルターを未指定に戻す">全てリセット</button>
-            </div>
-            <div class="type-row">
-              <span class="type-label">リプライ</span>
-              <div class="tri-toggle" data-filter="replies">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">引用</span>
-              <div class="tri-toggle" data-filter="quote">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">リンク</span>
-              <div class="tri-toggle" data-filter="links">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">メディア</span>
-              <div class="tri-toggle" data-filter="media">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">画像</span>
-              <div class="tri-toggle" data-filter="images">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">動画</span>
-              <div class="tri-toggle" data-filter="videos">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">RT</span>
-              <div class="tri-toggle" data-filter="retweets">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">RTのみ</button>
-                <button type="button" data-val="exclude">RT除外</button>
-              </div>
-            </div>
-          </div>
-          <div style="height:12px"></div>
-          <div class="type-grid">
-            <div class="muted-small" style="margin-bottom:4px"><b>アカウントタイプ</b></div>
-            <div class="type-row">
-              <span class="type-label">公式</span>
-              <div class="tri-toggle" data-filter="verified">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-            <div class="type-row">
-              <span class="type-label">フォロー中</span>
-              <div class="tri-toggle" data-filter="following">
-                <button type="button" data-val="none" class="active-none">未指定</button>
-                <button type="button" data-val="only">限定</button>
-                <button type="button" data-val="exclude">除外</button>
-              </div>
-            </div>
-          </div>
-          <div style="display:none">
-            <input type="checkbox" id="only_replies" aria-label="リプライ 限定"><input type="checkbox" id="exclude_replies" aria-label="リプライ 除外">
-            <input type="checkbox" id="only_quote" aria-label="引用 限定"><input type="checkbox" id="exclude_quote" aria-label="引用 除外">
-            <input type="checkbox" id="only_links" aria-label="リンク 限定"><input type="checkbox" id="exclude_links" aria-label="リンク 除外">
-            <input type="checkbox" id="only_media" aria-label="メディア 限定"><input type="checkbox" id="exclude_media" aria-label="メディア 除外">
-            <input type="checkbox" id="only_images" aria-label="画像 限定"><input type="checkbox" id="exclude_images" aria-label="画像 除外">
-            <input type="checkbox" id="only_videos" aria-label="動画 限定"><input type="checkbox" id="exclude_videos" aria-label="動画 除外">
-            <input type="checkbox" id="only_verified" aria-label="公式 限定"><input type="checkbox" id="exclude_verified" aria-label="公式 除外">
-            <input type="checkbox" id="only_following" aria-label="フォロー中 限定">
-            <input type="checkbox" id="exclude_following" aria-label="フォロー中 除外">
-            <input type="checkbox" id="only_retweets" aria-label="RT 限定"><input type="checkbox" id="exclude_retweets" aria-label="RT 除外">
-          </div>
-        </div>
-      </div>
-
-      <!-- ブックマークモーダル -->
-      <div class="section-modal-overlay" id="modal_bookmarks">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_bookmarks"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/bookmark.svg" alt="" aria-hidden="true" /> ブックマークの開き方</h3>
-          <div style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);color:var(--muted);font-size:12px;line-height:1.6">
-            「検索欄あり」を優先する場合は <b>Web版（同一タブ）</b> を試してください。<br>
-            Xアプリ内ブラウザではアプリ仕様で閉じ方・表示が端末差で変わることがあります。
-          </div>
-
-          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-            <button type="button" class="secondary" data-bookmark-method="web_same" data-copy-query="true" style="width:100%;text-align:left">コピーして Web版ブックマークを開く（同一タブ / 検索欄あり優先）</button>
-            <button type="button" class="secondary" data-bookmark-method="web_new" data-copy-query="true" style="width:100%;text-align:left">コピーして Web版ブックマークを開く（新規タブ）</button>
-            <button type="button" class="secondary" data-bookmark-method="auto" data-copy-query="true" style="width:100%;text-align:left">コピーして 自動判定で開く（従来）</button>
-            <button type="button" class="secondary" data-bookmark-method="x_scheme" style="width:100%;text-align:left">Xアプリスキームで開く（x://bookmarks）</button>
-            <button type="button" class="secondary" data-bookmark-method="twitter_scheme" style="width:100%;text-align:left">Twitterスキームで開く（twitter://bookmarks）</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- その他モーダル -->
-      <div class="section-modal-overlay" id="modal_other">
-        <div class="section-modal">
-          <button class="section-modal-close" data-close="modal_other"><img src="./image/x.svg" alt="" aria-hidden="true" /></button>
-          <h3><img class="icon-inline" src="./image/gear.svg" alt="" aria-hidden="true" /> その他</h3>
-
-          <div style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid #f59e0b;color:var(--text);font-size:12px;line-height:1.6">
-            このサイトは <b>X（旧Twitter）公式とは無関係の非公式ツール</b>です。仕様変更や表示差異が発生する場合があります。
-          </div>
-                    
-          <div style="margin-top:12px;">
-            <div style="margin-bottom:10px">
-              <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer" style="color:var(--accent-1);font-weight:700">コマンド説明（note）</a>
-            </div>
-            <div class="mini-apps-wrap">
-              <div class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>ミニアプリ</b></div>
-              <div class="mini-apps">
-                <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/intent/" target="_blank" rel="noopener noreferrer">
-                  <div class="mini-head">
-                    <div>
-                      <div class="mini-title">Intentリンク作成</div>
-                      <div class="mini-desc">ツイート用テキストを作って短縮・テストできます（280字）</div>
-                    </div>
-                  </div>
-                  <div class="mini-action">開く</div>
-                </a>
-                <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/dm/" target="_blank" rel="noopener noreferrer">
-                  <div class="mini-head">
-                    <div>
-                      <div class="mini-title">DMボタン作成</div>
-                      <div class="mini-desc">DM用リンクやボタンを簡単に生成</div>
-                    </div>
-                  </div>
-                  <div class="mini-action">開く</div>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top:10px">
-            <div class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">結果表示</div>
-            <div class="hint" style="color:var(--muted)">このツールは常に「最新」タブ（<b>f=live</b>）で開きます。<br><b>注意:</b> アプリで開く場合、アプリ側の仕様で「話題」タブ表示になることがあります。</div>
-            <div class="hint">UIアイコンはPhosphor Iconsを使用しています。</div>
-          </div>
-          <button type="button" id="aux_pin" class="aux-pin" aria-label="外部リンク"></button>
-
-        </div>
-      </div>
 
     </div>
+
+
+    <!-- ===== セクション別モーダル ===== -->
+
+    <!-- 期間モーダル -->
+    <div class="section-modal-overlay" id="modal_period">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_period"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/calendar.svg" alt="" aria-hidden="true" /> 期間</h3>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <div class="muted-small" style="margin:0;color:var(--text)"><b>カスタム期間（yymmdd形式）</b></div>
+          <button id="btn_period_reset" type="button" class="engagement-reset-btn" title="開始/終了をリセット"
+            style="margin-left:6px">リセット</button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
+          <div style="flex:1;display:flex;gap:8px;align-items:center">
+            <div style="flex:1">
+              <input id="q_since_date" class="date-input"
+                style="width:100%;color:var(--text);background:var(--input-bg)" type="text" placeholder="開始日"
+                inputmode="numeric" maxlength="6" />
+            </div>
+            <span style="color:var(--text);font-weight:700">〜</span>
+            <div style="flex:1;display:flex;align-items:center">
+              <input id="q_until_date" class="date-input"
+                style="width:100%;color:var(--text);background:var(--input-bg)" type="text" placeholder="終了日"
+                inputmode="numeric" maxlength="6" />
+            </div>
+
+          </div>
+        </div>
+        <div id="period_desc" class="hint" style="margin-top:8px;color:var(--muted)">期間が未指定です。</div>
+
+        <div style="height:8px"></div>
+        <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>カレンダー範囲</b></div>
+        <div class="period-preset-row">
+          <button type="button" class="period-preset-btn" data-range="today">今日</button>
+          <button type="button" class="period-preset-btn" data-range="this_week">今週</button>
+          <button type="button" class="period-preset-btn" data-range="this_month">今月</button>
+          <button type="button" class="period-preset-btn" data-range="this_year">今年</button>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>直近から遡る（クイック選択）</b></div>
+        <div class="period-preset-row">
+          <button type="button" class="period-preset-btn" data-quick="1d">1日</button>
+          <button type="button" class="period-preset-btn" data-quick="7d">7日</button>
+          <button type="button" class="period-preset-btn" data-quick="31d">31日</button>
+          <button type="button" class="period-preset-btn" data-quick="365d">365日</button>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="muted-small" style="margin-bottom:6px;display:block;color:var(--text)"><b>開始日からn日（開始日を先に入力）</b>
+        </div>
+        <div class="period-preset-row period-from-row">
+          <button type="button" class="period-preset-btn" data-period-from="1d">+1日</button>
+          <button type="button" class="period-preset-btn" data-period-from="7d">+7日</button>
+          <button type="button" class="period-preset-btn" data-period-from="31d">+31日</button>
+          <button type="button" class="period-preset-btn" data-period-from="365d">+365日</button>
+        </div>
+        <div class="hint"
+          style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--muted)">
+          <div style="margin-bottom:6px">開始日を入力してから「+n日」を押すと終了日が自動計算されます</div>
+          <div>注: X の検索パラメータ <code
+              style="background:var(--input-bg);padding:2px 4px;border-radius:3px">until:YYYY-MM-DD</code> は指定日を含みません。この
+            UI では直感的に終了日を含めるため、内部的に終了日を1日進めて設定しています。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 反応数モーダル -->
+    <div class="section-modal-overlay" id="modal_engagement">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_engagement"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> 反応数（最小）</h3>
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
+          <button id="btn_reset_all_engagement" type="button" class="engagement-reset-btn"
+            title="全てのエンゲージ条件を未指定に戻す">全てリセット</button>
+        </div>
+        <div class="hint"
+          style="margin-top:0;margin-bottom:10px;padding:10px;background:var(--collapse-content-bg);border-left:3px solid #f59e0b;border-radius:8px;color:var(--text);line-height:1.6">
+          <b>注意:</b> <code style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_*</code> 系コマンド（<code
+            style="background:var(--input-bg);padding:2px 4px;border-radius:3px">min_faves:</code>
+          など）は、X側のバグで検索結果が不安定です。
+        </div>
+
+        <div class="engagement-columns">
+          <!-- リプライ数（左列） -->
+          <div class="engagement-block"
+            style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+            <div style="margin-bottom:6px;">
+              <label class="muted-small" for="q_min_replies" style="font-weight:700;color:var(--text)"><img
+                  class="icon-inline" src="./image/chat-circle.svg" alt="" aria-hidden="true" /> リプライ</label>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+              <button type="button" class="engagement-reset-btn" data-reset="q_min_replies">リセット</button>
+            </div>
+            <input id="q_min_replies" class="num-small"
+              style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px"
+              type="text" placeholder="例: 3" inputmode="numeric" maxlength="6" />
+            <div class="engagement-buttons">
+              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="1">1</button>
+              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="5">5</button>
+              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="10">10</button>
+              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="20">20</button>
+              <button type="button" class="reply-btn" data-target="q_min_replies" data-value="50">50</button>
+            </div>
+          </div>
+
+          <!-- リツイート数（中央列） -->
+          <div class="engagement-block"
+            style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+            <div style="margin-bottom:6px;">
+              <label class="muted-small" for="q_min_retweets" style="font-weight:700;color:var(--text)"><img
+                  class="icon-inline" src="./image/repeat.svg" alt="" aria-hidden="true" /> リツイート</label>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+              <button type="button" class="engagement-reset-btn" data-reset="q_min_retweets">リセット</button>
+            </div>
+            <input id="q_min_retweets" class="num-small"
+              style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px"
+              type="text" placeholder="例: 50" inputmode="numeric" maxlength="6" />
+            <div class="engagement-buttons">
+              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="10">10</button>
+              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="50">50</button>
+              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="100">100</button>
+              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="500">500</button>
+              <button type="button" class="retweet-btn" data-target="q_min_retweets" data-value="1000">1000</button>
+            </div>
+          </div>
+
+          <!-- いいね数（右列） -->
+          <div class="engagement-block"
+            style="background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);padding:10px;">
+            <div style="margin-bottom:6px;">
+              <label class="muted-small" for="q_min_likes" style="font-weight:700;color:var(--text)"><img
+                  class="icon-inline" src="./image/heart.svg" alt="" aria-hidden="true" /> いいね</label>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+              <button type="button" class="engagement-reset-btn" data-reset="q_min_likes">リセット</button>
+            </div>
+            <input id="q_min_likes" class="num-small"
+              style="width:100%;box-sizing:border-box;color:var(--text);background:var(--input-bg);margin-bottom:8px"
+              type="text" placeholder="例: 100" inputmode="numeric" maxlength="6" />
+            <div class="engagement-buttons">
+              <button type="button" class="like-btn" data-target="q_min_likes" data-value="10">10</button>
+              <button type="button" class="like-btn" data-target="q_min_likes" data-value="100">100</button>
+              <button type="button" class="like-btn" data-target="q_min_likes" data-value="500">500</button>
+              <button type="button" class="like-btn" data-target="q_min_likes" data-value="1000">1000</button>
+              <button type="button" class="like-btn" data-target="q_min_likes" data-value="10000">10000</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ポストIDでリプライと引用を開く -->
+        <div
+          style="margin-top:12px;padding:10px;background:var(--collapse-content-bg);border-radius:10px;border:1px solid var(--input-border);">
+          <label class="muted-small" for="q_post_id"
+            style="font-weight:700;color:var(--text);display:block;margin-bottom:6px">ツイートのURLを貼り付けて返信と引用を一括表示</label>
+          <div class="post-id-tool">
+            <input id="q_post_id" class="post-id-input" type="text" placeholder="例: 1255050733675704320"
+              style="padding:8px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text)" />
+            <div class="post-id-actions">
+              <button id="btn_paste_id" type="button" class="secondary">ペースト</button>
+              <button id="btn_open_by_id" type="button" class="engagement-reset-btn">検索実行</button>
+            </div>
+          </div>
+          <div class="hint" style="margin-top:8px;color:var(--muted)">
+            ペーストボタンからURLをペーストするとIDを自動で抽出します。抽出したIDで「conversation_id:ID OR ID」を自動生成して検索を開きます（リプライ＋引用の一括取得）。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- アカウント指定モーダル -->
+    <div class="section-modal-overlay" id="modal_account">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_account"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/user-circle.svg" alt="" aria-hidden="true" /> アカウント指定</h3>
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;margin-bottom:8px">
+          <button id="btn_account_reset_all" type="button" class="engagement-reset-btn"
+            title="全てのアカウント指定を未指定に戻す">全てリセット</button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+          <div style="font-weight:800;color:var(--muted);width:44px">from</div>
+          <div style="flex:1"><input id="q_from" type="text" placeholder="例: 5gkyu" /></div>
+          <button type="button" class="engagement-reset-btn" data-reset="q_from">リセット</button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+          <div style="font-weight:800;color:var(--muted);width:44px">to</div>
+          <div style="flex:1"><input id="q_to" type="text" placeholder="例: 5gkyu" /></div>
+          <button type="button" class="engagement-reset-btn" data-reset="q_to">リセット</button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+          <div style="font-weight:800;color:var(--muted);width:44px">@</div>
+          <div style="flex:1"><input id="q_at_search" type="text" placeholder="例: 5gkyu" /></div>
+          <button type="button" class="engagement-reset-btn" data-reset="q_at_search">リセット</button>
+        </div>
+        <div style="margin-top:10px">
+          <label class="muted-small" for="q_lang_select" style="color:var(--text)">言語</label>
+          <select id="q_lang_select" aria-label="言語指定"
+            style="width:200px;color:var(--text);background:var(--input-bg);">
+            <option value="">自動</option>
+            <option value="ja">日本語 (ja)</option>
+            <option value="en">英語 (en)</option>
+            <option value="zh-CN">中国語（簡体） (zh-CN)</option>
+            <option value="zh-TW">中国語（繁体） (zh-TW)</option>
+            <option value="ko">韓国語 (ko)</option>
+            <option value="es">スペイン語 (es)</option>
+            <option value="fr">フランス語 (fr)</option>
+            <option value="de">ドイツ語 (de)</option>
+          </select>
+        </div>
+        <div class="hint"
+          style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);line-height:1.6;color:var(--text)">
+          <div style="margin-bottom:6px"><b>コマンドの違い:</b></div>
+          <div style="font-size:12px;margin-bottom:4px">• <code
+              style="background:var(--input-bg);padding:2px 4px;border-radius:3px">from:</code> — 指定アカウントが投稿したポスト</div>
+          <div style="font-size:12px;margin-bottom:4px">• <code
+              style="background:var(--input-bg);padding:2px 4px;border-radius:3px">to:</code> —
+            指定アカウント<b>への返信（リプライ）</b>のみ</div>
+          <div style="font-size:12px">• <code
+              style="background:var(--input-bg);padding:2px 4px;border-radius:3px">@</code> —
+            本文中に@ユーザー名が含まれる投稿（<b>メンション検索</b>、リプライ以外も含む）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 投稿タイプモーダル -->
+    <div class="section-modal-overlay" id="modal_type">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_type"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/toggle-left.svg" alt="" aria-hidden="true" /> 投稿タイプ</h3>
+        <div style="height:6px"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1">
+            <label class="muted-small" for="q_url" style="display:block;margin-bottom:6px"><b>URL検索（url:）</b></label>
+            <input id="q_url" type="text" placeholder="例: reddit.com"
+              style="width:100%;background:var(--input-bg);color:var(--text);padding:8px;border-radius:8px;border:1px solid var(--input-border);" />
+          </div>
+          <div style="flex:0 0 90px">
+            <button type="button" class="engagement-reset-btn" data-reset="q_url" style="width:100%">リセット</button>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="type-grid">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="muted-small" style="margin:0"><b>ツイートタイプ</b></div>
+            <button id="btn_type_reset" type="button" class="engagement-reset-btn"
+              title="全てのフィルターを未指定に戻す">全てリセット</button>
+          </div>
+          <div class="type-row">
+            <span class="type-label">リプライ</span>
+            <div class="tri-toggle" data-filter="replies">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">引用</span>
+            <div class="tri-toggle" data-filter="quote">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">リンク</span>
+            <div class="tri-toggle" data-filter="links">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">メディア</span>
+            <div class="tri-toggle" data-filter="media">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">画像</span>
+            <div class="tri-toggle" data-filter="images">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">動画</span>
+            <div class="tri-toggle" data-filter="videos">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">RT</span>
+            <div class="tri-toggle" data-filter="retweets">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">RTのみ</button>
+              <button type="button" data-val="exclude">RT除外</button>
+            </div>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="type-grid">
+          <div class="muted-small" style="margin-bottom:4px"><b>アカウントタイプ</b></div>
+          <div class="type-row">
+            <span class="type-label">公式</span>
+            <div class="tri-toggle" data-filter="verified">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+          <div class="type-row">
+            <span class="type-label">フォロー中</span>
+            <div class="tri-toggle" data-filter="following">
+              <button type="button" data-val="none" class="active-none">未指定</button>
+              <button type="button" data-val="only">限定</button>
+              <button type="button" data-val="exclude">除外</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:none">
+          <input type="checkbox" id="only_replies" aria-label="リプライ 限定"><input type="checkbox" id="exclude_replies"
+            aria-label="リプライ 除外">
+          <input type="checkbox" id="only_quote" aria-label="引用 限定"><input type="checkbox" id="exclude_quote"
+            aria-label="引用 除外">
+          <input type="checkbox" id="only_links" aria-label="リンク 限定"><input type="checkbox" id="exclude_links"
+            aria-label="リンク 除外">
+          <input type="checkbox" id="only_media" aria-label="メディア 限定"><input type="checkbox" id="exclude_media"
+            aria-label="メディア 除外">
+          <input type="checkbox" id="only_images" aria-label="画像 限定"><input type="checkbox" id="exclude_images"
+            aria-label="画像 除外">
+          <input type="checkbox" id="only_videos" aria-label="動画 限定"><input type="checkbox" id="exclude_videos"
+            aria-label="動画 除外">
+          <input type="checkbox" id="only_verified" aria-label="公式 限定"><input type="checkbox" id="exclude_verified"
+            aria-label="公式 除外">
+          <input type="checkbox" id="only_following" aria-label="フォロー中 限定">
+          <input type="checkbox" id="exclude_following" aria-label="フォロー中 除外">
+          <input type="checkbox" id="only_retweets" aria-label="RT 限定"><input type="checkbox" id="exclude_retweets"
+            aria-label="RT 除外">
+        </div>
+      </div>
+    </div>
+
+    <!-- ブックマークモーダル -->
+    <div class="section-modal-overlay" id="modal_bookmarks">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_bookmarks"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/bookmark.svg" alt="" aria-hidden="true" /> ブックマークの開き方</h3>
+        <div
+          style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid var(--accent-1);color:var(--muted);font-size:12px;line-height:1.6">
+          「検索欄あり」を優先する場合は <b>Web版（同一タブ）</b> を試してください。<br>
+          Xアプリ内ブラウザではアプリ仕様で閉じ方・表示が端末差で変わることがあります。
+        </div>
+
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <button type="button" class="secondary" data-bookmark-method="web_same" data-copy-query="true"
+            style="width:100%;text-align:left">コピーして Web版ブックマークを開く（同一タブ / 検索欄あり優先）</button>
+          <button type="button" class="secondary" data-bookmark-method="web_new" data-copy-query="true"
+            style="width:100%;text-align:left">コピーして Web版ブックマークを開く（新規タブ）</button>
+          <button type="button" class="secondary" data-bookmark-method="auto" data-copy-query="true"
+            style="width:100%;text-align:left">コピーして 自動判定で開く（従来）</button>
+          <button type="button" class="secondary" data-bookmark-method="x_scheme"
+            style="width:100%;text-align:left">Xアプリスキームで開く（x://bookmarks）</button>
+          <button type="button" class="secondary" data-bookmark-method="twitter_scheme"
+            style="width:100%;text-align:left">Twitterスキームで開く（twitter://bookmarks）</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- その他モーダル -->
+    <div class="section-modal-overlay" id="modal_other">
+      <div class="section-modal">
+        <button class="section-modal-close" data-close="modal_other"><img src="./image/x.svg" alt=""
+            aria-hidden="true" /></button>
+        <h3><img class="icon-inline" src="./image/gear.svg" alt="" aria-hidden="true" /> その他</h3>
+
+        <div
+          style="margin-top:8px;padding:10px;background:var(--collapse-content-bg);border-radius:8px;border-left:3px solid #f59e0b;color:var(--text);font-size:12px;line-height:1.6">
+          このサイトは <b>X（旧Twitter）公式とは無関係の非公式ツール</b>です。仕様変更や表示差異が発生する場合があります。
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="margin-bottom:10px">
+            <a href="https://note.com/5gkyu/n/nb27e77ff2315" target="_blank" rel="noopener noreferrer"
+              style="color:var(--accent-1);font-weight:700">コマンド説明（note）</a>
+          </div>
+          <div class="mini-apps-wrap">
+            <div class="muted-small" style="display:block;margin-bottom:8px;color:var(--text)"><b>ミニアプリ</b></div>
+            <div class="mini-apps">
+              <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/intent/" target="_blank"
+                rel="noopener noreferrer">
+                <div class="mini-head">
+                  <div>
+                    <div class="mini-title">Intentリンク作成</div>
+                    <div class="mini-desc">ツイート用テキストを作って短縮・テストできます（280字）</div>
+                  </div>
+                </div>
+                <div class="mini-action">開く</div>
+              </a>
+              <a class="mini-app-card" href="https://5gkyu.github.io/archive/app/x/dm/" target="_blank"
+                rel="noopener noreferrer">
+                <div class="mini-head">
+                  <div>
+                    <div class="mini-title">DMリンク作成</div>
+                    <div class="mini-desc">DM用リンクを簡単に生成</div>
+                  </div>
+                </div>
+                <div class="mini-action">開く</div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="muted-small" style="display:block;margin-bottom:6px;color:var(--text)">結果表示</div>
+          <div class="hint" style="color:var(--muted)">このツールは常に「最新」タブ（<b>f=live</b>）で開きます。<br><b>注意:</b>
+            アプリで開く場合、アプリ側の仕様で「話題」タブ表示になることがあります。</div>
+          <div class="hint">UIアイコンはPhosphor Iconsを使用しています。</div>
+        </div>
+        <button type="button" id="aux_pin" class="aux-pin" aria-label="外部リンク"></button>
+
+      </div>
+    </div>
+
+  </div>
 
   </div>
 
   <script src="x_script.js"></script>
 </body>
+
 </html>

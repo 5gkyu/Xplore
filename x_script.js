@@ -10,7 +10,7 @@ const STORAGE_KEY = 'xsearch_state_v3';
 const SAVE_DEBOUNCE_MS = 200;
 const OPEN_APP_TIMEOUT_MS = 1200;
 const STATE_FIELDS_SELECTOR = 'input[id^="q_"], select[id^="q_"], textarea[id^="q_"], input[id^="only_"], input[id^="exclude_"]';
-const DEFAULT_PHRASE_WRAP_MODE = 'triple';
+const DEFAULT_PHRASE_WRAP_MODE = 'double';
 
 function debounce(fn, ms){ let t; return function(){ clearTimeout(t); t = setTimeout(fn, ms); } }
 function splitTrim(s){ return s? String(s).trim().split(/\s+/).filter(x=>x):[] }
@@ -191,9 +191,7 @@ function openBookmarksPage(method){
 function resolveCurrentQuery(){
   var query = '';
   try {
-    if (typeof userEditedQuery !== 'undefined' && userEditedQuery && typeof manualQueryOverride === 'string' && manualQueryOverride.trim()) {
-      query = manualQueryOverride;
-    } else if (typeof buildQuery === 'function') {
+    if (typeof buildQuery === 'function') {
       query = buildQuery() || '';
     }
   } catch (e) {
@@ -578,12 +576,9 @@ let manualQueryOverride = null;
 let forceAutoQueryUpdate = false;
 
 function clearManualOverride(){
-  userEditedQuery = false;
-  manualQueryOverride = null;
 }
 
 function markAutoQueryUpdate(){
-  forceAutoQueryUpdate = true;
 }
 
 function syncTriToggleUI(){
@@ -940,15 +935,6 @@ document.addEventListener('DOMContentLoaded', function() {
       try { modalQueryText.focus(); } catch(e) {}
     }
     var saveModalQuery = function(){
-      var text = modalQueryText.value || '';
-      var top = document.getElementById('top_query_display');
-      if (top) {
-        var trimmed = text.trim();
-        top.textContent = trimmed || '（検索クエリがここに表示されます）';
-        userEditedQuery = !!trimmed;
-        manualQueryOverride = userEditedQuery ? trimmed : null;
-        scheduleSaveState();
-      }
     };
     var updateModalQueryAnalysis = function(){
       if (!modalQueryAnalysis) return;
@@ -986,11 +972,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // 保存ボタンは UI から削除されたため、個別のクリックハンドラは不要です。
 
-    if (modalQueryText) {
-      modalQueryText.addEventListener('input', function(){
-        updateModalQueryAnalysis();
-      });
-    }
+    // modalQueryText.addEventListener('input') removed because it is readonly
 
     modalQuery.addEventListener('click', function(e){
       if (e.target === modalQuery) {
@@ -1476,18 +1458,10 @@ function updateModalUsageIndicators(){
 
 function updatePreview() {
   try {
-    if (forceAutoQueryUpdate) {
-      clearManualOverride();
-      forceAutoQueryUpdate = false;
-    }
     var q = buildQuery();
     var topQueryDisplay = document.getElementById('top_query_display');
     if (topQueryDisplay) {
-      if (userEditedQuery && manualQueryOverride && manualQueryOverride.trim()) {
-        topQueryDisplay.textContent = manualQueryOverride;
-      } else {
-        topQueryDisplay.textContent = q || '（検索クエリがここに表示されます）';
-      }
+      topQueryDisplay.textContent = q || '（検索クエリがここに表示されます）';
     }
   } finally {
     updatePeriodDescription();
@@ -1591,9 +1565,9 @@ function resetAllInputs() {
 // bind top reset and any btn_reset
 document.addEventListener('DOMContentLoaded', function(){
   var topReset = document.getElementById('top_btn_reset');
-  if (topReset) topReset.addEventListener('click', function(){ if (confirm('全ての入力をリセットしますか？')) resetAllInputs(); });
+  if (topReset) topReset.addEventListener('click', function(){ resetAllInputs(); });
   var btnReset = document.getElementById('btn_reset');
-  if (btnReset) btnReset.addEventListener('click', function(){ if (confirm('全ての入力をリセットしますか？')) resetAllInputs(); });
+  if (btnReset) btnReset.addEventListener('click', function(){ resetAllInputs(); });
   var btnRestore = document.getElementById('btn_restore_query');
   if (btnRestore) {
     btnRestore.addEventListener('click', function(){ userEditedQuery = false; updatePreview(); try { document.getElementById('top_query_display').focus(); } catch(e){} });

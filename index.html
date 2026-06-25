@@ -2030,12 +2030,12 @@
           <input id="q_phrase_input" class="phrase-input" type="text" placeholder='検索ワードをここに入力' />
           <div class="phrase-mode-wrap" role="group" aria-label="検索ワードの囲み方">
             <span class="phrase-mode-label">囲み方</span>
-            <div class="phrase-mode-row">
-              <button type="button" class="phrase-mode-chip active" data-phrase-mode="double"
-                aria-pressed="true">"ワード"</button>
-              <button type="button" class="phrase-mode-chip" data-phrase-mode="triple"
-                aria-pressed="false">"""ワード"""</button>
-              <button type="button" class="phrase-mode-chip" data-phrase-mode="plain" aria-pressed="false">ワード</button>
+            <div class="phrase-mode-row" style="flex-wrap: wrap;">
+              <button type="button" class="phrase-mode-chip active" data-phrase-mode="double" aria-pressed="true">"単語"</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="triple" aria-pressed="false">"""単語"""</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="plain" aria-pressed="false">単語</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="exact_double" aria-pressed="false">"全文"</button>
+              <button type="button" class="phrase-mode-chip" data-phrase-mode="exact_triple" aria-pressed="false">"""全文"""</button>
             </div>
           </div>
         </div>

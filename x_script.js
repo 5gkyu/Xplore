@@ -19,7 +19,7 @@ function collapseSpaces(str){ return String(str||'').split(/\s+/).filter(x=>x &&
 
 function normalizePhraseWrapMode(mode){
   var m = String(mode || '').toLowerCase();
-  if (m === 'double' || m === 'triple' || m === 'plain') return m;
+  if (m === 'double' || m === 'triple' || m === 'plain' || m === 'exact_double' || m === 'exact_triple') return m;
   return DEFAULT_PHRASE_WRAP_MODE;
 }
 
@@ -52,6 +52,12 @@ function tokenizePhraseInput(input){
   var tokens = [];
   var buf = '';
   var inQuote = false;
+  
+  if (getPhraseWrapMode() === 'exact_double' || getPhraseWrapMode() === 'exact_triple') {
+    var trimmed = text.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  
   for (var i = 0; i < text.length; i++){
     var ch = text[i];
     if (ch === '"') {
@@ -1248,7 +1254,8 @@ function buildQuery() {
       if (t.startsWith('"') && t.endsWith('"')) return t;
       if (phraseWrapMode === 'plain') return t;
       var escaped = t.replace(/"/g, '\\"');
-      if (phraseWrapMode === 'double') return '"' + escaped + '"';
+      if (phraseWrapMode === 'double' || phraseWrapMode === 'exact_double') return '"' + escaped + '"';
+      if (phraseWrapMode === 'triple' || phraseWrapMode === 'exact_triple') return '"""' + escaped + '"""';
       return '"""' + escaped + '"""';
     });
     parts.push(processed.join(' '));
